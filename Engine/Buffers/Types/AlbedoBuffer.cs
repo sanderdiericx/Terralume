@@ -1,6 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
+using Color = Microsoft.Xna.Framework.Color;
+using Terraria;
 
-namespace Terralume.Engine.Buffers
+namespace Terralume.Engine.Buffers.Types
 {
     // Buffer storing pixel color data without lighting alterations
     public class AlbedoBuffer
@@ -16,15 +20,13 @@ namespace Terralume.Engine.Buffers
         }
 
         // Draw spriteBatch to stored RenderTarget
-        public void BeginRender(SpriteBatch spritebatch)
+        public void Render(SpriteBatch spriteBatch, SamplerState samplerState, Matrix transformationMatrix)
         {
             graphicsDevice.SetRenderTarget(RenderTarget);
-            spritebatch.Begin();
-        }
+            graphicsDevice.Clear(Color.Transparent);
 
-        // End drawing of spritebatch to stored RenderTarget
-        public void EndRender(SpriteBatch spriteBatch)
-        {
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, transformationMatrix);
+
             graphicsDevice.SetRenderTarget(null);
             spriteBatch.End();
         }
