@@ -3,7 +3,7 @@ using Terraria.ID;
 
 namespace Terralume.Engine.Materials
 {
-    internal static class MaterialMapper
+    public static class MaterialMapper
     {
         // Maps Terraria tile IDs to their respective MaterialData
         public static Dictionary<int, MaterialData> Tiles = new Dictionary<int, MaterialData>()
