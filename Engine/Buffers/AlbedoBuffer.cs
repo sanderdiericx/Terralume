@@ -25,6 +25,7 @@ namespace Terralume.Engine.Buffers
         // End drawing of spritebatch to stored RenderTarget
         public void EndRender(SpriteBatch spriteBatch)
         {
+            graphicsDevice.SetRenderTarget(null);
             spriteBatch.End();
         }
     }
