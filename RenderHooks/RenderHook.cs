@@ -1,5 +1,4 @@
-﻿using Humanizer;
-using Terralume.Engine.Buffers;
+﻿using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Types;
 using Terraria;
 using Terraria.ModLoader;
@@ -14,7 +13,11 @@ namespace Terralume.RenderHooks
         {
             base.OnModLoad();
 
-            bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
+            // Graphics related tasks must be performed on the main thread
+            Main.QueueMainThreadAction(() =>
+            {
+                bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+            });
         }
 
 
@@ -22,9 +25,11 @@ namespace Terralume.RenderHooks
         {
             base.PostDrawTiles();
 
+            // TO DO, CHECK FOR RESIZE, ON RESIZE BUILD NEW RENDERTARGETS
+
             AlbedoBuffer albedoBuffer = bufferManager.AlbedoBuffer;
 
-            albedoBuffer.Render(Main.spriteBatch, Main.DefaultSamplerState, Main.GameViewMatrix.TransformationMatrix);
+            albedoBuffer.Render();
         }
     }
 }
