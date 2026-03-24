@@ -1,15 +1,29 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Terralume.Engine.Buffers.Types;
+using System;
 
 namespace Terralume.Engine.Buffers
 {
-    public class BufferManager
+    public class BufferManager : IDisposable
     {
-        public AlbedoBuffer AlbedoBuffer;
+        public RenderTarget2D BackgroundBuffer;
+        public RenderTarget2D AlbedoBuffer;
+
+        public int Width;
+        public int Height;
 
         public BufferManager(GraphicsDevice graphicsDevice, int width, int height)
         {
-            AlbedoBuffer = new AlbedoBuffer(graphicsDevice, width, height);
+            BackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
+
+            Width = width;
+            Height = height;
+        }
+
+        void IDisposable.Dispose()
+        {
+            BackgroundBuffer.Dispose();
+            AlbedoBuffer.Dispose();
         }
     }
 }

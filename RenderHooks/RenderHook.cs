@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Humanizer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.IO;
+using Terralume.Engine.Buffers;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -9,18 +12,18 @@ namespace Terralume.RenderHooks
 {
     public class DeferredRendererSystem : ModSystem
     {
-        private RenderTarget2D albedoBuffer;
+        private BufferManager bufferManager;
+        private SpriteBatch deferredSpriteBatch;
 
         private int tick;
 
         public override void Load()
         {
-            // Nuke all background drawing
-            On_Main.DrawBackground += (orig, self) => { return; };
-            On_Main.DrawSurfaceBG += (orig, self) => { return; };
-            On_Main.DrawUnderworldBackground += (orig, self, flat) => { return; };
-            On_Main.DrawStarsInBackground += (orig, self, sceneArea, artificial) => { return; };
-            On_Main.DrawSunAndMoon += (orig, self, sceneArea, moonColor, sunColor, tempMushroomInfluence) => { return; };
+            Main.QueueMainThreadAction(() =>
+            {
+                bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
+            });
 
             On_Main.DrawWalls += StartHook;
             On_Main.DrawInterface += EndHook;
@@ -28,11 +31,31 @@ namespace Terralume.RenderHooks
             tick = 0;
         }
 
+        public override void Unload()
+        {
+            base.Unload();
+
+            On_Main.DrawWalls -= StartHook;
+            On_Main.DrawInterface -= EndHook;
+        }
+
         private void StartHook(On_Main.orig_DrawWalls orig, Main self)
         {
             UpdateBuffer();
 
-            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+            RenderTargetBinding[] oldTargets = Main.graphics.GraphicsDevice.GetRenderTargets();
+            Viewport oldViewport = Main.graphics.GraphicsDevice.Viewport;
+
+            RenderTarget2D backgroundBuffer = bufferManager.BackgroundBuffer;
+
+            // Copy the current screen target to our background buffer
+            Main.graphics.GraphicsDevice.SetRenderTarget(backgroundBuffer);
+            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            deferredSpriteBatch.End();
+
+            Main.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
+            Main.graphics.GraphicsDevice.Viewport = oldViewport;
 
             tick++;
 
@@ -42,21 +65,26 @@ namespace Terralume.RenderHooks
         private void EndHook(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
         {
             RenderTargetBinding[] oldTargets = Main.graphics.GraphicsDevice.GetRenderTargets();
+            Viewport oldViewport = Main.graphics.GraphicsDevice.Viewport;
+
+            RenderTarget2D albedoBuffer = bufferManager.AlbedoBuffer;
 
             // Copy the current screen target to our albedo buffer
             Main.graphics.GraphicsDevice.SetRenderTarget(albedoBuffer);
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            Main.spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
-            Main.spriteBatch.End();
+            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            deferredSpriteBatch.End();
 
             // Temporary debug
             if (tick > 600)
             {
                 tick = 0;
-                ExportDebugImage(albedoBuffer, "albedo_buffer");
+                ExportDebugImage(bufferManager.BackgroundBuffer, "background_buffer");
+                ExportDebugImage(bufferManager.AlbedoBuffer, "albedo_buffer");
             }
 
             Main.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
+            Main.graphics.GraphicsDevice.Viewport = oldViewport;
 
             // Draw UI normally
             orig(self, gameTime);
@@ -65,10 +93,10 @@ namespace Terralume.RenderHooks
         // Make sure all buffers match screen size
         private void UpdateBuffer()
         {
-            if (albedoBuffer == null || albedoBuffer.Width != Main.graphics.PreferredBackBufferWidth || albedoBuffer.Height != Main.graphics.PreferredBackBufferHeight)
+            if (bufferManager == null || bufferManager.Width != Main.graphics.PreferredBackBufferWidth || bufferManager.Height != Main.graphics.PreferredBackBufferHeight)
             {
-                albedoBuffer?.Dispose();
-                albedoBuffer = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.graphics.PreferredBackBufferWidth, Main.graphics.PreferredBackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
+                ((IDisposable)bufferManager).Dispose();
+                bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
             }
         }
 
