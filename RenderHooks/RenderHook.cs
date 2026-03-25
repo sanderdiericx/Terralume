@@ -1,11 +1,9 @@
-﻿using Humanizer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terralume.Engine.Buffers;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace Terralume.RenderHooks
@@ -25,8 +23,8 @@ namespace Terralume.RenderHooks
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
             });
 
-            On_Main.DrawWalls += StartHook;
-            On_Main.DrawInterface += EndHook;
+            On_Main.DoDraw_WallsAndBlacks += ClearForAlbedoHook;
+            On_Main.DrawInterface += CaptureAlbedoHook;
 
             tick = 0;
         }
@@ -35,56 +33,72 @@ namespace Terralume.RenderHooks
         {
             base.Unload();
 
-            On_Main.DrawWalls -= StartHook;
-            On_Main.DrawInterface -= EndHook;
+            On_Main.DoDraw_WallsAndBlacks -= ClearForAlbedoHook;
+            On_Main.DrawInterface -= CaptureAlbedoHook;
         }
 
-        private void StartHook(On_Main.orig_DrawWalls orig, Main self)
+        private void ClearForAlbedoHook(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
         {
+            tick++;
+
             UpdateBuffer();
 
-            RenderTargetBinding[] oldTargets = Main.graphics.GraphicsDevice.GetRenderTargets();
-            Viewport oldViewport = Main.graphics.GraphicsDevice.Viewport;
-
-            RenderTarget2D backgroundBuffer = bufferManager.BackgroundBuffer;
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy the current screen target to our background buffer
-            Main.graphics.GraphicsDevice.SetRenderTarget(backgroundBuffer);
+            device.SetRenderTarget(bufferManager.BackgroundBuffer);
+            device.Clear(Color.Transparent);
+
             deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
-            Main.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
-            Main.graphics.GraphicsDevice.Viewport = oldViewport;
+            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
 
-            tick++;
+            // Bake backgroundTarget into BackgroundBuffer before wiping it
+            device.SetRenderTarget(bufferManager.BackgroundBuffer);
+            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            deferredSpriteBatch.Draw(Main.instance.backgroundTarget, drawPos, Color.White);
+            deferredSpriteBatch.End();
+
+            device.SetRenderTarget(Main.instance.backgroundTarget);
+            device.Clear(Color.Transparent);
+
+            // Clear everything drawn so far so that the albedo buffer contains a transparent background
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
 
             orig(self);
         }
 
-        private void EndHook(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
-        {
-            RenderTargetBinding[] oldTargets = Main.graphics.GraphicsDevice.GetRenderTargets();
-            Viewport oldViewport = Main.graphics.GraphicsDevice.Viewport;
 
-            RenderTarget2D albedoBuffer = bufferManager.AlbedoBuffer;
+        private void CaptureAlbedoHook(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy the current screen target to our albedo buffer
-            Main.graphics.GraphicsDevice.SetRenderTarget(albedoBuffer);
+            device.SetRenderTarget(bufferManager.AlbedoBuffer);
+            device.Clear(Color.Transparent);
+
             deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
+
+            // Reset Terraria drawing state
+            device.SetRenderTargets(oldTargets);
+
+
             // Temporary debug
-            if (tick > 600)
+            if (tick > 1000)
             {
                 tick = 0;
                 ExportDebugImage(bufferManager.BackgroundBuffer, "background_buffer");
                 ExportDebugImage(bufferManager.AlbedoBuffer, "albedo_buffer");
             }
 
-            Main.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
-            Main.graphics.GraphicsDevice.Viewport = oldViewport;
 
             // Draw UI normally
             orig(self, gameTime);
@@ -104,7 +118,7 @@ namespace Terralume.RenderHooks
         private void ExportDebugImage(Texture2D texture, string fileName)
         {
             // Ensure the path exists in your Terraria save folder
-            string path = Path.Combine(@"C:\Users\marij\Documents\Terralume_Debug", fileName + ".png");
+            string path = Path.Combine(@"C:\Users\sande\Documents\Terralume_Debug", fileName + ".png");
 
             using (FileStream stream = File.OpenWrite(path))
             {
