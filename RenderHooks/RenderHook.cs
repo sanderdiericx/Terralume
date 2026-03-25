@@ -54,16 +54,8 @@ namespace Terralume.RenderHooks
             deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
-            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
-
             // Bake backgroundTarget into BackgroundBuffer before wiping it
-            device.SetRenderTarget(bufferManager.BackgroundBuffer);
-            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            deferredSpriteBatch.Draw(Main.instance.backgroundTarget, drawPos, Color.White);
-            deferredSpriteBatch.End();
-
-            device.SetRenderTarget(Main.instance.backgroundTarget);
-            device.Clear(Color.Transparent);
+           
 
             // Clear everything drawn so far so that the albedo buffer contains a transparent background
             device.SetRenderTargets(oldTargets);
@@ -78,14 +70,26 @@ namespace Terralume.RenderHooks
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
+
+            // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
+
+
             // Copy the current screen target to our albedo buffer
             device.SetRenderTarget(bufferManager.AlbedoBuffer);
             device.Clear(Color.Transparent);
+
+            // Bake underground background buffer into our albedo buffer.
+            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
+            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            deferredSpriteBatch.Draw(Main.instance.backgroundTarget, drawPos, Color.White);
+            deferredSpriteBatch.End();
 
             deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             deferredSpriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
+            device.SetRenderTarget(Main.instance.backgroundTarget);
+            device.Clear(Color.Transparent);
 
             // Reset Terraria drawing state
             device.SetRenderTargets(oldTargets);
