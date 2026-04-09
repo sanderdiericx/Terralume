@@ -37,7 +37,10 @@ namespace Terralume.Hooks
         {
             base.Unload();
 
-            bufferCollection.Dispose();
+            Main.QueueMainThreadAction(() =>
+            {
+                bufferCollection.Dispose();
+            });
 
             On_Main.DoDraw_WallsAndBlacks -= ClearForAlbedoHook;
             On_Main.DrawInterface -= CaptureAlbedoHook;

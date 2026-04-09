@@ -25,7 +25,7 @@ namespace Terralume.Engine.Buffers
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(Main.instance.backgroundTarget);
+            // device.SetRenderTarget(Main.instance.backgroundTarget);
             // device.Clear(Color.Transparent);
 
             // Reset Terraria drawing state
