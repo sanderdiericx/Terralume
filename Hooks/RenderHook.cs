@@ -1,16 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.IO;
 using Terralume.Engine.Buffers;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.RenderHooks
+namespace Terralume.Hooks
 {
-    public class DeferredRendererSystem : ModSystem
+    public class RenderHook : ModSystem
     {
-        private BufferManager bufferManager;
+        private BufferCollection bufferCollection;
         private SpriteBatch deferredSpriteBatch;
 
         private int tick;
@@ -19,11 +18,11 @@ namespace Terralume.RenderHooks
         {
             Main.QueueMainThreadAction(() =>
             {
-                bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
             });
 
-            On_Main.DoDraw_WallsAndBlacks += CaptureBackgroundHook;
+            On_Main.DoDraw_WallsAndBlacks += ClearForAlbedoHook;
             On_Main.DrawInterface += CaptureAlbedoHook;
 
             tick = 0;
@@ -33,17 +32,17 @@ namespace Terralume.RenderHooks
         {
             base.Unload();
 
-            On_Main.DoDraw_WallsAndBlacks -= CaptureBackgroundHook;
+            On_Main.DoDraw_WallsAndBlacks -= ClearForAlbedoHook;
             On_Main.DrawInterface -= CaptureAlbedoHook;
         }
 
-        private void CaptureBackgroundHook(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+        private void ClearForAlbedoHook(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
         {
             tick++;
 
             UpdateBuffer();
 
-            bufferManager.RenderBackgroundBuffer(deferredSpriteBatch);
+            BufferRenderer.RenderBackgroundBuffer(deferredSpriteBatch, bufferCollection.BackgroundBuffer);
 
             orig(self);
         }
@@ -54,14 +53,14 @@ namespace Terralume.RenderHooks
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
 
-            bufferManager.RenderAlbedoBuffer(deferredSpriteBatch);
+            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
 
             // Temporary debug
             if (tick > 1000)
             {
                 tick = 0;
-                ExportDebugImage(bufferManager.BackgroundBuffer, "background_buffer");
-                ExportDebugImage(bufferManager.AlbedoBuffer, "albedo_buffer");
+                ExportDebugImage(bufferCollection.BackgroundBuffer, "background_buffer");
+                ExportDebugImage(bufferCollection.AlbedoBuffer, "albedo_buffer");
             }
 
             // Draw UI normally
@@ -71,15 +70,15 @@ namespace Terralume.RenderHooks
         // Make sure all buffers match screen size
         private void UpdateBuffer()
         {
-            if (bufferManager == null || bufferManager.Width != Main.graphics.PreferredBackBufferWidth || bufferManager.Height != Main.graphics.PreferredBackBufferHeight)
+            if (bufferCollection.IsValid())
             {
-                ((IDisposable)bufferManager).Dispose();
-                bufferManager = new BufferManager(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                bufferCollection.Dispose();
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
             }
         }
 
         // VERY temporary debug
-        private void ExportDebugImage(Texture2D texture, string fileName)
+        public static void ExportDebugImage(Texture2D texture, string fileName)
         {
             // Ensure the path exists in your Terraria save folder
             string path = Path.Combine(@"C:\Users\sande\Documents\Terralume_Debug", fileName + ".png");

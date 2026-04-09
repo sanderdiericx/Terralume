@@ -1,7 +1,6 @@
-﻿using Terraria;
-using Terraria.ModLoader;
+﻿using Terraria.ModLoader;
 
-namespace Terralume.RenderHooks
+namespace Terralume.Hooks
 {
     public class LightingHook : GlobalWall
     {
