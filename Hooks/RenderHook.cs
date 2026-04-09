@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System.IO;
 using Terralume.Engine.Buffers;
 using Terraria;
@@ -11,6 +12,8 @@ namespace Terralume.Hooks
     {
         private BufferCollection bufferCollection;
         private SpriteBatch deferredSpriteBatch;
+
+        private RenderTarget2D currentRenderTarget;
 
         private int tick;
 
@@ -25,12 +28,16 @@ namespace Terralume.Hooks
             On_Main.DoDraw_WallsAndBlacks += ClearForAlbedoHook;
             On_Main.DrawInterface += CaptureAlbedoHook;
 
+            currentRenderTarget = Main.screenTarget;
+
             tick = 0;
         }
 
         public override void Unload()
         {
             base.Unload();
+
+            bufferCollection.Dispose();
 
             On_Main.DoDraw_WallsAndBlacks -= ClearForAlbedoHook;
             On_Main.DrawInterface -= CaptureAlbedoHook;
@@ -55,13 +62,29 @@ namespace Terralume.Hooks
 
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
 
-            // Temporary debug
-            if (tick > 1000)
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            if (tick > 10)
             {
                 tick = 0;
-                ExportDebugImage(bufferCollection.BackgroundBuffer, "background_buffer");
-                ExportDebugImage(bufferCollection.AlbedoBuffer, "albedo_buffer");
+
+                if (keyboardState.IsKeyDown(Keys.F5))
+                {
+                    Main.NewText("[DEBUG] Switching to albedo buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.AlbedoBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.F6))
+                {
+                    Main.NewText("[DEBUG] Switching to background buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.BackgroundBuffer;
+                }
             }
+
+            deferredSpriteBatch.Begin();
+            deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
+            deferredSpriteBatch.End();
 
             // Draw UI normally
             orig(self, gameTime);
@@ -70,25 +93,11 @@ namespace Terralume.Hooks
         // Make sure all buffers match screen size
         private void UpdateBuffer()
         {
-            if (bufferCollection.IsValid())
+            if (!bufferCollection.IsValid())
             {
                 bufferCollection.Dispose();
                 bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
             }
-        }
-
-        // VERY temporary debug
-        public static void ExportDebugImage(Texture2D texture, string fileName)
-        {
-            // Ensure the path exists in your Terraria save folder
-            string path = Path.Combine(@"C:\Users\sande\Documents\Terralume_Debug", fileName + ".png");
-
-            using (FileStream stream = File.OpenWrite(path))
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-            }
-
-            Main.NewText($"G-Buffer exported to: {path}", Color.Green);
         }
     }
 }
