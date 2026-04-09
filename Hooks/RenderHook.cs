@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.ModLoader.UI.ModBrowser;
 
 namespace Terralume.Hooks
 {
@@ -81,6 +84,19 @@ namespace Terralume.Hooks
                     Main.NewText("[DEBUG] Switching to background buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.BackgroundBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.H))
+                {
+                    try
+                    {
+                        ushort[] tileIDs = TileHelper.GetVisibleTiles().TileIDs;
+
+                        Main.NewText($"[DEBUG] Tile length: {tileIDs.Length}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Main.NewText(ex.Message);
+                    }
                 }
             }
 

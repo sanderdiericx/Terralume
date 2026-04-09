@@ -12,9 +12,9 @@ namespace Terralume.Engine.Shaders
 
         private static readonly Dictionary<EffectType, string> mappedEffects = new Dictionary<EffectType, string>()
         {
-            { EffectType.Depth, "Depth" },
-            { EffectType.Normal, "Normal" },
-            { EffectType.Material, "Material" }
+            { EffectType.Depth, "depth" },
+            { EffectType.Normal, "normal" },
+            { EffectType.Material, "material" }
         };
 
         private static Dictionary<EffectType, Effect> loadedEffects = new Dictionary<EffectType, Effect>();
