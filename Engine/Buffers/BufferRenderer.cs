@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Buffers
@@ -25,10 +27,29 @@ namespace Terralume.Engine.Buffers
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            // device.SetRenderTarget(Main.instance.backgroundTarget);
-            // device.Clear(Color.Transparent);
-
             // Reset Terraria drawing state
+            device.SetRenderTargets(oldTargets);
+        }
+
+        public static void RenderDepthBuffer(SpriteBatch spriteBatch, RenderTarget2D albedoBuffer, RenderTarget2D depthBuffer, Texture2D tileTexture)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(depthBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Depth);
+
+            effect.Parameters["TileTexture"]?.SetValue(tileTexture);
+            effect.Parameters["TileStride"]?.SetValue(TileHelper.GetHorizontalTileStride());
+            effect.Parameters["TileTextureSize"]?.SetValue(new Vector2(tileTexture.Width, tileTexture.Height));
+            effect.Parameters["ScreenOffset"]?.SetValue(new Vector2(Main.screenPosition.X % 16, Main.screenPosition.Y % 16));
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(albedoBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
             device.SetRenderTargets(oldTargets);
         }
 

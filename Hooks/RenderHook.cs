@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI.ModBrowser;
 
 namespace Terralume.Hooks
 {
@@ -25,6 +25,8 @@ namespace Terralume.Hooks
             {
                 bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
+
+                EffectManager.LoadEffect(EffectType.Depth);
             });
 
             On_Main.DoDraw_WallsAndBlacks += ClearForAlbedoHook;
@@ -64,39 +66,58 @@ namespace Terralume.Hooks
         {
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
+            TileSearchResult tileSearchResult = TileHelper.GetVisibleTiles();
+
+            TileHelper.PackTileTexture(bufferCollection.TileTexture, tileSearchResult.Tiles);
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.screenTarget, bufferCollection.DepthBuffer, bufferCollection.TileTexture);
 
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
 
             KeyboardState keyboardState = Keyboard.GetState();
 
-            if (tick > 10)
+            if (tick > 5)
             {
                 tick = 0;
 
-                if (keyboardState.IsKeyDown(Keys.F5))
+                if (keyboardState.IsKeyDown(Keys.NumPad1))
                 {
                     Main.NewText("[DEBUG] Switching to albedo buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.AlbedoBuffer;
                 }
-                else if (keyboardState.IsKeyDown(Keys.F6))
+                else if (keyboardState.IsKeyDown(Keys.NumPad2))
                 {
                     Main.NewText("[DEBUG] Switching to background buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.BackgroundBuffer;
                 }
+                else if (keyboardState.IsKeyDown(Keys.NumPad3))
+                {
+                    Main.NewText("[DEBUG] Switching to depth buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.DepthBuffer;
+                }
                 else if (keyboardState.IsKeyDown(Keys.H))
                 {
-                    try
-                    {
-                        ushort[] tileIDs = TileHelper.GetVisibleTiles().TileIDs;
+                    bool[] tiles = tileSearchResult.Tiles;
+                    int tileStride = TileHelper.GetHorizontalTileStride();
+                    string output = "\n";
 
-                        Main.NewText($"[DEBUG] Tile length: {tileIDs.Length}");
-                    }
-                    catch (Exception ex)
+                    int height = tiles.Length / tileStride;
+
+                    for (int i = 0; i < height; i++)
                     {
-                        Main.NewText(ex.Message);
+                        for (int j = 0; j < tileStride; j++)
+                        {
+                            int index = j + (tileStride * i);
+
+                            output += tiles[index] ? "#" : " ";
+                        }
+
+                        output += "\n";
                     }
+
+                    Mod.Logger.Debug(output);
                 }
             }
 

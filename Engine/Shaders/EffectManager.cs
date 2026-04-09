@@ -17,33 +17,26 @@ namespace Terralume.Engine.Shaders
             { EffectType.Material, "material" }
         };
 
-        private static Dictionary<EffectType, Effect> loadedEffects = new Dictionary<EffectType, Effect>();
+        private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();
 
         public static void LoadEffect(EffectType effectType)
         {
-            Asset<Effect> asset = null;
-
-            Main.QueueMainThreadAction(() =>
+            if (!loadedEffects.ContainsKey(effectType))
             {
-                asset = ModContent.Request<Effect>($"{effectPath}{mappedEffects[effectType]}");
-
-                if (!loadedEffects.TryAdd(effectType, asset.Value))
-                {
-                    loadedEffects[effectType] = asset.Value;
-                }
-            });
+                Asset<Effect> asset = ModContent.Request<Effect>($"{effectPath}{mappedEffects[effectType]}", AssetRequestMode.ImmediateLoad);
+                loadedEffects.Add(effectType, asset);
+            }
         }
 
         public static Effect GetEffect(EffectType effectType)
         {
-            if (!loadedEffects.TryGetValue(effectType, out Effect effect))
+            if (loadedEffects.TryGetValue(effectType, out Asset<Effect> asset))
             {
-                LoadEffect(effectType);
-
-                effect = GetEffect(effectType);
+                return asset.Value;
             }
 
-            return effect;
+            LoadEffect(effectType);
+            return loadedEffects[effectType].Value;
         }
     }
 }

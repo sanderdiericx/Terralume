@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
-using Terraria.ModLoader.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Terralume.Engine.Utils
 {
+    // TO DO, optimize by caching pixel color arrays and others
     public static class TileHelper
     {
-        // Builds flat 2 arrays for all visible tiles, One array contains tile IDs, an array specifying if that index contains a tile or not.
+        // Builds flat 2 arrays for all visible tiles, One array contains tile IDs, the other specifies which indices contain tiles.
         //
         // Note: Indices without tiles will recieve tile ID 0 by default.
         public static TileSearchResult GetVisibleTiles()
@@ -66,7 +63,7 @@ namespace Terralume.Engine.Utils
         }
 
         // Finds the amount of tiles spanning the x axis visible on screen
-        public static int GetHorizontalScreenTileLength()
+        public static int GetHorizontalTileStride()
         {
             Vector2 screenPos = Main.screenPosition;
 
@@ -86,7 +83,10 @@ namespace Terralume.Engine.Utils
         public static void PackTileIDTexture(Texture2D tileIDTexture, ushort[] tileIDs)
         {
             int pixelCount = (tileIDs.Length + 1) / 2; // Ceiling division
-            Color[] pixels = new Color[pixelCount];
+
+            Color[] pixels = new Color[tileIDTexture.Width * tileIDTexture.Height];
+
+            int safePixelCount = Math.Min(pixelCount, pixels.Length);
 
             for (int i = 0; i < pixelCount; i++)
             {
@@ -109,9 +109,12 @@ namespace Terralume.Engine.Utils
         public static void PackTileTexture(Texture2D tileTexture, bool[] tiles)
         {
             int pixelCount = (tiles.Length + 3) / 4; // Ceiling division
-            Color[] pixels = new Color[pixelCount];
 
-            for (int i = 0; i < pixelCount; i++)
+            Color[] pixels = new Color[tileTexture.Width * tileTexture.Height];
+
+            int safePixelCount = Math.Min(pixelCount, pixels.Length);
+
+            for (int i = 0; i < safePixelCount; i++)
             {
                 byte[] values = { 0, 0, 0, 0 };
 
