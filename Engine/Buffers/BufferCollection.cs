@@ -7,8 +7,11 @@ namespace Terralume.Engine.Buffers
     public class BufferCollection : IDisposable
     {
         public RenderTarget2D BackgroundBuffer;
+        public RenderTarget2D UndergroundBackgroundBuffer;
         public RenderTarget2D AlbedoBuffer;
         public RenderTarget2D DepthBuffer;
+
+        public RenderTarget2D StableTileTarget;
 
         public Texture2D TileIDTexture;
         public Texture2D TileTexture;
@@ -19,8 +22,11 @@ namespace Terralume.Engine.Buffers
         public BufferCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
             BackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
+
+            StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
 
             TileIDTexture = new Texture2D(graphicsDevice, 150, 150);
             TileTexture = new Texture2D(graphicsDevice, 150, 150);
@@ -37,8 +43,11 @@ namespace Terralume.Engine.Buffers
         public void Dispose()
         {
             BackgroundBuffer.Dispose();
+            UndergroundBackgroundBuffer.Dispose();
             AlbedoBuffer.Dispose();
             DepthBuffer.Dispose();
+
+            StableTileTarget.Dispose();
 
             TileIDTexture.Dispose();
             TileTexture.Dispose();

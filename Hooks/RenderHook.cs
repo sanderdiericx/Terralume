@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.IO;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -56,7 +57,10 @@ namespace Terralume.Hooks
 
             UpdateBuffer();
 
-            BufferRenderer.RenderBackgroundBuffer(deferredSpriteBatch, bufferCollection.BackgroundBuffer);
+            BufferRenderer.CopyBackgroundBuffer(deferredSpriteBatch, bufferCollection.BackgroundBuffer);
+            BufferRenderer.CopyUnderGroundBackgroundBuffer(deferredSpriteBatch, bufferCollection.UndergroundBackgroundBuffer);
+
+            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
 
             orig(self);
         }
@@ -66,11 +70,9 @@ namespace Terralume.Hooks
         {
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
-            TileSearchResult tileSearchResult = TileHelper.GetVisibleTiles();
+            BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection.StableTileTarget);
 
-            TileHelper.PackTileTexture(bufferCollection.TileTexture, tileSearchResult.Tiles);
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.instance.tileTarget, bufferCollection.DepthBuffer, bufferCollection.TileTexture);
-
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.screenTarget, bufferCollection.DepthBuffer, bufferCollection.StableTileTarget, bufferCollection.UndergroundBackgroundBuffer);
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
 
             KeyboardState keyboardState = Keyboard.GetState();
@@ -101,9 +103,26 @@ namespace Terralume.Hooks
                 {
                     Main.NewText("[DEBUG] Switching to tile buffer view", Color.Green);
 
-                    currentRenderTarget = Main.instance.tileTarget;
+                    currentRenderTarget = bufferCollection.StableTileTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad5))
+                {
+                    Main.NewText("[DEBUG] Switching to underground background buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.UndergroundBackgroundBuffer;
                 }
             }
+
+            if (keyboardState.IsKeyDown(Keys.H))
+            {
+                Main.NewText("[DEBUG] Exporting");
+
+                using (FileStream fs = new FileStream("C:\\Users\\sande\\Documents\\Terralume_Debug\\backtroundTarget.png", FileMode.Create))
+                {
+                    bufferCollection.AlbedoBuffer.SaveAsPng(fs, bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
+                }
+            }
+
 
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
