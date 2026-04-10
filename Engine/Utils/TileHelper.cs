@@ -14,47 +14,40 @@ namespace Terralume.Engine.Utils
         public static TileSearchResult GetVisibleTiles()
         {
             Vector2 screenPos = Main.screenPosition;
-
             Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
             if (Main.GameViewMatrix != null)
             {
                 viewSize /= Main.GameViewMatrix.Zoom;
             }
 
+            int strideX = (int)Math.Ceiling(viewSize.X / 16.0) + 2;
+            int strideY = (int)Math.Ceiling(viewSize.Y / 16.0) + 2;
+
             int minTileX = (int)Math.Floor(screenPos.X / 16.0);
-            int maxTileX = (int)Math.Ceiling((screenPos.X + viewSize.X) / 16.0);
-
             int minTileY = (int)Math.Floor(screenPos.Y / 16.0);
-            int maxTileY = (int)Math.Ceiling((screenPos.Y + viewSize.Y) / 16.0);
 
-            int xSize = maxTileX - minTileX + 1;
-            int ySize = maxTileY - minTileY + 1;
+            int maxTileX = minTileX + strideX - 1;
+            int maxTileY = minTileY + strideY - 1;
 
-            ushort[] tileIDs = new ushort[xSize * ySize];
-            bool[] tiles = new bool[xSize * ySize];
+            ushort[] tileIDs = new ushort[strideX * strideY];
+            bool[] tiles = new bool[strideX * strideY];
 
             int count = 0;
 
-            for (int i = minTileX; i <= maxTileX; i++)
+            for (int i = minTileY; i <= maxTileY; i++)
             {
-                for (int j = minTileY; j <= maxTileY; j++)
+                for (int j = minTileX; j <= maxTileX; j++)
                 {
-                    int localX = i - minTileX;
-                    int localY = j - minTileY;
-
-                    if (i < 0 || i >= Main.maxTilesX || j < 0 || j >= Main.maxTilesY)
+                    if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY)
                     {
                         tileIDs[count] = 0;
                         tiles[count] = false;
-
-                        count++;
-
-                        continue;
                     }
-
-                    tileIDs[count] = (ushort)(Main.tile[i, j].HasTile ? Main.tile[i, j].TileType : 0);
-                    tiles[count] = Main.tile[i, j].HasTile;
-
+                    else
+                    {
+                        tileIDs[count] = (ushort)(Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : 0);
+                        tiles[count] = Main.tile[j, i].HasTile;
+                    }
                     count++;
                 }
             }
@@ -62,21 +55,26 @@ namespace Terralume.Engine.Utils
             return new TileSearchResult(tileIDs, tiles);
         }
 
-        // Finds the amount of tiles spanning the x axis visible on screen
         public static int GetHorizontalTileStride()
         {
-            Vector2 screenPos = Main.screenPosition;
-
             Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
             if (Main.GameViewMatrix != null)
             {
                 viewSize /= Main.GameViewMatrix.Zoom;
             }
 
-            int minTileX = (int)Math.Floor(screenPos.X / 16.0);
-            int maxTileX = (int)Math.Ceiling((screenPos.X + viewSize.X) / 16.0);
+            return (int)Math.Ceiling(viewSize.X / 16.0) + 2;
+        }
 
-            return maxTileX - minTileX + 1;
+        public static int GetVerticalTileStride()
+        {
+            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            if (Main.GameViewMatrix != null)
+            {
+                viewSize /= Main.GameViewMatrix.Zoom;
+            }
+
+            return (int)Math.Ceiling(viewSize.Y / 16.0) + 2;
         }
 
         // Encodes an array of ushorts into a 2D texture

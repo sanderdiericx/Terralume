@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
@@ -33,6 +34,15 @@ namespace Terralume.Engine.Buffers
 
         public static void RenderDepthBuffer(SpriteBatch spriteBatch, RenderTarget2D albedoBuffer, RenderTarget2D depthBuffer, Texture2D tileTexture)
         {
+            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            if (Main.GameViewMatrix != null)
+            {
+                viewSize /= Main.GameViewMatrix.Zoom;
+            }
+
+            int minTileX = (int)Math.Floor(Main.screenPosition.X / 16.0);
+            int minTileY = (int)Math.Floor(Main.screenPosition.Y / 16.0);
+
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
@@ -41,10 +51,16 @@ namespace Terralume.Engine.Buffers
 
             Effect effect = EffectManager.GetEffect(EffectType.Depth);
 
-            effect.Parameters["TileTexture"]?.SetValue(tileTexture);
-            effect.Parameters["TileStride"]?.SetValue(TileHelper.GetHorizontalTileStride());
-            effect.Parameters["TileTextureSize"]?.SetValue(new Vector2(tileTexture.Width, tileTexture.Height));
-            effect.Parameters["ScreenOffset"]?.SetValue(new Vector2(Main.screenPosition.X % 16, Main.screenPosition.Y % 16));
+            effect.Parameters["TileTexture"].SetValue(tileTexture);
+            effect.Parameters["TileStride"].SetValue(new Vector2(TileHelper.GetHorizontalTileStride(), TileHelper.GetVerticalTileStride()));
+            effect.Parameters["TileTextureSize"].SetValue(new Vector2(tileTexture.Width, tileTexture.Height));
+
+            effect.Parameters["ScreenPosition"].SetValue(Main.screenPosition);
+            effect.Parameters["ViewSize"].SetValue(viewSize);
+            effect.Parameters["MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
+
+            // Prevent monogame from blurring TileTexture data
+            device.SamplerStates[1] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(albedoBuffer, Vector2.Zero, Color.White);

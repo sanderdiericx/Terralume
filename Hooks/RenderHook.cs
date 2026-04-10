@@ -69,13 +69,13 @@ namespace Terralume.Hooks
             TileSearchResult tileSearchResult = TileHelper.GetVisibleTiles();
 
             TileHelper.PackTileTexture(bufferCollection.TileTexture, tileSearchResult.Tiles);
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.screenTarget, bufferCollection.DepthBuffer, bufferCollection.TileTexture);
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.instance.tileTarget, bufferCollection.DepthBuffer, bufferCollection.TileTexture);
 
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
 
             KeyboardState keyboardState = Keyboard.GetState();
 
-            if (tick > 5)
+            if (tick > 10)
             {
                 tick = 0;
 
@@ -97,27 +97,11 @@ namespace Terralume.Hooks
 
                     currentRenderTarget = bufferCollection.DepthBuffer;
                 }
-                else if (keyboardState.IsKeyDown(Keys.H))
+                else if (keyboardState.IsKeyDown(Keys.NumPad4))
                 {
-                    bool[] tiles = tileSearchResult.Tiles;
-                    int tileStride = TileHelper.GetHorizontalTileStride();
-                    string output = "\n";
+                    Main.NewText("[DEBUG] Switching to tile buffer view", Color.Green);
 
-                    int height = tiles.Length / tileStride;
-
-                    for (int i = 0; i < height; i++)
-                    {
-                        for (int j = 0; j < tileStride; j++)
-                        {
-                            int index = j + (tileStride * i);
-
-                            output += tiles[index] ? "#" : " ";
-                        }
-
-                        output += "\n";
-                    }
-
-                    Mod.Logger.Debug(output);
+                    currentRenderTarget = Main.instance.tileTarget;
                 }
             }
 

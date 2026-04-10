@@ -1,9 +1,23 @@
 ﻿sampler2D AlbedoTexture : register(s0);
-sampler2D TileTexture : register(s1);
 
-int TileStride;
+float2 TileStride;
 float2 TileTextureSize;
-float2 ScreenOffset;
+float2 ScreenPosition;
+float2 ViewSize;
+float2 MinTilePosition;
+
+Texture2D TileTexture;
+
+sampler TileSampler = sampler_state
+{
+    Texture = (TileTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 
 struct PixelShaderInput
 {
@@ -14,31 +28,41 @@ struct PixelShaderInput
 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
-	float4 textureColor = tex2D(AlbedoTexture, input.TexCoord);
-	
-	if (textureColor.a < 0.01)
+	if (tex2D(AlbedoTexture, input.TexCoord).a < 0.01)
 	{
 		return float4(0.9, 0.9, 0.9, 1.0);
 	}
 
-	// Find the tile at this position
-	int tileX = (int)((input.Position.x - ScreenOffset.x) / 16.0);
-	int tileY = (int)((input.Position.y - ScreenOffset.y) / 16.0);
-	int tileIndex = tileY * TileStride + tileX;
-	
-	// Decode from tile map
-	int pixelIndex = tileIndex / 4;
-	int channelIndex = tileIndex % 4;
+	float2 worldPosition = ScreenPosition + (input.TexCoord * ViewSize) + 0.5;
+	int worldTileX = (int)floor(worldPosition.x / 16.0);
+	int worldTileY = (int)floor(worldPosition.y / 16.0);
 
-	float pixelX = (float)(pixelIndex % (int)TileTextureSize.x);
-    float pixelY = (float)(pixelIndex / (int)TileTextureSize.x);
-    
-    // Normalize and offset by 0.5 to hit pixel centers
-    float2 tileUV = (float2(pixelX, pixelY) + 0.5) / TileTextureSize;
-    float4 sampledTile = tex2D(TileTexture, tileUV);
+	int tileX = (int)round((float)worldTileX - MinTilePosition.x);
+	int tileY = (int)round((float)worldTileY - MinTilePosition.y);
 
-	float mask[4] = { sampledTile.r, sampledTile.g, sampledTile.b, sampledTile.a };
-	bool tile = mask[channelIndex] > 0.5;
+	tileX = clamp(tileX, 0, TileStride.x - 1);
+	tileY = clamp(tileY, 0, TileStride.y - 1);
+
+	int tileIndex = tileY * TileStride.x + tileX;
+
+	int pixelIndex  = (int)floor((float)tileIndex / 4.0);
+	int channelIndex = tileIndex - pixelIndex * 4;
+
+	float tw = TileTextureSize.x;
+	float pixelX = fmod((float)pixelIndex, tw);
+	float pixelY = floor((float)pixelIndex / tw);
+
+	float2 tileUV = (float2(pixelX, pixelY) + 0.5) / TileTextureSize;
+	float4 sampledTile = tex2D(TileSampler, tileUV);
+
+	float4 channels = sampledTile;
+	float tileVal;
+	if (channelIndex == 0) tileVal = channels.r;
+	else if (channelIndex == 1) tileVal = channels.g;
+	else if (channelIndex == 2) tileVal = channels.b;
+	else tileVal = channels.a;
+
+	bool tile = tileVal > 0.5;
 
 	if (tile)
 	{
