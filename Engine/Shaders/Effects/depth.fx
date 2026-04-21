@@ -58,7 +58,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 	// Pixel could be a wall
 	if (wall.a > 0.01)
 	{
-		float dist = distance(albedo.xyz, wall.xyz);
+		float dist = distance(albedo.rgb, wall.rgb);
 
 		// Albedo buffer and wall buffer contain ~ the same pixel (probably a wall)
 		// NOTE: Might cause artifacts, improve in the future

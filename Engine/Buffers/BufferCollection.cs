@@ -13,12 +13,13 @@ namespace Terralume.Engine.Buffers
 
         public RenderTarget2D AlbedoBuffer;
         public RenderTarget2D DepthBuffer;
+        public RenderTarget2D MaterialBuffer;
 
         public RenderTarget2D StableTileTarget;
         public RenderTarget2D StableWallTarget;
 
         public Texture2D TileIDTexture;
-        public Texture2D TileTexture;
+        public Texture2D MaterialTexture;
 
         public int Width;
         public int Height;
@@ -32,12 +33,13 @@ namespace Terralume.Engine.Buffers
 
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
             StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
             StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
 
-            TileIDTexture = new Texture2D(graphicsDevice, 150, 150);
-            TileTexture = new Texture2D(graphicsDevice, 150, 150);
+            TileIDTexture = new Texture2D(graphicsDevice, 256, 256);
+            MaterialTexture = new Texture2D(graphicsDevice, 256, 256);
 
             Width = width;
             Height = height;
@@ -57,12 +59,15 @@ namespace Terralume.Engine.Buffers
 
             AlbedoBuffer.Dispose();
             DepthBuffer.Dispose();
+            MaterialBuffer.Dispose();
 
             StableTileTarget.Dispose();
             StableWallTarget.Dispose();
 
             TileIDTexture.Dispose();
-            TileTexture.Dispose();
+            MaterialTexture.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

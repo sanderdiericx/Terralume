@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Buffers
@@ -45,6 +47,46 @@ namespace Terralume.Engine.Buffers
 
             device.SamplerStates[1] = SamplerState.PointClamp;
             device.SamplerStates[2] = SamplerState.PointClamp;
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, RenderTarget2D screenTarget)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.MaterialBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Material);
+
+            effect.Parameters["TileStride"].SetValue(TileHelper.GetTileStride());
+            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(bufferCollection.TileIDTexture.Width, bufferCollection.TileIDTexture.Height));
+
+            effect.Parameters["ScreenPosition"].SetValue(Main.screenPosition);
+
+            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            effect.Parameters["ViewSize"].SetValue(viewSize);
+
+            int minTileX = (int)Math.Floor(Main.screenPosition.X / 16f);
+            int minTileY = (int)Math.Floor(Main.screenPosition.Y / 16f);
+
+            effect.Parameters["MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
+
+            effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(bufferCollection.MaterialTexture.Width, bufferCollection.MaterialTexture.Height));
+
+            effect.Parameters["TileTarget"].SetValue(bufferCollection.StableTileTarget);
+            effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
+            effect.Parameters["MaterialTexture"].SetValue(bufferCollection.MaterialTexture);
+
+            device.SamplerStates[1] = SamplerState.PointClamp;
+            device.SamplerStates[2] = SamplerState.PointClamp;
+            device.SamplerStates[3] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);

@@ -4,7 +4,9 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Buffers;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.Enums;
 using Terraria.ID;
@@ -32,6 +34,7 @@ namespace Terralume.Hooks
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
                 EffectManager.LoadEffect(EffectType.Depth);
+                EffectManager.LoadEffect(EffectType.Material);
             });
 
             On_Main.RenderBackground += On_Main_RenderBackground;
@@ -84,11 +87,16 @@ namespace Terralume.Hooks
         private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
         {
             // TO DO: SAMPLE Main.screenTarget here to build normal and material buffer.
+            short[] tileIDs = TileHelper.GetVisibleTiles();
+
+            TileHelper.PackTileIDTexture(bufferCollection.TileIDTexture, tileIDs);
+            TileHelper.PackMaterialTexture(bufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
             BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection);
             BufferRenderer.CopyWallTarget(deferredSpriteBatch, bufferCollection);
 
             BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, Main.screenTarget);
+            BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, Main.screenTarget);
 
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection);
 
@@ -143,6 +151,12 @@ namespace Terralume.Hooks
                     Main.NewText("[DEBUG] Switching to wall target view", Color.Green);
 
                     currentRenderTarget = bufferCollection.StableWallTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad8))
+                {
+                    Main.NewText("[DEBUG] Switching to material buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.MaterialBuffer;
                 }
             }
 

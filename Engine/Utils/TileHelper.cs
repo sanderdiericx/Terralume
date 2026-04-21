@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Build.Evaluation;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 
 namespace Terralume.Engine.Utils
@@ -8,10 +11,10 @@ namespace Terralume.Engine.Utils
     // TO DO, optimize by caching pixel color arrays and others
     public static class TileHelper
     {
-        // Builds flat 2 arrays for all visible tiles, One array contains tile IDs, the other specifies which indices contain tiles.
+        // Builds a flat array with tile ids of all visible tiles
         //
-        // Note: Indices without tiles will recieve tile ID 0 by default.
-        public static TileSearchResult GetVisibleTiles()
+        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
+        public static short[] GetVisibleTiles()
         {
             Vector2 screenPos = Main.screenPosition;
             Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
@@ -29,8 +32,7 @@ namespace Terralume.Engine.Utils
             int maxTileX = minTileX + strideX - 1;
             int maxTileY = minTileY + strideY - 1;
 
-            ushort[] tileIDs = new ushort[strideX * strideY];
-            bool[] tiles = new bool[strideX * strideY];
+            short[] tileIDs = new short[strideX * strideY];
 
             int count = 0;
 
@@ -41,21 +43,21 @@ namespace Terralume.Engine.Utils
                     if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY)
                     {
                         tileIDs[count] = 0;
-                        tiles[count] = false;
                     }
                     else
                     {
-                        tileIDs[count] = (ushort)(Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : 0);
-                        tiles[count] = Main.tile[j, i].HasTile;
+                        tileIDs[count] = (short)(Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : -1);
                     }
+
                     count++;
                 }
             }
 
-            return new TileSearchResult(tileIDs, tiles);
+            return tileIDs;
         }
 
-        public static int GetHorizontalTileStride()
+
+        public static Vector2 GetTileStride()
         {
             Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
             if (Main.GameViewMatrix != null)
@@ -63,22 +65,12 @@ namespace Terralume.Engine.Utils
                 viewSize /= Main.GameViewMatrix.Zoom;
             }
 
-            return (int)Math.Ceiling(viewSize.X / 16.0) + 2;
+            return new Vector2((int)Math.Ceiling(viewSize.X / 16.0) + 2, (int)Math.Ceiling(viewSize.Y / 16.0) + 2);
         }
 
-        public static int GetVerticalTileStride()
-        {
-            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            if (Main.GameViewMatrix != null)
-            {
-                viewSize /= Main.GameViewMatrix.Zoom;
-            }
 
-            return (int)Math.Ceiling(viewSize.Y / 16.0) + 2;
-        }
-
-        // Encodes an array of ushorts into a 2D texture
-        public static void PackTileIDTexture(Texture2D tileIDTexture, ushort[] tileIDs)
+        // Encodes an array of shorts into a 2D texture
+        public static void PackTileIDTexture(Texture2D tileIDTexture, short[] tileIDs)
         {
             int pixelCount = (tileIDs.Length + 1) / 2; // Ceiling division
 
@@ -89,8 +81,8 @@ namespace Terralume.Engine.Utils
             for (int i = 0; i < pixelCount; i++)
             {
                 int index = i * 2;
-                ushort u0 = tileIDs[index];
-                ushort u1 = (index + 1 < tileIDs.Length) ? tileIDs[index + 1] : (ushort)0;
+                short u0 = tileIDs[index];
+                short u1 = (index + 1 < tileIDs.Length) ? tileIDs[index + 1] : (short)-1;
 
                 pixels[i] = new Color(
                     (byte)(u0 & 0xFF), // low byte of u0
@@ -103,33 +95,20 @@ namespace Terralume.Engine.Utils
             tileIDTexture.SetData(pixels);
         }
 
-        // Encodes an array of booleans into a 2D texture
-        public static void PackTileTexture(Texture2D tileTexture, bool[] tiles)
+        // Encodes a dictionary mapping tile ID to material vector into a texture, the position inside of a color inside the texture refers to its tile ID
+        public static void PackMaterialTexture(Texture2D materialTexture, Dictionary<int, Vector3> mappedMaterials)
         {
-            int pixelCount = (tiles.Length + 3) / 4; // Ceiling division
+            Color[] pixels = new Color[materialTexture.Width * materialTexture.Height];
 
-            Color[] pixels = new Color[tileTexture.Width * tileTexture.Height];
-
-            int safePixelCount = Math.Min(pixelCount, pixels.Length);
-
-            for (int i = 0; i < safePixelCount; i++)
+            for (int i = 0; i < pixels.Length; i++)
             {
-                byte[] values = { 0, 0, 0, 0 };
+                Vector3 color = new Vector3(0.0f, 0.0f, 0.0f);
+                mappedMaterials.TryGetValue(i, out color);
 
-                // Take 4 booleans from the tiles array and convert them into bytes
-                for (int j = 0; j < 4; j++)
-                {
-                    if (i * 4 + j < tiles.Length)
-                    {
-                        values[j] = tiles[i * 4 + j] ? (byte)255 : (byte)0;
-                    }
-                }
-
-                // Encode into each color channel
-                pixels[i] = new Color(values[0], values[1], values[2], values[3]);
+                pixels[i] = new Color(color.X, color.Y, color.Z);
             }
 
-            tileTexture.SetData(pixels);
+            materialTexture.SetData(pixels);
         }
     }
 }
