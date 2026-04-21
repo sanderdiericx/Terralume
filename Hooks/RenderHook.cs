@@ -1,11 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.IO;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
-using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -17,6 +15,9 @@ namespace Terralume.Hooks
         private SpriteBatch deferredSpriteBatch;
 
         private RenderTarget2D currentRenderTarget;
+
+        private bool backgroundRedrawn;
+
 
         private int tick;
 
@@ -30,8 +31,11 @@ namespace Terralume.Hooks
                 EffectManager.LoadEffect(EffectType.Depth);
             });
 
-            On_Main.DoDraw_WallsAndBlacks += ClearForAlbedoHook;
-            On_Main.DrawInterface += CaptureAlbedoHook;
+            On_Main.RenderBackground += On_Main_RenderBackground;
+            On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
+            On_Main.DrawInterface += On_Main_DrawInterface;
+
+            backgroundRedrawn = false;
 
             currentRenderTarget = Main.screenTarget;
 
@@ -47,18 +51,68 @@ namespace Terralume.Hooks
                 bufferCollection.Dispose();
             });
 
-            On_Main.DoDraw_WallsAndBlacks -= ClearForAlbedoHook;
-            On_Main.DrawInterface -= CaptureAlbedoHook;
+            On_Main.RenderBackground -= On_Main_RenderBackground;
+            On_Main.DoDraw_WallsAndBlacks -= On_Main_DoDraw_WallsAndBlacks;
+            On_Main.DrawInterface -= On_Main_DrawInterface;
         }
 
-        private void ClearForAlbedoHook(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+        private void On_Main_RenderBackground(On_Main.orig_RenderBackground orig, Main self)
+        {
+            orig(self);
+
+            backgroundRedrawn = true;
+        }
+
+        private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
         {
             tick++;
 
             UpdateBuffer();
 
             BufferRenderer.CopyBackgroundBuffer(deferredSpriteBatch, bufferCollection.BackgroundBuffer);
-            BufferRenderer.CopyUnderGroundBackgroundBuffer(deferredSpriteBatch, bufferCollection.UndergroundBackgroundBuffer);
+
+            ///
+
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // STEP 1: CAPTURE (Only when the engine actually renders)
+            if (backgroundRedrawn)
+            {
+                // Use BackgroundBuffer as your "Master Copy" of the raw pixels
+                device.SetRenderTarget(bufferCollection.UndergroundBackgroundBufferMaster);
+                device.Clear(Color.Transparent);
+
+                deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                // We draw at Zero because we want the raw, unshifted texture
+                deferredSpriteBatch.Draw(Main.instance.backgroundTarget, Vector2.Zero, Color.White);
+                deferredSpriteBatch.End();
+
+                backgroundRedrawn = false;
+            }
+
+            // STEP 2: BLIT (Every single frame)
+            // This draws from your Master Copy to the final buffer using the movement math
+            device.SetRenderTarget(bufferCollection.UndergroundBackgroundBuffer);
+            device.Clear(Color.Transparent);
+
+            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+
+            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
+
+            // Draw the Master Copy we saved earlier
+            deferredSpriteBatch.Draw(bufferCollection.UndergroundBackgroundBufferMaster, drawPos, Color.White);
+            deferredSpriteBatch.End();
+
+            // STEP 3: CLEAR ENGINE TARGET
+            // We clear the engine's target so it doesn't show up in the final screen blit
+            device.SetRenderTarget(Main.instance.backgroundTarget);
+            device.Clear(Color.Transparent);
+
+            // Restore and continue
+            device.SetRenderTargets(oldTargets);
+
+            ///
 
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
 
@@ -66,18 +120,23 @@ namespace Terralume.Hooks
         }
 
 
-        private void CaptureAlbedoHook(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
+        private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
         {
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
             BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection.StableTileTarget);
 
             BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.screenTarget, bufferCollection.DepthBuffer, bufferCollection.StableTileTarget, bufferCollection.UndergroundBackgroundBuffer);
-            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer);
+
+            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer, bufferCollection.UndergroundBackgroundBuffer);
+
+            /*
+             *  START DEBUG
+             */
 
             KeyboardState keyboardState = Keyboard.GetState();
 
-            if (tick > 10)
+            if (tick > 5)
             {
                 tick = 0;
 
@@ -107,26 +166,25 @@ namespace Terralume.Hooks
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad5))
                 {
-                    Main.NewText("[DEBUG] Switching to underground background buffer view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to screen target view", Color.Green);
+
+                    currentRenderTarget = Main.screenTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad6))
+                {
+                    Main.NewText("[DEBUG] Switching to underground background view", Color.Green);
 
                     currentRenderTarget = bufferCollection.UndergroundBackgroundBuffer;
                 }
             }
 
-            if (keyboardState.IsKeyDown(Keys.H))
-            {
-                Main.NewText("[DEBUG] Exporting");
-
-                using (FileStream fs = new FileStream("C:\\Users\\sande\\Documents\\Terralume_Debug\\backtroundTarget.png", FileMode.Create))
-                {
-                    bufferCollection.AlbedoBuffer.SaveAsPng(fs, bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
-                }
-            }
-
-
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
+
+            /*
+             *  STOP DEBUG
+             */
 
             // Draw UI normally
             orig(self, gameTime);

@@ -1,15 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terralume.Engine.Shaders;
-using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Buffers
 {
     public static class BufferRenderer
     {
-        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, RenderTarget2D albedoBuffer)
+        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, RenderTarget2D albedoBuffer, RenderTarget2D undergroundBackgroundBuffer)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -18,8 +16,11 @@ namespace Terralume.Engine.Buffers
             device.Clear(Color.Transparent);
 
             // Copy the current screen target to our albedo buffer
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+
+            spriteBatch.Draw(undergroundBackgroundBuffer, Vector2.Zero, Color.White);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+
             spriteBatch.End();
 
             // Reset Terraria drawing state
@@ -64,22 +65,6 @@ namespace Terralume.Engine.Buffers
 
             device.SetRenderTargets(oldTargets);
             device.Clear(Color.Transparent);
-        }
-
-        public static void CopyUnderGroundBackgroundBuffer(SpriteBatch spriteBatch, RenderTarget2D undergroundBackgroundBuffer)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            device.SetRenderTarget(undergroundBackgroundBuffer);
-            device.Clear(Color.Transparent);
-
-            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            spriteBatch.Draw(Main.instance.backgroundTarget, drawPos, Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
         }
 
         public static void CopyTileTarget(SpriteBatch spriteBatch, RenderTarget2D stableTileTarget)
