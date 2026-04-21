@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.IO;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
 using Terraria;
@@ -69,50 +68,8 @@ namespace Terralume.Hooks
 
             UpdateBuffer();
 
-            BufferRenderer.CopyBackgroundBuffer(deferredSpriteBatch, bufferCollection.BackgroundBuffer);
-
-            ///
-
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            // STEP 1: CAPTURE (Only when the engine actually renders)
-            if (backgroundRedrawn)
-            {
-                // Use BackgroundBuffer as your "Master Copy" of the raw pixels
-                device.SetRenderTarget(bufferCollection.UndergroundBackgroundBufferMaster);
-                device.Clear(Color.Transparent);
-
-                deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-                // We draw at Zero because we want the raw, unshifted texture
-                deferredSpriteBatch.Draw(Main.instance.backgroundTarget, Vector2.Zero, Color.White);
-                deferredSpriteBatch.End();
-
-                backgroundRedrawn = false;
-            }
-
-            // STEP 2: BLIT (Every single frame)
-            // This draws from your Master Copy to the final buffer using the movement math
-            device.SetRenderTarget(bufferCollection.UndergroundBackgroundBuffer);
-            device.Clear(Color.Transparent);
-
-            deferredSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
-
-            Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
-
-            // Draw the Master Copy we saved earlier
-            deferredSpriteBatch.Draw(bufferCollection.UndergroundBackgroundBufferMaster, drawPos, Color.White);
-            deferredSpriteBatch.End();
-
-            // STEP 3: CLEAR ENGINE TARGET
-            // We clear the engine's target so it doesn't show up in the final screen blit
-            device.SetRenderTarget(Main.instance.backgroundTarget);
-            device.Clear(Color.Transparent);
-
-            // Restore and continue
-            device.SetRenderTargets(oldTargets);
-
-            ///
+            BufferRenderer.CopyBackgroundBuffer(deferredSpriteBatch, bufferCollection);
+            BufferRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, bufferCollection, ref backgroundRedrawn);
 
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
 
@@ -124,11 +81,12 @@ namespace Terralume.Hooks
         {
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
-            BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection.StableTileTarget);
+            BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection);
 
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, Main.screenTarget, bufferCollection.DepthBuffer, bufferCollection.StableTileTarget, bufferCollection.UndergroundBackgroundBuffer);
 
-            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection.AlbedoBuffer, bufferCollection.UndergroundBackgroundBuffer);
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, Main.screenTarget);
+
+            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection);
 
             /*
              *  START DEBUG
