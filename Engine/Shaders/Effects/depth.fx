@@ -12,11 +12,11 @@ sampler TileSampler = sampler_state
     AddressV = Clamp;
 };
 
-Texture2D UndergroundBackgroundTarget;
+Texture2D WallTarget;
 
-sampler BackgroundSampler = sampler_state
+sampler WallSampler = sampler_state
 {
-    Texture = (UndergroundBackgroundTarget);
+    Texture = (WallTarget);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -33,29 +33,42 @@ struct PixelShaderInput
 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
-	// Check if this fragment is a tile
-	if (tex2D(TileSampler, input.TexCoord).a > 0.01)
-	{
-		return float4(0.3, 0.3, 0.3, 1.0);
-	}
+	float4 albedo = tex2D(AlbedoTexture, input.TexCoord);
+	float4 tile = tex2D(TileSampler, input.TexCoord);
+	float4 wall = tex2D(WallSampler, input.TexCoord);
 
-	float4 albedoColor = tex2D(AlbedoTexture, input.TexCoord);
-	float4 backgroundColor = tex2D(BackgroundSampler, input.TexCoord);
-
-	bool isBackground = abs(backgroundColor.r - albedoColor.r) < 0.00001 && abs(backgroundColor.g - albedoColor.g) < 0.00001 && abs(backgroundColor.b - albedoColor.b) < 0.00001 && backgroundColor.a > 0.01;
-
-	if (isBackground)
+	// Background
+	if (albedo.a < 0.01)
 	{
 		return float4(0.9, 0.9, 0.9, 1.0);
 	}
 
-	// Check albedo buffer for non tile and non transparent
-	if (albedoColor.a > 0.01)
+	// Tile
+	if (tile.a > 0.01)
 	{
-		return float4(0.6, 0.6, 0.6, 1.0);
+		return float4(0.3, 0.3, 0.3, 1.0);
 	}
 
-	return float4(0.9, 0.9, 0.9, 1.0);
+	// Pixel is not a wall
+	if (wall.a < 0.01)
+	{
+		return float4(0.5, 0.5, 0.5, 1.0);
+	}
+	
+	// Pixel could be a wall
+	if (wall.a > 0.01)
+	{
+		float dist = distance(albedo.xyz, wall.xyz);
+
+		// Albedo buffer and wall buffer contain ~ the same pixel (probably a wall)
+		// NOTE: Might cause artifacts, improve in the future
+		if (dist < 0.0001)
+		{
+			return float4(0.7, 0.7, 0.7, 1.0);
+		}
+	}
+
+	return float4(0.5, 0.5, 0.5, 1.0);
 }
 
 technique Depth

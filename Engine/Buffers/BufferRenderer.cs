@@ -41,9 +41,8 @@ namespace Terralume.Engine.Buffers
             Effect effect = EffectManager.GetEffect(EffectType.Depth);
 
             effect.Parameters["TileTarget"].SetValue(bufferCollection.StableTileTarget);
-            effect.Parameters["UndergroundBackgroundTarget"].SetValue(bufferCollection.UndergroundBackgroundBuffer);
+            effect.Parameters["WallTarget"].SetValue(bufferCollection.StableWallTarget);
 
-            // Prevent monogame from blurring TileTarget data
             device.SamplerStates[1] = SamplerState.PointClamp;
             device.SamplerStates[2] = SamplerState.PointClamp;
 
@@ -123,6 +122,22 @@ namespace Terralume.Engine.Buffers
             Vector2 tileDrawPos = Main.sceneTilePos - Main.screenPosition;
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.instance.tileTarget, tileDrawPos, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Copies Terrarias wall target into a custom rendertarget with the correct offset applied
+        public static void CopyWallTarget(SpriteBatch spriteBatch, BufferCollection bufferCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.StableWallTarget);
+
+            Vector2 tileDrawPos = Main.sceneWallPos - Main.screenPosition;
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.instance.wallTarget, tileDrawPos, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);

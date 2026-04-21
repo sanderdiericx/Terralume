@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Buffers;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
 using Terraria;
@@ -82,7 +83,7 @@ namespace Terralume.Hooks
             // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
 
             BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection);
-
+            BufferRenderer.CopyWallTarget(deferredSpriteBatch, bufferCollection);
 
             BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, Main.screenTarget);
 
@@ -133,6 +134,12 @@ namespace Terralume.Hooks
                     Main.NewText("[DEBUG] Switching to underground background view", Color.Green);
 
                     currentRenderTarget = bufferCollection.UndergroundBackgroundBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad7))
+                {
+                    Main.NewText("[DEBUG] Switching to wall target view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.StableWallTarget;
                 }
             }
 

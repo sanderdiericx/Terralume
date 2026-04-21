@@ -15,6 +15,7 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D DepthBuffer;
 
         public RenderTarget2D StableTileTarget;
+        public RenderTarget2D StableWallTarget;
 
         public Texture2D TileIDTexture;
         public Texture2D TileTexture;
@@ -33,6 +34,7 @@ namespace Terralume.Engine.Buffers
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
             StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
+            StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
 
             TileIDTexture = new Texture2D(graphicsDevice, 150, 150);
             TileTexture = new Texture2D(graphicsDevice, 150, 150);
@@ -57,6 +59,7 @@ namespace Terralume.Engine.Buffers
             DepthBuffer.Dispose();
 
             StableTileTarget.Dispose();
+            StableWallTarget.Dispose();
 
             TileIDTexture.Dispose();
             TileTexture.Dispose();
