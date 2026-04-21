@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Buffers;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
 using Terraria;
+using Terraria.Enums;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Hooks
@@ -80,7 +83,7 @@ namespace Terralume.Hooks
 
         private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
         {
-            // TO DO: SAMPLE Main.screenTarget here to build depth normal and material buffer.
+            // TO DO: SAMPLE Main.screenTarget here to build normal and material buffer.
 
             BufferRenderer.CopyTileTarget(deferredSpriteBatch, bufferCollection);
             BufferRenderer.CopyWallTarget(deferredSpriteBatch, bufferCollection);
