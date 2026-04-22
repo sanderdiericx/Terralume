@@ -59,6 +59,8 @@ namespace Terralume.Engine.Pipeline
             TargetCapturer.CaptureInterfaceTargets();
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
 
+            RenderPipeline.Transition(PipelinePhase.Composing);
+
             short[] tileIDs = TileHelper.GetVisibleTiles();
 
             TileHelper.PackTileIDTexture(bufferCollection.TileIDTexture, tileIDs);
@@ -96,6 +98,24 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText("[DEBUG] Switching to material buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.MaterialBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad4))
+                {
+                    Main.NewText("[DEBUG] Switching to non solid tile target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.NonSolidTileBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad5))
+                {
+                    Main.NewText("[DEBUG] Switching to tile target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.StableTileTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad6))
+                {
+                    Main.NewText("[DEBUG] Switching to wall target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.StableWallTarget;
                 }
             }
 

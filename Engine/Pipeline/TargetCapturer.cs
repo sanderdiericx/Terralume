@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Render;
-using Terralume.Engine.Shaders;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -21,15 +20,13 @@ namespace Terralume.Engine.Pipeline
             {
                 TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
-
-                EffectManager.LoadEffect(EffectType.Depth);
-                EffectManager.LoadEffect(EffectType.Material);
             });
 
 
             On_Main.DoDraw += On_Main_DoDraw;
             On_Main.RenderBackground += On_Main_RenderBackground;
-            On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
+            On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;
+            On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;            
 
             On_Main.DrawNPCs += On_Main_DrawNPCs;
             On_Main.DrawPlayers_AfterProjectiles += On_Main_DrawPlayers_AfterProjectiles;
@@ -49,6 +46,7 @@ namespace Terralume.Engine.Pipeline
 
             On_Main.DoDraw -= On_Main_DoDraw;
             On_Main.RenderBackground -= On_Main_RenderBackground;
+            On_Main.DoDraw_Tiles_NonSolid -= On_Main_DoDraw_Tiles_NonSolid;
             On_Main.DoDraw_WallsAndBlacks -= On_Main_DoDraw_WallsAndBlacks;
 
             On_Main.DrawNPCs -= On_Main_DrawNPCs;
@@ -74,6 +72,13 @@ namespace Terralume.Engine.Pipeline
             backgroundRedrawn = true;
         }
 
+        private void On_Main_DoDraw_Tiles_NonSolid(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
+        {
+            orig(self);
+
+            TargetRenderer.CopyNonSolidTileTarget(deferredSpriteBatch, TargetCollection, orig, self);
+        }
+
         private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
         {
             TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, TargetCollection);
@@ -88,7 +93,7 @@ namespace Terralume.Engine.Pipeline
         {
             orig(self, behindTiles);
 
-            TargetRenderer.CopyNPCTarget(deferredSpriteBatch, TargetCollection, orig, self, behindTiles);
+            TargetRenderer.CopyEntityTarget(deferredSpriteBatch, TargetCollection, orig, self, behindTiles);
         }
 
         private void On_Main_DrawPlayers_AfterProjectiles(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)

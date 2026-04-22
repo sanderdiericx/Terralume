@@ -99,7 +99,7 @@ namespace Terralume.Engine.Render
 
         // Uses vanilla NPC drawing logic to draw NPCs to a custom rendertarget
         // Note: There is a lot of spritebatch restarting and rendertarget switching here, might need something better in the future
-        public static void CopyNPCTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
+        public static void CopyEntityTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
         {
             Main.spriteBatch.End();
 
@@ -113,7 +113,7 @@ namespace Terralume.Engine.Render
             spriteBatch.End();
 
             // Draw Entities
-            device.SetRenderTarget(targetCollection.NPCBuffer);
+            device.SetRenderTarget(targetCollection.EntityBuffer);
 
             if (behindTiles)
             {
@@ -173,6 +173,31 @@ namespace Terralume.Engine.Render
 
             // Draw Entities
             device.SetRenderTarget(targetCollection.ProjectileBuffer);
+
+            orig(self);
+
+            // Paste back into screenTarget
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw(targetCollection.CopyBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+        }
+
+        public static void CopyNonSolidTileTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // Copy screenTarget
+            device.SetRenderTarget(targetCollection.CopyBuffer);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            // Draw Entities
+            device.SetRenderTarget(targetCollection.NonSolidTileBuffer);
 
             orig(self);
 

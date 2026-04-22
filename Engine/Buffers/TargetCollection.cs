@@ -11,13 +11,10 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D UndergroundBackgroundBufferMaster;
         public RenderTarget2D UndergroundBackgroundBuffer;
 
-        public RenderTarget2D NPCBuffer;
+        public RenderTarget2D EntityBuffer;
         public RenderTarget2D PlayerBuffer;
         public RenderTarget2D ProjectileBuffer;
-
-        public RenderTarget2D AlbedoBuffer;
-        public RenderTarget2D DepthBuffer;
-        public RenderTarget2D MaterialBuffer;
+        public RenderTarget2D NonSolidTileBuffer;
 
         public RenderTarget2D StableTileTarget;
         public RenderTarget2D StableWallTarget;
@@ -34,13 +31,10 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundBufferMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
             UndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
-            NPCBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            EntityBuffer = new RenderTarget2D(graphicsDevice, width, height);
             PlayerBuffer = new RenderTarget2D(graphicsDevice, width, height);
             ProjectileBuffer = new RenderTarget2D(graphicsDevice, width, height);
-
-            AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
-            DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
-            MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            NonSolidTileBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
             StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
             StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
@@ -63,13 +57,11 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundBufferMaster.Dispose();
             UndergroundBackgroundBuffer.Dispose();
 
-            NPCBuffer.Dispose();
+            EntityBuffer.Dispose();
             PlayerBuffer.Dispose();
             ProjectileBuffer.Dispose();
 
-            AlbedoBuffer.Dispose();
-            DepthBuffer.Dispose();
-            MaterialBuffer.Dispose();
+            NonSolidTileBuffer.Dispose();
 
             StableTileTarget.Dispose();
             StableWallTarget.Dispose();
