@@ -1,19 +1,22 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.ID;
 
 namespace Terralume.Engine.Buffers
 {
     public class BufferCollection : IDisposable
     {
+        private const int DATA_TEXTURE_RESOLUTION = 256;
+
         public RenderTarget2D BackgroundBuffer;
 
         public RenderTarget2D UndergroundBackgroundBufferMaster;
         public RenderTarget2D UndergroundBackgroundBuffer;
 
         public RenderTarget2D NPCBuffer;
-
-        public RenderTarget2D CopyBuffer;
+        public RenderTarget2D PlayerBuffer;
+        public RenderTarget2D ProjectileBuffer;
 
         public RenderTarget2D AlbedoBuffer;
         public RenderTarget2D DepthBuffer;
@@ -24,6 +27,8 @@ namespace Terralume.Engine.Buffers
 
         public Texture2D TileIDTexture;
         public Texture2D MaterialTexture;
+
+        public RenderTarget2D CopyBuffer;
 
         public int Width;
         public int Height;
@@ -36,8 +41,8 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
             NPCBuffer = new RenderTarget2D(graphicsDevice, width, height);
-
-            CopyBuffer = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            PlayerBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            ProjectileBuffer = new RenderTarget2D(graphicsDevice, width, height);
 
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
@@ -46,8 +51,10 @@ namespace Terralume.Engine.Buffers
             StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
             StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
 
-            TileIDTexture = new Texture2D(graphicsDevice, 256, 256);
-            MaterialTexture = new Texture2D(graphicsDevice, 256, 256);
+            TileIDTexture = new Texture2D(graphicsDevice, DATA_TEXTURE_RESOLUTION, DATA_TEXTURE_RESOLUTION);
+            MaterialTexture = new Texture2D(graphicsDevice, DATA_TEXTURE_RESOLUTION, DATA_TEXTURE_RESOLUTION);
+
+            CopyBuffer = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
             Width = width;
             Height = height;
@@ -66,6 +73,8 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundBuffer.Dispose();
 
             NPCBuffer.Dispose();
+            PlayerBuffer.Dispose();
+            ProjectileBuffer.Dispose();
 
             AlbedoBuffer.Dispose();
             DepthBuffer.Dispose();
@@ -76,6 +85,8 @@ namespace Terralume.Engine.Buffers
 
             TileIDTexture.Dispose();
             MaterialTexture.Dispose();
+
+            CopyBuffer.Dispose();
 
             GC.SuppressFinalize(this);
         }

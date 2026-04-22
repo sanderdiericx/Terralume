@@ -222,5 +222,55 @@ namespace Terralume.Engine.Buffers
 
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
+
+        public static void CopyPlayerTarget(SpriteBatch spriteBatch, BufferCollection bufferCollection, On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // Copy screenTarget
+            device.SetRenderTarget(bufferCollection.CopyBuffer);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            // Draw Entities
+            device.SetRenderTarget(bufferCollection.PlayerBuffer);
+            
+            orig(self);
+
+            // Paste back into screenTarget
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw(bufferCollection.CopyBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+        }
+
+        public static void CopyProjectileTarget(SpriteBatch spriteBatch, BufferCollection bufferCollection, On_Main.orig_DrawProjectiles orig, Main self)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // Copy screenTarget
+            device.SetRenderTarget(bufferCollection.CopyBuffer);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            // Draw Entities
+            device.SetRenderTarget(bufferCollection.ProjectileBuffer);
+
+            orig(self);
+
+            // Paste back into screenTarget
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw(bufferCollection.CopyBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+        }
     }
 }

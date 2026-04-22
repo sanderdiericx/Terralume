@@ -38,6 +38,8 @@ namespace Terralume.Hooks
             On_Main.DrawInterface += On_Main_DrawInterface;
 
             On_Main.DrawNPCs += On_Main_DrawNPCs;
+            On_Main.DrawPlayers_AfterProjectiles += On_Main_DrawPlayers_AfterProjectiles;
+            On_Main.DrawProjectiles += On_Main_DrawProjectiles;
 
             backgroundRedrawn = false;
 
@@ -58,6 +60,10 @@ namespace Terralume.Hooks
             On_Main.RenderBackground -= On_Main_RenderBackground;
             On_Main.DoDraw_WallsAndBlacks -= On_Main_DoDraw_WallsAndBlacks;
             On_Main.DrawInterface -= On_Main_DrawInterface;
+
+            On_Main.DrawNPCs -= On_Main_DrawNPCs;
+            On_Main.DrawPlayers_AfterProjectiles -= On_Main_DrawPlayers_AfterProjectiles;
+            On_Main.DrawProjectiles -= On_Main_DrawProjectiles;
         }
 
         private void On_Main_RenderBackground(On_Main.orig_RenderBackground orig, Main self)
@@ -79,6 +85,27 @@ namespace Terralume.Hooks
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
 
             orig(self);
+        }
+
+        private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
+        {
+            orig(self, behindTiles);
+
+            BufferRenderer.CopyNPCTarget(deferredSpriteBatch, bufferCollection, orig, self, behindTiles);
+        }
+
+        private void On_Main_DrawPlayers_AfterProjectiles(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
+        {
+            orig(self);
+
+            BufferRenderer.CopyPlayerTarget(deferredSpriteBatch, bufferCollection, orig, self);
+        }
+
+        private void On_Main_DrawProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
+        {
+            orig(self);
+
+            BufferRenderer.CopyProjectileTarget(deferredSpriteBatch, bufferCollection, orig, self);
         }
 
 
@@ -116,9 +143,9 @@ namespace Terralume.Hooks
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad2))
                 {
-                    Main.NewText("[DEBUG] Switching to background buffer view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to projectile buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.BackgroundBuffer;
+                    currentRenderTarget = bufferCollection.ProjectileBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad3))
                 {
@@ -140,9 +167,9 @@ namespace Terralume.Hooks
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad6))
                 {
-                    Main.NewText("[DEBUG] Switching to underground background view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to player target view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.UndergroundBackgroundBuffer;
+                    currentRenderTarget = bufferCollection.PlayerBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad7))
                 {
@@ -158,7 +185,7 @@ namespace Terralume.Hooks
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad9))
                 {
-                    Main.NewText("[DEBUG] Switching to entity buffer view");
+                    Main.NewText("[DEBUG] Switching to entity buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.NPCBuffer;
                 }
@@ -175,14 +202,6 @@ namespace Terralume.Hooks
             // Draw UI normally
             orig(self, gameTime);
         }
-
-        private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
-        {
-            orig(self, behindTiles);
-
-
-        }
-
 
         // Make sure all buffers match screen size
         private void UpdateBuffer()
