@@ -1,15 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Buffers;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
-using Terraria.Enums;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Hooks
@@ -40,6 +36,8 @@ namespace Terralume.Hooks
             On_Main.RenderBackground += On_Main_RenderBackground;
             On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
             On_Main.DrawInterface += On_Main_DrawInterface;
+
+            On_Main.DrawNPCs += On_Main_DrawNPCs;
 
             backgroundRedrawn = false;
 
@@ -158,6 +156,12 @@ namespace Terralume.Hooks
 
                     currentRenderTarget = bufferCollection.MaterialBuffer;
                 }
+                else if (keyboardState.IsKeyDown(Keys.NumPad9))
+                {
+                    Main.NewText("[DEBUG] Switching to entity buffer view");
+
+                    currentRenderTarget = bufferCollection.NPCBuffer;
+                }
             }
 
             deferredSpriteBatch.Begin();
@@ -171,6 +175,14 @@ namespace Terralume.Hooks
             // Draw UI normally
             orig(self, gameTime);
         }
+
+        private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
+        {
+            orig(self, behindTiles);
+
+
+        }
+
 
         // Make sure all buffers match screen size
         private void UpdateBuffer()

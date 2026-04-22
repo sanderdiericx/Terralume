@@ -59,12 +59,6 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     {
         return float4(0.0, 0.0, 0.0, 0.0);
     }
-	
-	// Not a tile
-    if (tex2D(TileSampler, input.TexCoord).a < 0.01)
-    {
-        return float4(0.0, 0.8, 0.0, 1.0);
-    }
 
 	// Convert TexCoord to tile space
     float2 worldPosition = ScreenPosition + (input.TexCoord * ViewSize) + 0.5;
@@ -108,6 +102,12 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     }
     
     float tileID = (float) u0 + ((float) u1 * 256.0);
+    
+    // Check for no tile
+    if (tileID == 65535)
+    {
+        return float4(1.0, 1.0, 1.0, 1.0);
+    }
     
     float materialPixelX = fmod((float) tileID, MaterialTextureSize.x);
     float materialPixelY = floor((float) tileID / MaterialTextureSize.x);

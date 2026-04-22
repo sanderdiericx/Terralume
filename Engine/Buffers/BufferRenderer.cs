@@ -184,5 +184,43 @@ namespace Terralume.Engine.Buffers
 
             device.SetRenderTargets(oldTargets);
         }
+
+        // Uses vanilla NPC drawing logic to draw NPCs to a custom rendertarget
+        // Note: There is a lot of spritebatch restarting and rendertarget switching here, might need something better in the future
+        public static void CopyNPCTarget(SpriteBatch spriteBatch, BufferCollection bufferCollection, On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
+        {
+            Main.spriteBatch.End();
+
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // Copy screenTarget
+            device.SetRenderTarget(bufferCollection.CopyBuffer);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            // Draw Entities
+            device.SetRenderTarget(bufferCollection.NPCBuffer);
+
+            if (behindTiles)
+            {
+                device.Clear(Color.Transparent);
+            }
+
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            orig(self, behindTiles);
+            Main.spriteBatch.End();
+
+            // Paste back into screenTarget
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw(bufferCollection.CopyBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        }
     }
 }
