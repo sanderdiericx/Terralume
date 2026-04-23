@@ -6,40 +6,40 @@ namespace Terralume.Engine.Buffers
 {
     public class TargetCollection
     {
-        public RenderTarget2D BackgroundBuffer;
+        public RenderTarget2D BackgroundTarget;
 
-        public RenderTarget2D UndergroundBackgroundBufferMaster;
-        public RenderTarget2D UndergroundBackgroundBuffer;
+        public RenderTarget2D UndergroundBackgroundTargetMaster;
+        public RenderTarget2D UndergroundBackgroundTarget;
 
-        public RenderTarget2D EntityBuffer;
-        public RenderTarget2D PlayerBuffer;
-        public RenderTarget2D ProjectileBuffer;
-        public RenderTarget2D NonSolidTileBuffer;
+        public RenderTarget2D EntityTarget;
+        public RenderTarget2D PlayerTarget;
+        public RenderTarget2D ProjectileTarget;
+        public RenderTarget2D NonSolidTileTarget;
 
         public RenderTarget2D StableTileTarget;
         public RenderTarget2D StableWallTarget;
 
-        public RenderTarget2D CopyBuffer;
+        public RenderTarget2D CopyTarget;
 
         public int Width;
         public int Height;
 
         public TargetCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
-            BackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            BackgroundTarget = new RenderTarget2D(graphicsDevice, width, height);
 
-            UndergroundBackgroundBufferMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
-            UndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundTargetMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
+            UndergroundBackgroundTarget = new RenderTarget2D(graphicsDevice, width, height);
 
-            EntityBuffer = new RenderTarget2D(graphicsDevice, width, height);
-            PlayerBuffer = new RenderTarget2D(graphicsDevice, width, height);
-            ProjectileBuffer = new RenderTarget2D(graphicsDevice, width, height);
-            NonSolidTileBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            EntityTarget = new RenderTarget2D(graphicsDevice, width, height);
+            PlayerTarget = new RenderTarget2D(graphicsDevice, width, height);
+            ProjectileTarget = new RenderTarget2D(graphicsDevice, width, height);
+            NonSolidTileTarget = new RenderTarget2D(graphicsDevice, width, height);
 
             StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
             StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
 
-            CopyBuffer = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            CopyTarget = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
             Width = width;
             Height = height;
@@ -52,21 +52,21 @@ namespace Terralume.Engine.Buffers
 
         public void Dispose()
         {
-            BackgroundBuffer.Dispose();
+            BackgroundTarget.Dispose();
 
-            UndergroundBackgroundBufferMaster.Dispose();
-            UndergroundBackgroundBuffer.Dispose();
+            UndergroundBackgroundTargetMaster.Dispose();
+            UndergroundBackgroundTarget.Dispose();
 
-            EntityBuffer.Dispose();
-            PlayerBuffer.Dispose();
-            ProjectileBuffer.Dispose();
+            EntityTarget.Dispose();
+            PlayerTarget.Dispose();
+            ProjectileTarget.Dispose();
 
-            NonSolidTileBuffer.Dispose();
+            NonSolidTileTarget.Dispose();
 
             StableTileTarget.Dispose();
             StableWallTarget.Dispose();
 
-            CopyBuffer.Dispose();
+            CopyTarget.Dispose();
 
             GC.SuppressFinalize(this);
         }

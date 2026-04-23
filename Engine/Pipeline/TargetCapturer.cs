@@ -26,7 +26,7 @@ namespace Terralume.Engine.Pipeline
             On_Main.DoDraw += On_Main_DoDraw;
             On_Main.RenderBackground += On_Main_RenderBackground;
             On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;
-            On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;            
+            On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
 
             On_Main.DrawNPCs += On_Main_DrawNPCs;
             On_Main.DrawPlayers_AfterProjectiles += On_Main_DrawPlayers_AfterProjectiles;
@@ -56,8 +56,6 @@ namespace Terralume.Engine.Pipeline
 
         private void On_Main_DoDraw(On_Main.orig_DoDraw orig, Main self, GameTime gameTime)
         {
-            RenderPipeline.Reset();
-
             UpdateBuffer();
 
             orig(self, gameTime);
@@ -65,8 +63,6 @@ namespace Terralume.Engine.Pipeline
 
         private void On_Main_RenderBackground(On_Main.orig_RenderBackground orig, Main self)
         {
-            RenderPipeline.Transition(PipelinePhase.Capturing);
-
             orig(self);
 
             backgroundRedrawn = true;

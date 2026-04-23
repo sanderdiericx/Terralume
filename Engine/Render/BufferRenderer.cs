@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
@@ -23,7 +24,7 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             // We bake the underground background into the albedo buffer because it is affected by lights
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundBuffer, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.UndergroundBackgroundTarget, Vector2.Zero, Color.White);
 
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
 
@@ -33,7 +34,7 @@ namespace Terralume.Engine.Render
         }
 
         // Renders a depth map by sampling pixels from multiple captured render targets as layers to asign depth values
-        public static void RenderDepthBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection, RenderTarget2D screenTarget)
+        public static void RenderDepthBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection, RenderTarget2D screenTarget, DepthParameter depthParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -43,11 +44,21 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Depth);
 
-            effect.Parameters["TileTarget"].SetValue(targetCollection.StableTileTarget);
-            effect.Parameters["WallTarget"].SetValue(targetCollection.StableWallTarget);
+            effect.Parameters["DepthParameter_BackgroundDepth"].SetValue(depthParameter.BackgroundDepth);
+            effect.Parameters["DepthParameter_TileDepth"].SetValue(depthParameter.TileDepth);
+            effect.Parameters["DepthParameter_NonSolidTileDepth"].SetValue(depthParameter.NonSolidTileDepth);
+            effect.Parameters["DepthParameter_WallDepth"].SetValue(depthParameter.WallDepth);
+            effect.Parameters["DepthParameter_EntityDepth"].SetValue(depthParameter.EntityDepth);
+            effect.Parameters["DepthParameter_PlayerDepth"].SetValue(depthParameter.PlayerDepth);
+            effect.Parameters["DepthParameter_ProjectileDepth"].SetValue(depthParameter.ProjectileDepth);
+            effect.Parameters["DepthParameter_OtherDepth"].SetValue(depthParameter.OtherDepth);
 
-            device.SamplerStates[1] = SamplerState.PointClamp;
-            device.SamplerStates[2] = SamplerState.PointClamp;
+            effect.Parameters["TileTarget"].SetValue(targetCollection.StableTileTarget);
+            effect.Parameters["NonSolidTileTarget"].SetValue(targetCollection.NonSolidTileTarget);
+            effect.Parameters["WallTarget"].SetValue(targetCollection.StableWallTarget);
+            effect.Parameters["EntityTarget"].SetValue(targetCollection.EntityTarget);
+            effect.Parameters["PlayerTarget"].SetValue(targetCollection.PlayerTarget);
+            effect.Parameters["ProjectileTarget"].SetValue(targetCollection.ProjectileTarget);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);

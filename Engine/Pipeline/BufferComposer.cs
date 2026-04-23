@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.IO;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
@@ -16,8 +18,10 @@ namespace Terralume.Engine.Pipeline
         private BufferCollection bufferCollection;
         private SpriteBatch deferredSpriteBatch;
 
-        private RenderTarget2D currentRenderTarget;
+        private DepthParameter depthParameter;
 
+        // Debug
+        private RenderTarget2D currentRenderTarget;
         private int tick;
 
         public override void Load()
@@ -31,9 +35,12 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Material);
             });
 
+            depthParameter = new DepthParameter(0.9f, 0.3f, 0.5f, 0.7f, 0.5f, 0.5f, 0.5f, 0.5f);
+
 
             On_Main.DrawInterface += On_Main_DrawInterface;
 
+            // Debug
             currentRenderTarget = Main.screenTarget;
             tick = 0;
         }
@@ -59,14 +66,12 @@ namespace Terralume.Engine.Pipeline
             TargetCapturer.CaptureInterfaceTargets();
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
 
-            RenderPipeline.Transition(PipelinePhase.Composing);
-
             short[] tileIDs = TileHelper.GetVisibleTiles();
 
             TileHelper.PackTileIDTexture(bufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(bufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget);
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget, depthParameter);
             BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget);
 
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection, targetCollection);
@@ -77,11 +82,43 @@ namespace Terralume.Engine.Pipeline
 
             KeyboardState keyboardState = Keyboard.GetState();
 
+            if (keyboardState.IsKeyDown(Keys.H))
+            {
+                Main.NewText("[DEBUG] Saving all debug targets");
+
+                string debugDir = "C:\\Users\\sande\\Documents\\Terralume_Debug\\";
+                Directory.CreateDirectory(debugDir);
+
+                void SaveTarget(RenderTarget2D target, string name)
+                {
+                    string path = Path.Combine(debugDir, $"{name}.png");
+                    using FileStream fs = new FileStream(path, FileMode.Create);
+                    target.SaveAsPng(fs, target.Width, target.Height);
+                }
+
+                SaveTarget(Main.screenTarget, "screen_target_start");
+                SaveTarget(bufferCollection.AlbedoBuffer, "albedo_buffer");
+                SaveTarget(bufferCollection.DepthBuffer, "depth_buffer");
+                SaveTarget(bufferCollection.MaterialBuffer, "material_buffer");
+                SaveTarget(targetCollection.NonSolidTileTarget, "non_solid_tile_target");
+                SaveTarget(targetCollection.StableTileTarget, "tile_target");
+                SaveTarget(targetCollection.StableWallTarget, "wall_target");
+                SaveTarget(targetCollection.PlayerTarget, "player_target");
+                SaveTarget(targetCollection.EntityTarget, "entity_target");
+                SaveTarget(targetCollection.ProjectileTarget, "projectile_target");
+            }
+
             if (tick > 5)
             {
                 tick = 0;
 
-                if (keyboardState.IsKeyDown(Keys.NumPad1))
+                if (keyboardState.IsKeyDown(Keys.NumPad0))
+                {
+                    Main.NewText("[DEBUG] Switching to screen target view", Color.Green);
+
+                    currentRenderTarget = Main.screenTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad1))
                 {
                     Main.NewText("[DEBUG] Switching to albedo buffer view", Color.Green);
 
@@ -103,7 +140,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText("[DEBUG] Switching to non solid tile target view", Color.Green);
 
-                    currentRenderTarget = targetCollection.NonSolidTileBuffer;
+                    currentRenderTarget = targetCollection.NonSolidTileTarget;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad5))
                 {
@@ -116,6 +153,24 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText("[DEBUG] Switching to wall target view", Color.Green);
 
                     currentRenderTarget = targetCollection.StableWallTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad7))
+                {
+                    Main.NewText("[DEBUG] Switching to player target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.PlayerTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad8))
+                {
+                    Main.NewText("[DEBUG] Switching to entity target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.EntityTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad9))
+                {
+                    Main.NewText("[DEBUG] Switching to projectile view", Color.Green);
+
+                    currentRenderTarget = targetCollection.ProjectileTarget;
                 }
             }
 

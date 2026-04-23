@@ -1,10 +1,31 @@
-﻿sampler2D AlbedoTexture : register(s0);
+﻿sampler2D ScreenSampler : register(s0);
+
+float DepthParameter_BackgroundDepth;
+float DepthParameter_TileDepth;
+float DepthParameter_NonSolidTileDepth;
+float DepthParameter_WallDepth;
+float DepthParameter_EntityDepth;
+float DepthParameter_PlayerDepth;
+float DepthParameter_ProjectileDepth;
+float DepthParameter_OtherDepth;
 
 Texture2D TileTarget;
 
 sampler TileSampler = sampler_state
 {
     Texture = (TileTarget);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D NonSolidTileTarget;
+
+sampler NonSolidTileSampler = sampler_state
+{
+    Texture = (NonSolidTileTarget);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -24,6 +45,42 @@ sampler WallSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D EntityTarget;
+
+sampler EntitySampler = sampler_state
+{
+    Texture = (EntityTarget);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D PlayerTarget;
+
+sampler PlayerSampler = sampler_state
+{
+    Texture = (PlayerTarget);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D ProjectileTarget;
+
+sampler ProjectileSampler = sampler_state
+{
+    Texture = (ProjectileTarget);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 struct PixelShaderInput
 {
 	float4 Position : SV_POSITION;
@@ -33,42 +90,49 @@ struct PixelShaderInput
 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
-	float4 albedo = tex2D(AlbedoTexture, input.TexCoord);
-	float4 tile = tex2D(TileSampler, input.TexCoord);
-	float4 wall = tex2D(WallSampler, input.TexCoord);
+    // Background
+    if (tex2D(ScreenSampler, input.TexCoord).a < 0.01)
+    {
+        return float4(DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, 1.0);
+    }
 
-	// Background
-	if (albedo.a < 0.01)
-	{
-		return float4(0.9, 0.9, 0.9, 1.0);
-	}
-
-	// Tile
-	if (tile.a > 0.01)
-	{
-		return float4(0.3, 0.3, 0.3, 1.0);
-	}
-
-	// Pixel is not a wall
-	if (wall.a < 0.01)
-	{
-		return float4(0.5, 0.5, 0.5, 1.0);
-	}
-	
-	// Pixel could be a wall
-	if (wall.a > 0.01)
-	{
-		float dist = distance(albedo.rgb, wall.rgb);
-
-		// Albedo buffer and wall buffer contain ~ the same pixel (probably a wall)
-		// NOTE: Might cause artifacts, improve in the future
-		if (dist < 0.0001)
-		{
-			return float4(0.7, 0.7, 0.7, 1.0);
-		}
-	}
-
-	return float4(0.5, 0.5, 0.5, 1.0);
+    // Player
+    if (tex2D(PlayerSampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, 1.0);
+    }
+    
+    // Entity
+    if (tex2D(EntitySampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_EntityDepth, DepthParameter_EntityDepth, DepthParameter_EntityDepth, 1.0);
+    }
+    
+    // Projectile
+    if (tex2D(ProjectileSampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, 1.0);
+    }
+    
+    // Non Solid Tiles
+    if (tex2D(NonSolidTileSampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, 1.0);
+    }
+    
+    // Tiles
+    if (tex2D(TileSampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_TileDepth, DepthParameter_TileDepth, DepthParameter_TileDepth, 1.0);
+    }
+    
+    // Walls
+    if (tex2D(WallSampler, input.TexCoord).a > 0.01)
+    {
+        return float4(DepthParameter_WallDepth, DepthParameter_WallDepth, DepthParameter_WallDepth, 1.0);
+    }
+    
+    return float4(DepthParameter_OtherDepth, DepthParameter_OtherDepth, DepthParameter_OtherDepth, 1.0);
 }
 
 technique Depth
