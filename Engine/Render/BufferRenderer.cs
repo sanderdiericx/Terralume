@@ -93,12 +93,16 @@ namespace Terralume.Engine.Render
             effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(bufferCollection.MaterialTexture.Width, bufferCollection.MaterialTexture.Height));
 
             effect.Parameters["TileTarget"].SetValue(targetCollection.StableTileTarget);
+            effect.Parameters["NonSolidTileTarget"].SetValue(targetCollection.NonSolidTileTarget);
+            effect.Parameters["EntityTarget"].SetValue(targetCollection.EntityTarget);
+            effect.Parameters["PlayerTarget"].SetValue(targetCollection.PlayerTarget);
+            effect.Parameters["ProjectileTarget"].SetValue(targetCollection.ProjectileTarget);
+
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["MaterialTexture"].SetValue(bufferCollection.MaterialTexture);
 
-            device.SamplerStates[1] = SamplerState.PointClamp;
-            device.SamplerStates[2] = SamplerState.PointClamp;
-            device.SamplerStates[3] = SamplerState.PointClamp;
+            device.SamplerStates[6] = SamplerState.PointClamp;
+            device.SamplerStates[7] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(screenTarget, Vector2.Zero, Color.White);
