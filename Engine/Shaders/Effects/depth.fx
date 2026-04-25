@@ -40,50 +40,40 @@ struct PixelShaderInput
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
     float layer = tex2D(LayerSampler, input.TexCoord).r;
+    float epsilon = 0.0001;
     
-    // Background
-    if (abs(layer - LayerParameter_Background) < 0.0001)
-    {
-        return float4(DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, 1.0);
-    }
-
-    // Player
-    if (abs(layer - LayerParameter_Player) < 0.0001)
-    {
-        return float4(DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, 1.0);
-    }
+    float4 depth = float4(DepthParameter_OtherDepth, DepthParameter_OtherDepth, DepthParameter_OtherDepth, 1.0);
     
-    // Entity
-    if (abs(layer - LayerParameter_Entity) < 0.0001)
+    if (abs(layer - LayerParameter_Background) < epsilon) // Background
     {
-        return float4(DepthParameter_EntityDepth, DepthParameter_EntityDepth, DepthParameter_EntityDepth, 1.0);
+        depth = float4(DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, 1.0);
     }
-    
-    // Projectile
-    if (abs(layer - LayerParameter_Projectile) < 0.0001)
+    else if (abs(layer - LayerParameter_Tile) < epsilon) // Tiles
     {
-        return float4(DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, 1.0);
+        depth = float4(DepthParameter_TileDepth, DepthParameter_TileDepth, DepthParameter_TileDepth, 1.0);
     }
-    
-    // Non Solid Tiles
-    if (abs(layer - LayerParameter_NonSolidTile) < 0.0001)
+    else if (abs(layer - LayerParameter_Wall) < epsilon) // Walls
     {
-        return float4(DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, 1.0);
+        depth = float4(DepthParameter_WallDepth, DepthParameter_WallDepth, DepthParameter_WallDepth, 1.0);
     }
-   
-    // Tiles
-    if (abs(layer - LayerParameter_Tile) < 0.0001)
+    else if (abs(layer - LayerParameter_NonSolidTile) < epsilon) // Non Solid Tiles
     {
-        return float4(DepthParameter_TileDepth, DepthParameter_TileDepth, DepthParameter_TileDepth, 1.0);
+        depth = float4(DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, 1.0);
+    }
+    else if (abs(layer - LayerParameter_Entity) < epsilon) // Entity
+    {
+        depth = float4(DepthParameter_EntityDepth, DepthParameter_EntityDepth, DepthParameter_EntityDepth, 1.0);
+    }
+    else if (abs(layer - LayerParameter_Projectile) < epsilon) // Projectile
+    {
+        depth = float4(DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, 1.0);
+    }
+    else if (abs(layer - LayerParameter_Player) < epsilon) // Player
+    {
+        depth = float4(DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, 1.0);
     }
     
-    // Walls
-    if (abs(layer - LayerParameter_Wall) < 0.0001)
-    {
-        return float4(DepthParameter_WallDepth, DepthParameter_WallDepth, DepthParameter_WallDepth, 1.0);
-    }
-    
-    return float4(DepthParameter_OtherDepth, DepthParameter_OtherDepth, DepthParameter_OtherDepth, 1.0);
+    return depth;
 }
 
 technique Depth
