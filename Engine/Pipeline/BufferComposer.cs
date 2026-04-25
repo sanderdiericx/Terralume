@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.IO;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Materials;
@@ -18,9 +17,8 @@ namespace Terralume.Engine.Pipeline
         private BufferCollection bufferCollection;
         private SpriteBatch deferredSpriteBatch;
 
-        private LayerParameter layerParameter;
-        private DepthParameter depthParameter;
-        
+        private readonly LayerParameter layerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f);
+        private readonly DepthParameter depthParameter = new DepthParameter(0.9f, 0.3f, 0.5f, 0.7f, 0.5f, 0.5f, 0.5f, 0.5f);
 
         // Debug
         private RenderTarget2D currentRenderTarget;
@@ -36,10 +34,8 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
                 EffectManager.LoadEffect(EffectType.Material);
+                EffectManager.LoadEffect(EffectType.Normal);
             });
-
-            layerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f);
-            depthParameter = new DepthParameter(0.9f, 0.3f, 0.5f, 0.7f, 0.5f, 0.5f, 0.5f, 0.5f);
 
             On_Main.DrawInterface += On_Main_DrawInterface;
 
@@ -75,9 +71,11 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackMaterialTexture(bufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
             BufferRenderer.RenderLayerBuffer(deferredSpriteBatch, bufferCollection, targetCollection, layerParameter);
-            
+
             BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, layerParameter, depthParameter);
             BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, layerParameter);
+            BufferRenderer.RenderNormalBuffer(deferredSpriteBatch, bufferCollection);
+
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection, targetCollection);
 
             /*
@@ -92,9 +90,9 @@ namespace Terralume.Engine.Pipeline
 
                 if (keyboardState.IsKeyDown(Keys.NumPad0))
                 {
-                    Main.NewText("[DEBUG] Switching to layer buffer view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to normal buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.LayerBuffer;
+                    currentRenderTarget = bufferCollection.NormalBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad1))
                 {

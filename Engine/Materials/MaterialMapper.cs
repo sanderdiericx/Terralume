@@ -6,6 +6,8 @@ namespace Terralume.Engine.Materials
 {
     public static class MaterialMapper
     {
+        public static Vector3 DefaultMaterial = new Vector3(0.0f, 0.8f, 0.0f);
+
         public static Dictionary<int, Vector3> MappedTiles = new Dictionary<int, Vector3>()
         {
             { TileID.Dirt, new Vector3(0.0f, 0.9f, 0.0f) },

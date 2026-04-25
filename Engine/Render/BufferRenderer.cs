@@ -1,10 +1,9 @@
-﻿using log4net.Filter;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Security.Claims;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
@@ -107,6 +106,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["MaterialParameter_ViewSize"].SetValue(viewSize);
             effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
             effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(bufferCollection.MaterialTexture.Width, bufferCollection.MaterialTexture.Height));
+            effect.Parameters["MaterialParameter_DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
+
 
             layerParameter.SetUniforms(effect);
 
@@ -116,6 +117,25 @@ namespace Terralume.Engine.Render
 
             device.SamplerStates[2] = SamplerState.PointClamp;
             device.SamplerStates[3] = SamplerState.PointClamp;
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        public static void RenderNormalBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.NormalBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Normal);
+
+            effect.Parameters["ScreenSize"].SetValue(new Vector2(Main.screenTarget.Width, Main.screenTarget.Height));
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);

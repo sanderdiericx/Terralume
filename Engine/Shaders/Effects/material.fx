@@ -6,6 +6,7 @@ float2 MaterialParameter_MinTilePosition;
 float2 MaterialParameter_ViewSize;
 float2 MaterialParameter_TileIDTextureSize;
 float2 MaterialParameter_MaterialTextureSize;
+float3 MaterialParameter_DefaultMaterial;
 
 float LayerParameter_Background;
 float LayerParameter_Tile;
@@ -59,9 +60,11 @@ struct PixelShaderInput
 	float4 Color : COLOR0;
 };
 
+// TO DO: Add player, entity, wall materials. 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
     float layer = tex2D(LayerSampler, input.TexCoord).r;
+    float4 defaultMaterial = float4(MaterialParameter_DefaultMaterial.r, MaterialParameter_DefaultMaterial.g, MaterialParameter_DefaultMaterial.b, 1.0);
     
 	// Background
     if (abs(layer - LayerParameter_Background) < 0.0001)
@@ -71,13 +74,13 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     
     if (abs(layer - LayerParameter_Player) < 0.0001 || abs(layer - LayerParameter_Entity) < 0.0001 || abs(layer - LayerParameter_Projectile) < 0.0001)
     {
-        return float4(0.0, 0.8, 0.0, 1.0);
+        return defaultMaterial;
     }
     
-    if (abs(layer - LayerParameter_Tile) < 0.0001 || abs(layer - LayerParameter_NonSolidTile) < 0.0001)
+    if (abs(layer - LayerParameter_NonSolidTile) < 0.0001 || abs(layer - LayerParameter_Tile) < 0.0001)
     {
         // Convert TexCoord to tile space
-        float2 worldPosition = MaterialParameter_ScreenPosition + (input.TexCoord * MaterialParameter_ViewSize) + 0.5;
+        float2 worldPosition = MaterialParameter_ScreenPosition + (input.TexCoord * MaterialParameter_ViewSize);
         int worldTileX = (int) floor(worldPosition.x / 16.0);
         int worldTileY = (int) floor(worldPosition.y / 16.0);
 
@@ -122,7 +125,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
         // Check for no tile
         if (tileID == 65535)
         {
-            return float4(1.0, 1.0, 1.0, 1.0);
+            return defaultMaterial;
         }
     
         float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
@@ -134,7 +137,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     }
     
     // Walls for now
-    return float4(0.0, 0.8, 0.0, 1.0);
+    return defaultMaterial;
 }
 
 technique Material
