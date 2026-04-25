@@ -5,6 +5,7 @@
         Layer,
         Depth,
         Normal,
-        Material
+        Material,
+        Lighting
     }
 }

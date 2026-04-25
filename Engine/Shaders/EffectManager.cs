@@ -15,6 +15,7 @@ namespace Terralume.Engine.Shaders
             { EffectType.Depth, "depth" },
             { EffectType.Material, "material" },
             { EffectType.Normal, "normal" },
+            { EffectType.Lighting, "lighting" },
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();
