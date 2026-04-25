@@ -18,7 +18,9 @@ namespace Terralume.Engine.Pipeline
         private BufferCollection bufferCollection;
         private SpriteBatch deferredSpriteBatch;
 
+        private LayerParameter layerParameter;
         private DepthParameter depthParameter;
+        
 
         // Debug
         private RenderTarget2D currentRenderTarget;
@@ -31,12 +33,13 @@ namespace Terralume.Engine.Pipeline
                 bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
+                EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
                 EffectManager.LoadEffect(EffectType.Material);
             });
 
+            layerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f);
             depthParameter = new DepthParameter(0.9f, 0.3f, 0.5f, 0.7f, 0.5f, 0.5f, 0.5f, 0.5f);
-
 
             On_Main.DrawInterface += On_Main_DrawInterface;
 
@@ -71,6 +74,7 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackTileIDTexture(bufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(bufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
+            BufferRenderer.RenderLayerBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget, layerParameter);
             BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget, depthParameter);
             BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget);
 
@@ -82,41 +86,15 @@ namespace Terralume.Engine.Pipeline
 
             KeyboardState keyboardState = Keyboard.GetState();
 
-            if (keyboardState.IsKeyDown(Keys.H))
-            {
-                Main.NewText("[DEBUG] Saving all debug targets");
-
-                string debugDir = "C:\\Users\\sande\\Documents\\Terralume_Debug\\";
-                Directory.CreateDirectory(debugDir);
-
-                void SaveTarget(RenderTarget2D target, string name)
-                {
-                    string path = Path.Combine(debugDir, $"{name}.png");
-                    using FileStream fs = new FileStream(path, FileMode.Create);
-                    target.SaveAsPng(fs, target.Width, target.Height);
-                }
-
-                SaveTarget(Main.screenTarget, "screen_target_start");
-                SaveTarget(bufferCollection.AlbedoBuffer, "albedo_buffer");
-                SaveTarget(bufferCollection.DepthBuffer, "depth_buffer");
-                SaveTarget(bufferCollection.MaterialBuffer, "material_buffer");
-                SaveTarget(targetCollection.NonSolidTileTarget, "non_solid_tile_target");
-                SaveTarget(targetCollection.StableTileTarget, "tile_target");
-                SaveTarget(targetCollection.StableWallTarget, "wall_target");
-                SaveTarget(targetCollection.PlayerTarget, "player_target");
-                SaveTarget(targetCollection.EntityTarget, "entity_target");
-                SaveTarget(targetCollection.ProjectileTarget, "projectile_target");
-            }
-
             if (tick > 5)
             {
                 tick = 0;
 
                 if (keyboardState.IsKeyDown(Keys.NumPad0))
                 {
-                    Main.NewText("[DEBUG] Switching to screen target view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to layer buffer view", Color.Green);
 
-                    currentRenderTarget = Main.screenTarget;
+                    currentRenderTarget = bufferCollection.LayerBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad1))
                 {
@@ -138,9 +116,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad4))
                 {
-                    Main.NewText("[DEBUG] Switching to non solid tile target view", Color.Green);
+                    Main.NewText("[DEBUG] Switching to liquid target view", Color.Green);
 
-                    currentRenderTarget = targetCollection.NonSolidTileTarget;
+                    currentRenderTarget = Main.instance.backWaterTarget;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad5))
                 {

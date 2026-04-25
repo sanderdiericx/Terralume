@@ -2,6 +2,7 @@
 {
     public enum EffectType
     {
+        Layer,
         Depth,
         Normal,
         Material

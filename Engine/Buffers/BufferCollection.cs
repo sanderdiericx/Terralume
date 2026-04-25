@@ -8,6 +8,8 @@ namespace Terralume.Engine.Buffers
     {
         private const int DATA_TEXTURE_RESOLUTION = 256;
 
+        public RenderTarget2D LayerBuffer;
+
         public RenderTarget2D AlbedoBuffer;
         public RenderTarget2D DepthBuffer;
         public RenderTarget2D MaterialBuffer;
@@ -20,6 +22,8 @@ namespace Terralume.Engine.Buffers
 
         public BufferCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
+            LayerBuffer = new RenderTarget2D(graphicsDevice, width, height);
+
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
             MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height);
@@ -38,6 +42,8 @@ namespace Terralume.Engine.Buffers
 
         public void Dispose()
         {
+            LayerBuffer.Dispose();
+
             AlbedoBuffer.Dispose();
             DepthBuffer.Dispose();
             MaterialBuffer.Dispose();
