@@ -9,71 +9,20 @@ float DepthParameter_PlayerDepth;
 float DepthParameter_ProjectileDepth;
 float DepthParameter_OtherDepth;
 
-Texture2D TileTarget;
+float LayerParameter_Background;
+float LayerParameter_Tile;
+float LayerParameter_NonSolidTile;
+float LayerParameter_Wall;
+float LayerParameter_Entity;
+float LayerParameter_Player;
+float LayerParameter_Projectile;
+float LayerParameter_Other;
 
-sampler TileSampler = sampler_state
+Texture2D LayerBuffer;
+
+sampler LayerSampler = sampler_state
 {
-    Texture = (TileTarget);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D NonSolidTileTarget;
-
-sampler NonSolidTileSampler = sampler_state
-{
-    Texture = (NonSolidTileTarget);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D WallTarget;
-
-sampler WallSampler = sampler_state
-{
-    Texture = (WallTarget);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D EntityTarget;
-
-sampler EntitySampler = sampler_state
-{
-    Texture = (EntityTarget);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D PlayerTarget;
-
-sampler PlayerSampler = sampler_state
-{
-    Texture = (PlayerTarget);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D ProjectileTarget;
-
-sampler ProjectileSampler = sampler_state
-{
-    Texture = (ProjectileTarget);
+    Texture = (LayerBuffer);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -90,44 +39,46 @@ struct PixelShaderInput
 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
+    float layer = tex2D(LayerSampler, input.TexCoord).r;
+    
     // Background
-    if (tex2D(ScreenSampler, input.TexCoord).a < 0.01)
+    if (abs(layer - LayerParameter_Background) < 0.0001)
     {
         return float4(DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, DepthParameter_BackgroundDepth, 1.0);
     }
 
     // Player
-    if (tex2D(PlayerSampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_Player) < 0.0001)
     {
         return float4(DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, DepthParameter_PlayerDepth, 1.0);
     }
     
     // Entity
-    if (tex2D(EntitySampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_Entity) < 0.0001)
     {
         return float4(DepthParameter_EntityDepth, DepthParameter_EntityDepth, DepthParameter_EntityDepth, 1.0);
     }
     
     // Projectile
-    if (tex2D(ProjectileSampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_Projectile) < 0.0001)
     {
         return float4(DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, DepthParameter_ProjectileDepth, 1.0);
     }
     
     // Non Solid Tiles
-    if (tex2D(NonSolidTileSampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_NonSolidTile) < 0.0001)
     {
         return float4(DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, DepthParameter_NonSolidTileDepth, 1.0);
     }
-    
+   
     // Tiles
-    if (tex2D(TileSampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_Tile) < 0.0001)
     {
         return float4(DepthParameter_TileDepth, DepthParameter_TileDepth, DepthParameter_TileDepth, 1.0);
     }
     
     // Walls
-    if (tex2D(WallSampler, input.TexCoord).a > 0.01)
+    if (abs(layer - LayerParameter_Wall) < 0.0001)
     {
         return float4(DepthParameter_WallDepth, DepthParameter_WallDepth, DepthParameter_WallDepth, 1.0);
     }

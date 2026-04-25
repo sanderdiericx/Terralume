@@ -74,10 +74,10 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackTileIDTexture(bufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(bufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
-            BufferRenderer.RenderLayerBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget, layerParameter);
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, targetCollection, Main.screenTarget);
-
+            BufferRenderer.RenderLayerBuffer(deferredSpriteBatch, bufferCollection, targetCollection, layerParameter);
+            
+            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, bufferCollection, layerParameter, depthParameter);
+            BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, bufferCollection, layerParameter);
             BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, bufferCollection, targetCollection);
 
             /*

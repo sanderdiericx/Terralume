@@ -1,6 +1,8 @@
-﻿namespace Terralume.Engine.Buffers.Data
+﻿using Microsoft.Xna.Framework.Graphics;
+
+namespace Terralume.Engine.Buffers.Data
 {
-    public struct LayerParameter
+    public class LayerParameter
     {
         public float Background;
         public float Tile;
@@ -21,6 +23,18 @@
             Player = player;
             Projectile = projectile;
             Other = other;
+        }
+
+        public void SetUniforms(Effect effect)
+        {
+            effect.Parameters["LayerParameter_Background"].SetValue(Background);
+            effect.Parameters["LayerParameter_Tile"].SetValue(Tile);
+            effect.Parameters["LayerParameter_NonSolidTile"].SetValue(NonSolidTile);
+            effect.Parameters["LayerParameter_Wall"].SetValue(Wall);
+            effect.Parameters["LayerParameter_Entity"].SetValue(Entity);
+            effect.Parameters["LayerParameter_Player"].SetValue(Player);
+            effect.Parameters["LayerParameter_Projectile"].SetValue(Projectile);
+            effect.Parameters["LayerParameter_Other"].SetValue(Other);
         }
     }
 }

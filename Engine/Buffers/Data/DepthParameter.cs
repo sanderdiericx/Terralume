@@ -1,6 +1,8 @@
-﻿namespace Terralume.Engine.Buffers.Data
+﻿using Microsoft.Xna.Framework.Graphics;
+
+namespace Terralume.Engine.Buffers.Data
 {
-    public struct DepthParameter
+    public class DepthParameter
     {
         public float BackgroundDepth;
         public float TileDepth;
@@ -21,6 +23,18 @@
             PlayerDepth = playerDepth;
             ProjectileDepth = projectileDepth;
             OtherDepth = otherDepth;
+        }
+
+        public void SetUniforms(Effect effect)
+        {
+            effect.Parameters["DepthParameter_BackgroundDepth"].SetValue(BackgroundDepth);
+            effect.Parameters["DepthParameter_TileDepth"].SetValue(TileDepth);
+            effect.Parameters["DepthParameter_NonSolidTileDepth"].SetValue(NonSolidTileDepth);
+            effect.Parameters["DepthParameter_WallDepth"].SetValue(WallDepth);
+            effect.Parameters["DepthParameter_EntityDepth"].SetValue(EntityDepth);
+            effect.Parameters["DepthParameter_PlayerDepth"].SetValue(PlayerDepth);
+            effect.Parameters["DepthParameter_ProjectileDepth"].SetValue(ProjectileDepth);
+            effect.Parameters["DepthParameter_OtherDepth"].SetValue(OtherDepth);
         }
     }
 }

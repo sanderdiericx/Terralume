@@ -22,7 +22,7 @@ namespace Terralume.Engine.Buffers
 
         public BufferCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
-            LayerBuffer = new RenderTarget2D(graphicsDevice, width, height);
+            LayerBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height);
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height);
