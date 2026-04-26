@@ -1,16 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Terralume.Engine.Buffers.Data;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Terralume.Engine.Buffers
+namespace Terralume.Engine.Pipeline
 {
-    class LightCollection : ModSystem
+    class LightCapturer : ModSystem
     {
-        private static List<Tuple<Vector2, Vector3>> hookedLights = new();
+        private static readonly float PROJECTILE_RADIUS = 100f;
+
+        private static List<(Vector2, LightProfile)> hookedLights = new List<(Vector2, LightProfile)>();
 
         public override void Load()
         {
@@ -29,7 +31,22 @@ namespace Terralume.Engine.Buffers
             orig(position, rgb);
             if (rgb.LengthSquared() > 0.01f)
             {
-                hookedLights.Add(new Tuple<Vector2, Vector3>(position, rgb));
+                Vector2 screenPos = position - Main.screenPosition;
+                
+                hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), PROJECTILE_RADIUS)));
+            }
+        }
+
+        private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
+        {
+            orig(i, j, r, g, b);
+            Vector3 color = new Vector3(r, g, b);
+
+            if (color.LengthSquared() > 0.01f)
+            {
+                Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
+
+                hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), PROJECTILE_RADIUS)));
             }
         }
 
@@ -65,50 +82,33 @@ namespace Terralume.Engine.Buffers
 
                         if (r > 0 || g > 0 || b > 0)
                         {
-                            Vector2 worldPos = new Vector2(i * 16 + 8, j * 16 + 8); // Center of the 16x16 tile
+                            Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
-                            hookedLights.Add(new Tuple<Vector2, Vector3>(worldPos, new Vector3(r, g, b)));
-
+                            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), PROJECTILE_RADIUS)));
                         }
                     }
                 }
             }
         }
 
-
-        private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
-        {
-            orig(i, j, r, g, b);
-            Vector3 color = new Vector3(r, g, b);
-            if (color.LengthSquared() > 0.01f)
-            {
-                // Convert tile grid coordinates (16x16 pixels) to world center coordinates
-                Vector2 worldPos = new Vector2(i * 16 + 8, j * 16 + 8);
-                hookedLights.Add(new Tuple<Vector2, Vector3>(worldPos, color));
-            }
-        }
-
-        public static Tuple<Vector2[], Vector4[], int> GetClosestLights(int count, Vector2 screenSize)
+        public static List<(Vector2, LightProfile)> GetOnScreenLights(Vector2 screenSize)
         {
             CaptureVisibleTileLights();
 
-            Vector2[] positions = new Vector2[count];
-            Vector4[] colors = new Vector4[count];
-            int lightCount = 0;
+            List<(Vector2, LightProfile)> onScreenLights = new List<(Vector2, LightProfile)>();
 
-            Vector2 center = Main.screenPosition + new Vector2(screenSize.X / 2, screenSize.Y / 2);
-            var sortedLights = hookedLights.OrderBy(l => Vector2.DistanceSquared(l.Item1, center)).Take(count).ToList();
-
-            for (int i = 0; i < sortedLights.Count; i++)
+            for (int i = 0; i < hookedLights.Count; i++)
             {
-                positions[i] = sortedLights[i].Item1 - Main.screenPosition;
+                Vector2 lightPos = hookedLights[i].Item1;
 
-                colors[i] = new Vector4(sortedLights[i].Item2, 1f);
-                lightCount++;
+                if (lightPos.X >= 0 && lightPos.Y >= 0 && lightPos.X < screenSize.X && lightPos.Y < screenSize.Y)
+                {
+                    onScreenLights.Add(hookedLights[i]);
+                }
             }
 
             hookedLights.Clear();
-            return new Tuple<Vector2[], Vector4[], int>(positions, colors, lightCount);
+            return onScreenLights;
         }
     }
 }

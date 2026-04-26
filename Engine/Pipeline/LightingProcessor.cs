@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;

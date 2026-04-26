@@ -1,16 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Pipeline;
 using Terralume.Engine.Shaders;
 using Terraria;
-using Terraria.ID;
 
 namespace Terralume.Engine.Render
 {
     public static class OutputRenderer
     {
+        private static readonly int MAX_LIGHTS = 32;
+
         public static void RenderLightingBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -27,13 +29,25 @@ namespace Terralume.Engine.Render
             effect.Parameters["DepthScale"].SetValue(100);
             effect.Parameters["CameraPos"].SetValue(new Vector3(bufferCollection.AlbedoBuffer.Width / 2f, bufferCollection.AlbedoBuffer.Height / 2f, 100f));
 
-            Tuple<Vector2[], Vector4[], int> closestLights = LightCollection.GetClosestLights(6, screenSize);
+            List<(Vector2, LightProfile)> onScreenLights = LightCapturer.GetOnScreenLights(screenSize);
 
-            effect.Parameters["LightPositions"].SetValue(closestLights.Item1);
-            effect.Parameters["LightColors"].SetValue(closestLights.Item2);
-            effect.Parameters["ActiveLights"].SetValue(closestLights.Item3);
+            int ActiveLights = onScreenLights.Count < MAX_LIGHTS ? onScreenLights.Count : MAX_LIGHTS;
 
-            effect.Parameters["LightRadius"].SetValue(300f);
+            Vector2[] lightPositions = new Vector2[ActiveLights];
+            Vector4[] lightColors = new Vector4[ActiveLights];
+            float[] lightRadii = new float[ActiveLights];
+
+            for (int i = 0; i < ActiveLights; i++)
+            {
+                lightPositions[i] = onScreenLights[i].Item1;
+                lightColors[i] = onScreenLights[i].Item2.LightColor;
+                lightRadii[i] = onScreenLights[i].Item2.LightRadius;
+            }
+
+            effect.Parameters["LightPositions"].SetValue(lightPositions);
+            effect.Parameters["LightColors"].SetValue(lightColors);
+            effect.Parameters["LightRadii"].SetValue(lightRadii);
+            effect.Parameters["ActiveLights"].SetValue(ActiveLights);
             effect.Parameters["LightDepth"].SetValue(90f);
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);

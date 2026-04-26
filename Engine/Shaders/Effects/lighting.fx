@@ -1,7 +1,7 @@
 ﻿sampler2D AlbedoSampler : register(s0);
 
 static const float PI = 3.14159265359f;
-static const int MAX_LIGHTS = 6;
+static const int MAX_LIGHTS = 32;
 
 float2 ScreenSize;
 int DepthScale;
@@ -9,9 +9,9 @@ float3 CameraPos;
 
 float2 LightPositions[MAX_LIGHTS];
 float4 LightColors[MAX_LIGHTS];
+float LightRadii[MAX_LIGHTS];
 int ActiveLights;
 
-float LightRadius;
 float LightDepth;
 
 Texture2D DepthBuffer;
@@ -59,10 +59,10 @@ struct PixelShaderInput
 };
 
 
-float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir);
+float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, int radius);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
-float3 RadianceFunction(float3 lightColor, float dist);
+float3 RadianceFunction(float3 lightColor, float dist, int radius);
 
 float NormalDistributionFunction(float roughness, float3 normal, float3 halfVector);
 
@@ -101,9 +101,8 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     for (int i = 0; i < ActiveLights; i++)
     {
         float3 lightPos = float3(LightPositions[i].x, LightPositions[i].y, LightDepth);
-        float3 lightColor = LightColors[i].rgb;
         
-        output += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir);
+        output += CalculatePointLight(pixelPos, lightPos, LightColors[i].rgb, albedo, material, normal, viewDir, LightRadii[i]);
     }
 
     output = ToGamma(output);
@@ -112,13 +111,13 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 }
 
 
-float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir)
+float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, int radius)
 {
     float3 lightDir = normalize(lightPos - pixelPos);
     float3 halfVector = normalize(viewDir + lightDir);
     
     float3 baseReflectivity = BaseReflectivityFunction(material.r, albedo);
-    float3 radianceColor = RadianceFunction(lightColor, length(lightPos - pixelPos));
+    float3 radianceColor = RadianceFunction(lightColor, length(lightPos - pixelPos), radius);
     
     float distribution = NormalDistributionFunction(material.g, normal, halfVector);
     float geometry = GeometrySmith(material.g, normal, viewDir, lightDir);
@@ -135,9 +134,9 @@ float3 BaseReflectivityFunction(float metallic, float3 albedo)
     return (1.0 - metallic) * 0.04 + metallic * albedo;
 }
 
-float3 RadianceFunction(float3 lightColor, float dist)
+float3 RadianceFunction(float3 lightColor, float dist, int radius)
 {
-    float scaledDist = dist / LightRadius;
+    float scaledDist = dist / radius;
     
     return lightColor * (1.0 / (scaledDist * scaledDist + 1.0));
 }
