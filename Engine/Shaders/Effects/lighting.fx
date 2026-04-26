@@ -1,18 +1,15 @@
 ﻿sampler2D AlbedoSampler : register(s0);
 
 static const float PI = 3.14159265359f;
-static const int MAX_LIGHTS = 32;
 
 float2 ScreenSize;
 int DepthScale;
 float3 CameraPos;
 
-float2 LightPositions[MAX_LIGHTS];
-float4 LightColors[MAX_LIGHTS];
-float LightRadii[MAX_LIGHTS];
 int ActiveLights;
-
 float LightDepth;
+
+float2 LightDataTextureSize;
 
 Texture2D DepthBuffer;
 
@@ -50,6 +47,29 @@ sampler MaterialSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D LightPositionTexture;
+
+sampler LightPositionSampler = sampler_state
+{
+    Texture = (LightPositionTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D LightColorTexture;
+
+sampler LightColorSampler = sampler_state
+{
+    Texture = (LightColorTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 struct PixelShaderInput
 {
@@ -99,10 +119,21 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 output = float3(0.0, 0.0, 0.0);
     
     for (int i = 0; i < ActiveLights; i++)
-    {
-        float3 lightPos = float3(LightPositions[i].x, LightPositions[i].y, LightDepth);
+    {        
+        // Sample light position, radius and color for this index from the data textures
+        float xIndex = fmod((float) i, LightDataTextureSize.x);
+        float yIndex = floor((float) i / LightDataTextureSize.x);
+        float2 lightUV = (float2(xIndex, yIndex) + 0.5) / LightDataTextureSize;
         
-        output += CalculatePointLight(pixelPos, lightPos, LightColors[i].rgb, albedo, material, normal, viewDir, LightRadii[i]);
+        float4 positionSample = tex2Dlod(LightPositionSampler, float4(lightUV.x, lightUV.y, 0, 0));
+        float4 colorSample = tex2Dlod(LightColorSampler, float4(lightUV.x, lightUV.y, 0, 0));
+        
+        float3 lightPos = float3(positionSample.r, positionSample.g, LightDepth);
+        float lightRadius = positionSample.b;
+        
+        float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);
+        
+        output += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightRadius);
     }
 
     output = ToGamma(output);

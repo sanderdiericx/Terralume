@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -42,7 +45,11 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
+            List<(Vector2, LightProfile)> onScreenLights = LightCapturer.GetOnScreenLights(new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height));
+            LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, onScreenLights);
+            int activeLights = onScreenLights.Count;
+
+            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, activeLights);
 
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(outputCollection.LightingBuffer, Vector2.Zero, Color.White);

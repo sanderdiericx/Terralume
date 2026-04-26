@@ -29,10 +29,10 @@ namespace Terralume.Engine.Pipeline
         private void CaptureVectorLight(On_Lighting.orig_AddLight_Vector2_Vector3 orig, Vector2 position, Vector3 rgb)
         {
             orig(position, rgb);
-            if (rgb.LengthSquared() > 0.01f)
+            if (rgb.LengthSquared() > 0.3f)
             {
                 Vector2 screenPos = position - Main.screenPosition;
-                
+
                 hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), PROJECTILE_RADIUS)));
             }
         }
@@ -42,7 +42,7 @@ namespace Terralume.Engine.Pipeline
             orig(i, j, r, g, b);
             Vector3 color = new Vector3(r, g, b);
 
-            if (color.LengthSquared() > 0.01f)
+            if (color.LengthSquared() > 0.3f)
             {
                 Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
