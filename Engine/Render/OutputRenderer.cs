@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Shaders;
 using Terraria;
+using Terraria.ID;
 
 namespace Terralume.Engine.Render
 {
@@ -18,18 +21,20 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Lighting);
 
-            effect.Parameters["ScreenSize"].SetValue(new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height));
+            Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
+
+            effect.Parameters["ScreenSize"].SetValue(screenSize);
             effect.Parameters["DepthScale"].SetValue(100);
+            effect.Parameters["CameraPos"].SetValue(new Vector3(bufferCollection.AlbedoBuffer.Width / 2f, bufferCollection.AlbedoBuffer.Height / 2f, 100f));
 
-            // Center the light and camera on the screen
-            float screenCenterX = bufferCollection.AlbedoBuffer.Width / 2f;
-            float screenCenterY = bufferCollection.AlbedoBuffer.Height / 2f;
+            Tuple<Vector2[], Vector4[], int> closestLights = LightCollection.GetClosestLights(6, screenSize);
 
-            effect.Parameters["CameraPos"].SetValue(new Vector3(screenCenterX, screenCenterY, 100f));
-            effect.Parameters["LightPos"].SetValue(new Vector3(screenCenterX, screenCenterY, 50f));
-            effect.Parameters["LightColor"].SetValue(new Vector3(5.0f, 5.0f, 5.0f));
-            effect.Parameters["LightRadius"].SetValue(0.01f);
-            effect.Parameters["EmmisiveMultiplier"].SetValue(0.4f);
+            effect.Parameters["LightPositions"].SetValue(closestLights.Item1);
+            effect.Parameters["LightColors"].SetValue(closestLights.Item2);
+            effect.Parameters["ActiveLights"].SetValue(closestLights.Item3);
+
+            effect.Parameters["LightRadius"].SetValue(300f);
+            effect.Parameters["LightDepth"].SetValue(90f);
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);

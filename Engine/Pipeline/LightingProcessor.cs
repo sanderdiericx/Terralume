@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
@@ -47,6 +49,7 @@ namespace Terralume.Engine.Pipeline
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(outputCollection.LightingBuffer, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
+
 
             // Draw UI normally
             orig(self, gameTime);
