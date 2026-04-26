@@ -19,6 +19,19 @@ namespace Terralume.Engine.Pipeline
             On_Lighting.AddLight_int_int_float_float_float += CaptureTileLight;
         }
 
+        // Make sure ores dont cast light
+        // TO DO: Filter out only ores
+        public override void PostSetupContent()
+        {
+            for (int i = 0; i < TileID.Count; i++)
+            {
+                if (Main.tileShine[i] > 0)
+                {
+                    Main.tileShine[i] = 0;
+                }
+            }
+        }
+
         public override void Unload()
         {
             On_Lighting.AddLight_Vector2_Vector3 -= CaptureVectorLight;
