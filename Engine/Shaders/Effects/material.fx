@@ -69,7 +69,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 	// Background
     if (abs(layer - LayerParameter_Background) < 0.0001)
     {
-        return float4(0.0, 0.0, 0.0, 0.0);
+        return float4(0.0, 1.0, 0.0, 1.0);
     }
     
     if (abs(layer - LayerParameter_Player) < 0.0001 || abs(layer - LayerParameter_Entity) < 0.0001 || abs(layer - LayerParameter_Projectile) < 0.0001)

@@ -40,7 +40,7 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
-            BufferComposer.ComposeGBuffer();
+            BufferComposer.ComposeGBuffer(deferredSpriteBatch);
 
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
@@ -54,7 +54,6 @@ namespace Terralume.Engine.Pipeline
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(outputCollection.LightingBuffer, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
-
 
             // Draw UI normally
             orig(self, gameTime);

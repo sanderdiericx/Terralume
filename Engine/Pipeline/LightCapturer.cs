@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,8 +11,6 @@ namespace Terralume.Engine.Pipeline
 {
     class LightCapturer : ModSystem
     {
-        private static readonly float PROJECTILE_RADIUS = 100f;
-
         private static List<(Vector2, LightProfile)> hookedLights = new List<(Vector2, LightProfile)>();
 
         public override void Load()
@@ -29,12 +28,10 @@ namespace Terralume.Engine.Pipeline
         private void CaptureVectorLight(On_Lighting.orig_AddLight_Vector2_Vector3 orig, Vector2 position, Vector3 rgb)
         {
             orig(position, rgb);
-            if (rgb.LengthSquared() > 0.3f)
-            {
-                Vector2 screenPos = position - Main.screenPosition;
 
-                hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), PROJECTILE_RADIUS)));
-            }
+            Vector2 screenPos = position - Main.screenPosition;
+
+            hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
         }
 
         private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
@@ -42,14 +39,12 @@ namespace Terralume.Engine.Pipeline
             orig(i, j, r, g, b);
             Vector3 color = new Vector3(r, g, b);
 
-            if (color.LengthSquared() > 0.3f)
-            {
-                Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
+            Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
-                hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), PROJECTILE_RADIUS)));
-            }
+            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
         }
 
+        // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
         private static void CaptureVisibleTileLights()
         {
             int startX = Math.Clamp((int)(Main.screenPosition.X / 16f) - 2, 0, Main.maxTilesX - 1);
@@ -78,19 +73,18 @@ namespace Terralume.Engine.Pipeline
                             r = 0.9f; g = 0.7f; b = 0.6f;
                         }
 
-                        // TileLoader.ModifyLight(i, j, tile.TileType, ref r, ref g, ref b);
-
                         if (r > 0 || g > 0 || b > 0)
                         {
                             Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
-                            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), PROJECTILE_RADIUS)));
+                            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
                         }
                     }
                 }
             }
         }
 
+        // Gets the screen space position and light profile of all lights on screen
         public static List<(Vector2, LightProfile)> GetOnScreenLights(Vector2 screenSize)
         {
             CaptureVisibleTileLights();

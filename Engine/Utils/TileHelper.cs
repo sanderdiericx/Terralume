@@ -2,13 +2,16 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Terralume.Engine.Constants;
 using Terraria;
 
 namespace Terralume.Engine.Utils
 {
-    // TO DO, optimize by caching pixel color arrays and others
     public static class TileHelper
     {
+        private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static Color[] tileIDPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+
         // Builds a flat array with tile ids of all visible tiles
         //
         // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
@@ -72,17 +75,15 @@ namespace Terralume.Engine.Utils
         {
             int pixelCount = (tileIDs.Length + 1) / 2; // Ceiling division
 
-            Color[] pixels = new Color[tileIDTexture.Width * tileIDTexture.Height];
+            int safePixelCount = Math.Min(pixelCount, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
 
-            int safePixelCount = Math.Min(pixelCount, pixels.Length);
-
-            for (int i = 0; i < pixelCount; i++)
+            for (int i = 0; i < safePixelCount; i++)
             {
                 int index = i * 2;
                 short u0 = tileIDs[index];
                 short u1 = (index + 1 < tileIDs.Length) ? tileIDs[index + 1] : (short)-1;
 
-                pixels[i] = new Color(
+                tileIDPixels[i] = new Color(
                     (byte)(u0 & 0xFF), // low byte of u0
                     (byte)(u0 >> 8), // high byte of u0
                     (byte)(u1 & 0xFF), // low byte of u1
@@ -90,23 +91,23 @@ namespace Terralume.Engine.Utils
                 );
             }
 
-            tileIDTexture.SetData(pixels);
+            tileIDTexture.SetData(tileIDPixels);
         }
 
         // Encodes a dictionary mapping tile ID to material vector into a texture, the position inside of a color inside the texture refers to its tile ID
         public static void PackMaterialTexture(Texture2D materialTexture, Dictionary<int, Vector3> mappedMaterials)
         {
-            Color[] pixels = new Color[materialTexture.Width * materialTexture.Height];
+            int materialCount = Math.Min(mappedMaterials.Count, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
 
-            for (int i = 0; i < pixels.Length; i++)
+            for (int i = 0; i < materialCount; i++)
             {
                 Vector3 color = new Vector3(0.0f, 0.0f, 0.0f);
                 mappedMaterials.TryGetValue(i, out color);
 
-                pixels[i] = new Color(color.X, color.Y, color.Z);
+                materialPixels[i] = new Color(color.X, color.Y, color.Z);
             }
 
-            materialTexture.SetData(pixels);
+            materialTexture.SetData(materialPixels);
         }
     }
 }

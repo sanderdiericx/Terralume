@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Shaders;
 using Terraria;
 
@@ -8,8 +9,7 @@ namespace Terralume.Engine.Render
 {
     public static class OutputRenderer
     {
-        private static readonly int MAX_LIGHTS = 32;
-
+        // Uses the composed G-Buffer to compute lighting for the albedo buffer
         public static void RenderLightingBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection, int activeLights)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -28,7 +28,7 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ActiveLights"].SetValue(activeLights);
             effect.Parameters["LightDepth"].SetValue(90f);
-            effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(outputCollection.LightPositionTexture.Width, outputCollection.LightPositionTexture.Height));
+            effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);

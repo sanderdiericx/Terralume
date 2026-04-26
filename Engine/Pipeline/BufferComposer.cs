@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
@@ -13,17 +14,12 @@ namespace Terralume.Engine.Pipeline
     public class BufferComposer : ModSystem
     {
         public static BufferCollection BufferCollection;
-        private static SpriteBatch deferredSpriteBatch;
-
-        private static readonly LayerParameter layerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f);
-        private static readonly DepthParameter depthParameter = new DepthParameter(0.1f, 0.7f, 0.5f, 0.3f, 0.5f, 0.5f, 0.5f, 0.5f);
 
         public override void Load()
         {
             Main.QueueMainThreadAction(() =>
             {
                 BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
-                deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
@@ -43,24 +39,27 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Must be called at On_Main.DrawInterface!
-        public static void ComposeGBuffer()
+        public static void ComposeGBuffer(SpriteBatch spriteBatch)
         {
             UpdateBuffer();
 
             TargetCapturer.CaptureInterfaceTargets();
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
 
+            LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
+            DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
+
             short[] tileIDs = TileHelper.GetVisibleTiles();
 
             TileHelper.PackTileIDTexture(BufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(BufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
 
-            BufferRenderer.RenderLayerBuffer(deferredSpriteBatch, BufferCollection, targetCollection, layerParameter);
+            BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
 
-            BufferRenderer.RenderDepthBuffer(deferredSpriteBatch, BufferCollection, layerParameter, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(deferredSpriteBatch, BufferCollection, layerParameter);
-            BufferRenderer.RenderNormalBuffer(deferredSpriteBatch, BufferCollection);
-            BufferRenderer.RenderAlbedoBuffer(deferredSpriteBatch, BufferCollection, targetCollection);
+            BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
+            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter);
+            BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
+            BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);
         }
 
         // Make sure all buffers match screen size

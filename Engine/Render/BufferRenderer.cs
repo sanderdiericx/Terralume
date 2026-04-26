@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -63,7 +64,7 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders a depth map by sampling pixels from multiple captured render targets as layers to asign depth values
+        // Renders a depth map by comparing layers and then fetching the depth value for that layer from the depth parameter
         public static void RenderDepthBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, DepthParameter depthParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -86,6 +87,7 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
+        // Renders a material buffer
         public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -105,9 +107,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(Main.screenPosition);
             effect.Parameters["MaterialParameter_ViewSize"].SetValue(viewSize);
             effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
-            effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(bufferCollection.MaterialTexture.Width, bufferCollection.MaterialTexture.Height));
+            effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["MaterialParameter_DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
-
 
             layerParameter.SetUniforms(effect);
 
@@ -125,6 +126,7 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
+        // Renders a normal buffer by converting pixels to greyscale and then running a weighted sobel filter over it
         public static void RenderNormalBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;

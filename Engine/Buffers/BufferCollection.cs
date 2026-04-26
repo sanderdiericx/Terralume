@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using Terralume.Engine.Constants;
 using Terraria;
 
 namespace Terralume.Engine.Buffers
 {
     public class BufferCollection : IDisposable
     {
-        private const int DATA_TEXTURE_RESOLUTION = 256;
-
         public RenderTarget2D LayerBuffer;
         public RenderTarget2D DepthBuffer;
 
@@ -30,8 +29,8 @@ namespace Terralume.Engine.Buffers
             MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
-            TileIDTexture = new Texture2D(graphicsDevice, DATA_TEXTURE_RESOLUTION, DATA_TEXTURE_RESOLUTION);
-            MaterialTexture = new Texture2D(graphicsDevice, DATA_TEXTURE_RESOLUTION, DATA_TEXTURE_RESOLUTION);
+            TileIDTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+            MaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
 
             Width = width;
             Height = height;

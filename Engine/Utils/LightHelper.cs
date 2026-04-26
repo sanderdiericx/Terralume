@@ -1,21 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 
 namespace Terralume.Engine.Utils
 {
     public static class LightHelper
     {
-        private const int MAX_PIXELS = 32 * 32;
-
-        private static HalfVector4[] lightPositionPixels = new HalfVector4[MAX_PIXELS];
-        private static Color[] lightColorPixels = new Color[MAX_PIXELS];
+        private static HalfVector4[] lightPositionPixels = new HalfVector4[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
+        private static Color[] lightColorPixels = new Color[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
 
         public static void PackLightTextures(Texture2D lightPositionTexture, Texture2D lightColorTexture, List<(Vector2, LightProfile)> lightProfiles)
         {
-            int lightCount = System.Math.Min(lightProfiles.Count, MAX_PIXELS);
+            int lightCount = Math.Min(lightProfiles.Count, RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION);
 
             for (int i = 0; i < lightCount; i++)
             {
