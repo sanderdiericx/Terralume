@@ -16,7 +16,7 @@ namespace Terralume.Engine.Pipeline
         private static SpriteBatch deferredSpriteBatch;
 
         private static readonly LayerParameter layerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f);
-        private static readonly DepthParameter depthParameter = new DepthParameter(0.2f, 0.9f, 0.7f, 0.5f, 0.7f, 0.7f, 0.7f, 0.7f);
+        private static readonly DepthParameter depthParameter = new DepthParameter(0.1f, 0.7f, 0.5f, 0.3f, 0.5f, 0.5f, 0.5f, 0.5f);
 
         public override void Load()
         {

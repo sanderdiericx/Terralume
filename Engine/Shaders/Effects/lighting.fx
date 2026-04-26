@@ -1,18 +1,16 @@
 ﻿sampler2D AlbedoSampler : register(s0);
 
+static const float PI = 3.14159265359f;
+
 float2 ScreenSize;
+int DepthScale;
+float EmmisiveMultiplier;
 
-int WorldThickness;
-float LightDepth;
-float LightIntensity;
+float3 CameraPos;
 
-float Constant;
-float Linear;
-float Quadratic;
-
-float3 Ambient;
-float3 Diffuse;
-float3 Specular;
+float3 LightPos;
+float3 LightColor;
+float LightRadius;
 
 Texture2D DepthBuffer;
 
@@ -38,6 +36,19 @@ sampler NormalSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D MaterialBuffer;
+
+sampler MaterialSampler = sampler_state
+{
+    Texture = (MaterialBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+
 struct PixelShaderInput
 {
     float4 Position : SV_POSITION;
@@ -45,35 +56,137 @@ struct PixelShaderInput
     float4 Color : COLOR0;
 };
 
+
+float3 BaseReflectivityFunction(float metallic, float3 albedo);
+float3 RadianceFunction(float3 lightColor, float dist);
+
+float NormalDistributionFunction(float roughness, float3 normal, float3 halfVector);
+
+float GeometrySchlickGGX(float roughness, float3 normal, float3 x);
+float GeometrySmith(float roughness, float3 normal, float3 viewDir, float3 lightDir);
+
+float3 FresnelSchlickApproximationFunction(float3 baseReflectivity, float3 viewDir, float3 halfVector);
+float3 EnergyConservationFunction(float3 fresnel, float metallic);
+
+float3 CalculateBRDFSpecular(float distribution, float geometry, float3 fresnel, float3 normal, float3 viewDir, float3 lightDir);
+float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 specular, float3 radianceColor, float3 normal, float3 lightDir);
+
+float3 ToLinear(float3 sRGB);
+float3 ToGamma(float3 linearRGB);
+
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+{     
+    float4 albedoOriginal = tex2D(AlbedoSampler, input.TexCoord);
+    
+    if (albedoOriginal.a < 0.01)
+    {
+        discard;
+    }
+    
+    float3 albedo = ToLinear(albedoOriginal.rgb);
+    float3 normal = normalize(tex2D(NormalSampler, input.TexCoord).rgb * 2.0 - 1.0);
+    float3 material = tex2D(MaterialSampler, input.TexCoord).rgb;
+    
+    float pixelZ = tex2D(DepthSampler, input.TexCoord).r * DepthScale;
+    float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);
+    
+    float3 viewDir = normalize(CameraPos - pixelPos);
+    float3 lightDir = normalize(LightPos - pixelPos);
+    float3 halfVector = normalize(viewDir + lightDir);
+    
+    float3 baseReflectivity = BaseReflectivityFunction(material.r, albedo);
+    float3 radianceColor = RadianceFunction(LightColor, length(LightPos - pixelPos));
+    
+    float distribution = NormalDistributionFunction(material.g, normal, halfVector);
+    float geometry = GeometrySmith(material.g, normal, viewDir, lightDir);
+    
+    float3 fresnel = FresnelSchlickApproximationFunction(baseReflectivity, viewDir, halfVector);
+    float3 energyConservation = EnergyConservationFunction(fresnel, material.r);
+    float3 specular = CalculateBRDFSpecular(distribution, geometry, fresnel, normal, viewDir, lightDir);
+    
+    float3 output = CalculateOutgoingLight(energyConservation, albedo, specular, radianceColor, normal, lightDir);
+
+    float emmisive = albedo * material.b;
+    output += emmisive * EmmisiveMultiplier;
+    
+    output = ToGamma(output);
+    
+    return float4(output.r, output.g, output.b, albedoOriginal.a);
+}
+
+float3 BaseReflectivityFunction(float metallic, float3 albedo)
 {
-    float4 albedo = tex2D(AlbedoSampler, input.TexCoord);
+    return (1.0 - metallic) * 0.04 + metallic * albedo;
+}
+
+float3 RadianceFunction(float3 lightColor, float dist)
+{
+    float scaledDist = dist * LightRadius;
     
-    float3 viewDir = float3(0.0, 0.0, 1.0);
-    float3 lightPos = float3(ScreenSize.x / 2.0, ScreenSize.y / 2.0, LightDepth);
-    float3 normal = normalize(tex2D(NormalSampler, input.TexCoord) * 2.0 - 1.0);
-    float3 fragPos = float3(input.Position.x, input.Position.y, tex2D(DepthSampler, input.TexCoord).r * WorldThickness);
+    return lightColor * (1.0 / (scaledDist * scaledDist + 1.0));
+}
+
+float NormalDistributionFunction(float roughness, float3 normal, float3 halfVector)
+{
+    float r = max(roughness, 0.04);
+
+    float alpha = r * r;
+    float alpha2 = alpha * alpha;
     
-    float3 lightDir = normalize(lightPos - fragPos);
+    float NdotH = max(dot(normal, halfVector), 0.0);
+    float denom = (NdotH * NdotH) * (alpha2 - 1.0) + 1.0;
     
-    float diff = max(dot(normal, lightDir), 0.0);
+    return alpha2 / (PI * (denom * denom));
+}
+
+float GeometrySchlickGGX(float roughness, float3 normal, float3 x)
+{
+    float r = max(roughness, 0.04);
     
-    float3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+    float k = ((r + 1.0) * (r + 1.0)) / 8.0;
+    float NdotX = max(dot(normal, x), 0.0);
+    float denom = NdotX * (1.0 - k) + k;
+
+    return NdotX / denom;
+}
+
+float GeometrySmith(float roughness, float3 normal, float3 viewDir, float3 lightDir)
+{
+    return GeometrySchlickGGX(roughness, normal, viewDir) * GeometrySchlickGGX(roughness, normal, lightDir);
+}
+
+float3 FresnelSchlickApproximationFunction(float3 baseReflectivity, float3 viewDir, float3 halfVector)
+{
+    return baseReflectivity + (1.0 - baseReflectivity) * pow(1.0 - dot(viewDir, halfVector), 5);
+}
+
+float3 EnergyConservationFunction(float3 fresnel, float metallic)
+{
+    return (1.0 - fresnel) * (1.0 - metallic);
+}
+
+float3 CalculateBRDFSpecular(float distribution, float geometry, float3 fresnel, float3 normal, float3 viewDir, float3 lightDir)
+{
+    float3 num = distribution * geometry * fresnel;
+    float denom = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
     
-    float distance = length(lightPos - fragPos) / 100.0;
-    float attenuation = 1.0 / (Constant + Linear * distance + Quadratic * (distance * distance));
-    
-    float3 ambient = Ambient * albedo.rgb;
-    float3 diffuse = Diffuse * diff * albedo.rgb * LightIntensity;
-    float3 specular = Specular * spec * LightIntensity;
-    
-    diffuse *= attenuation;
-    specular *= attenuation;
-    
-    float3 output = ambient + diffuse + specular;
-    
-    return float4(output.r, output.g, output.b, albedo.a);
+    return num / denom;
+}
+
+float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 specular, float3 radianceColor, float3 normal, float3 lightDir)
+{
+    return (energyConservation * (albedo / PI) + specular) * radianceColor * max(dot(normal, lightDir), 0.0);
+}
+
+
+float3 ToLinear(float3 sRGB)
+{
+    return pow(sRGB, 2.2);
+}
+
+float3 ToGamma(float3 linearRGB)
+{
+    return pow(linearRGB, 1.0 / 2.2);
 }
 
 technique Lighting
