@@ -25,8 +25,10 @@ namespace Terralume.Engine.Pipeline
 
             On_Main.DoDraw += On_Main_DoDraw;
             On_Main.RenderBackground += On_Main_RenderBackground;
-            On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;
             On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
+
+            On_Main.DoDraw_Tiles_Solid += On_Main_DoDraw_Tiles_Solid;
+            On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;            
 
             On_Main.DrawNPCs += On_Main_DrawNPCs;
             On_Main.DrawPlayers_AfterProjectiles += On_Main_DrawPlayers_AfterProjectiles;
@@ -46,8 +48,10 @@ namespace Terralume.Engine.Pipeline
 
             On_Main.DoDraw -= On_Main_DoDraw;
             On_Main.RenderBackground -= On_Main_RenderBackground;
-            On_Main.DoDraw_Tiles_NonSolid -= On_Main_DoDraw_Tiles_NonSolid;
             On_Main.DoDraw_WallsAndBlacks -= On_Main_DoDraw_WallsAndBlacks;
+
+            On_Main.DoDraw_Tiles_Solid -= On_Main_DoDraw_Tiles_Solid;
+            On_Main.DoDraw_Tiles_NonSolid -= On_Main_DoDraw_Tiles_NonSolid;
 
             On_Main.DrawNPCs -= On_Main_DrawNPCs;
             On_Main.DrawPlayers_AfterProjectiles -= On_Main_DrawPlayers_AfterProjectiles;
@@ -68,6 +72,25 @@ namespace Terralume.Engine.Pipeline
             backgroundRedrawn = true;
         }
 
+        private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
+        {
+            TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, TargetCollection);
+            TargetRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, TargetCollection, ref backgroundRedrawn);
+
+            orig(self);
+
+            TargetRenderer.CopyWallTarget(deferredSpriteBatch, TargetCollection);
+
+            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+        }
+
+        private void On_Main_DoDraw_Tiles_Solid(On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
+        {
+            orig(self);
+
+            TargetRenderer.CopyTileTarget(deferredSpriteBatch, TargetCollection, orig, self);
+        }
+
         private void On_Main_DoDraw_Tiles_NonSolid(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
         {
             orig(self);
@@ -75,15 +98,6 @@ namespace Terralume.Engine.Pipeline
             TargetRenderer.CopyNonSolidTileTarget(deferredSpriteBatch, TargetCollection, orig, self);
         }
 
-        private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
-        {
-            TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, TargetCollection);
-            TargetRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, TargetCollection, ref backgroundRedrawn);
-
-            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
-
-            orig(self);
-        }
 
         private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
         {
@@ -104,12 +118,6 @@ namespace Terralume.Engine.Pipeline
             orig(self);
 
             TargetRenderer.CopyProjectileTarget(deferredSpriteBatch, TargetCollection, orig, self);
-        }
-
-        public static void CaptureInterfaceTargets()
-        {
-            TargetRenderer.CopyTileTarget(deferredSpriteBatch, TargetCollection);
-            TargetRenderer.CopyWallTarget(deferredSpriteBatch, TargetCollection);
         }
 
         // Make sure all buffers match screen size

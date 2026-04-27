@@ -2,10 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terraria;
+using Terraria.ModLoader;
 
 namespace Terralume.Engine.Render
 {
-    public static class TargetRenderer
+    // Note: There is a lot of double drawing, spritebatch restarting and rendertarget switching here, might need something better in the future
+    public class TargetRenderer
     {
         // Copies the background (surface/underworld texture) into a custom background render target
         // Note: It's stored in a seperate render target because these backgrounds should not be affected by lighting
@@ -51,7 +53,7 @@ namespace Terralume.Engine.Render
             device.SetRenderTarget(targetCollection.UndergroundBackgroundTarget);
             device.Clear(Color.Transparent);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
             Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
 
@@ -65,42 +67,6 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Copies Terrarias tile target into a custom rendertarget with the correct offset applied
-        public static void CopyTileTarget(SpriteBatch spriteBatch, TargetCollection targetCollection)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            device.SetRenderTarget(targetCollection.StableTileTarget);
-            device.Clear(Color.Transparent);
-
-            Vector2 tileDrawPos = Main.sceneTilePos - Main.screenPosition;
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            spriteBatch.Draw(Main.instance.tileTarget, tileDrawPos, Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
-        }
-
-        // Copies Terrarias wall target into a custom rendertarget with the correct offset applied
-        public static void CopyWallTarget(SpriteBatch spriteBatch, TargetCollection targetCollection)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            device.SetRenderTarget(targetCollection.StableWallTarget);
-            device.Clear(Color.Transparent);
-
-            Vector2 tileDrawPos = Main.sceneWallPos - Main.screenPosition;
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            spriteBatch.Draw(Main.instance.wallTarget, tileDrawPos, Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
-        }
-
-        // Uses vanilla NPC drawing logic to draw NPCs to a custom rendertarget
-        // Note: There is a lot of spritebatch restarting and rendertarget switching here, might need something better in the future
         public static void CopyEntityTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
         {
             Main.spriteBatch.End();
@@ -114,7 +80,6 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            // Draw Entities
             device.SetRenderTarget(targetCollection.EntityTarget);
             device.Clear(Color.Transparent);
 
@@ -144,7 +109,6 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            // Draw Entities
             device.SetRenderTarget(targetCollection.PlayerTarget);
             device.Clear(Color.Transparent);
 
@@ -170,8 +134,32 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            // Draw Entities
             device.SetRenderTarget(targetCollection.ProjectileTarget);
+            device.Clear(Color.Transparent);
+
+            orig(self);
+
+            // Paste back into screenTarget
+            device.SetRenderTargets(oldTargets);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+        }
+
+        public static void CopyTileTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            // Copy screenTarget
+            device.SetRenderTarget(targetCollection.CopyTarget);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTarget(targetCollection.TileTarget);
             device.Clear(Color.Transparent);
 
             orig(self);
@@ -196,7 +184,6 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            // Draw Entities
             device.SetRenderTarget(targetCollection.NonSolidTileTarget);
             device.Clear(Color.Transparent);
 
@@ -209,6 +196,24 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+        }
+
+        public static void CopyWallTarget(SpriteBatch spriteBatch, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(targetCollection.WallTarget);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Vector2 wallOffset = Main.sceneWallPos - Main.screenPosition;
+            spriteBatch.Draw(Main.instance.wallTarget, wallOffset, Color.White);
+
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
         }
     }
 }

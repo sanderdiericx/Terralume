@@ -11,13 +11,14 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D UndergroundBackgroundTargetMaster;
         public RenderTarget2D UndergroundBackgroundTarget;
 
+        public RenderTarget2D NonSolidTileTarget;
+        public RenderTarget2D TileTarget;
+        public RenderTarget2D WallTarget;
+
         public RenderTarget2D EntityTarget;
         public RenderTarget2D PlayerTarget;
         public RenderTarget2D ProjectileTarget;
-        public RenderTarget2D NonSolidTileTarget;
-
-        public RenderTarget2D StableTileTarget;
-        public RenderTarget2D StableWallTarget;
+        
 
         public RenderTarget2D CopyTarget;
 
@@ -31,13 +32,13 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundTargetMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
             UndergroundBackgroundTarget = new RenderTarget2D(graphicsDevice, width, height);
 
+            NonSolidTileTarget = new RenderTarget2D(graphicsDevice, width, height);
+            TileTarget = new RenderTarget2D(graphicsDevice, width, height);
+            WallTarget = new RenderTarget2D(graphicsDevice, width, height);
+
             EntityTarget = new RenderTarget2D(graphicsDevice, width, height);
             PlayerTarget = new RenderTarget2D(graphicsDevice, width, height);
             ProjectileTarget = new RenderTarget2D(graphicsDevice, width, height);
-            NonSolidTileTarget = new RenderTarget2D(graphicsDevice, width, height);
-
-            StableTileTarget = new RenderTarget2D(graphicsDevice, width, height);
-            StableWallTarget = new RenderTarget2D(graphicsDevice, width, height);
 
             CopyTarget = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
@@ -57,14 +58,13 @@ namespace Terralume.Engine.Buffers
             UndergroundBackgroundTargetMaster.Dispose();
             UndergroundBackgroundTarget.Dispose();
 
+            NonSolidTileTarget.Dispose();
+            TileTarget.Dispose();
+            WallTarget.Dispose();
+
             EntityTarget.Dispose();
             PlayerTarget.Dispose();
             ProjectileTarget.Dispose();
-
-            NonSolidTileTarget.Dispose();
-
-            StableTileTarget.Dispose();
-            StableWallTarget.Dispose();
 
             CopyTarget.Dispose();
 

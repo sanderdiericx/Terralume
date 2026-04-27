@@ -28,9 +28,9 @@ namespace Terralume.Engine.Render
 
             layerParameter.SetUniforms(effect);
 
-            effect.Parameters["TileTarget"].SetValue(targetCollection.StableTileTarget);
+            effect.Parameters["TileTarget"].SetValue(targetCollection.TileTarget);
             effect.Parameters["NonSolidTileTarget"].SetValue(targetCollection.NonSolidTileTarget);
-            effect.Parameters["WallTarget"].SetValue(targetCollection.StableWallTarget);
+            effect.Parameters["WallTarget"].SetValue(targetCollection.WallTarget);
             effect.Parameters["EntityTarget"].SetValue(targetCollection.EntityTarget);
             effect.Parameters["PlayerTarget"].SetValue(targetCollection.PlayerTarget);
             effect.Parameters["ProjectileTarget"].SetValue(targetCollection.ProjectileTarget);

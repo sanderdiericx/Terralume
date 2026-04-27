@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SteelSeries.GameSense.DeviceZone;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
@@ -18,6 +19,8 @@ namespace Terralume.Engine.Pipeline
         private OutputCollection outputCollection;
         private SpriteBatch deferredSpriteBatch;
 
+        private RenderTarget2D currentRenderTarget;
+
         public override void Load()
         {
             Main.QueueMainThreadAction(() =>
@@ -27,6 +30,8 @@ namespace Terralume.Engine.Pipeline
 
                 EffectManager.LoadEffect(EffectType.Lighting);
             });
+
+            currentRenderTarget = Main.screenTarget;
 
             On_Main.DrawInterface += On_Main_DrawInterface;
         }
@@ -53,8 +58,76 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, activeLights);
 
+
+            KeyboardState keyboardState = Main.keyState;
+
+            if (keyboardState.IsKeyDown(Keys.LeftAlt))
+            {
+                if (keyboardState.IsKeyDown(Keys.D1))
+                {
+                    Main.NewText($"Switching to layer buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.LayerBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D2))
+                {
+                    Main.NewText($"Switching to albedo buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.AlbedoBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D3))
+                {
+                    Main.NewText($"Switching to material buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.MaterialBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D4))
+                {
+                    Main.NewText($"Switching to depth buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.DepthBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D5))
+                {
+                    Main.NewText($"Switching to tile target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.TileTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D6))
+                {
+                    Main.NewText($"Switching to non solid tile target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.NonSolidTileTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D7))
+                {
+                    Main.NewText($"Switching to wall target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.WallTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D8))
+                {
+                    Main.NewText($"Switching to background target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.BackgroundTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D9))
+                {
+                    Main.NewText($"Switching to underground background target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.UndergroundBackgroundTarget;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D0))
+                {
+                    Main.NewText($"Switching to screen target view", Color.Green);
+
+                    currentRenderTarget = Main.screenTarget;
+                }
+
+            }
+
             deferredSpriteBatch.Begin();
-            deferredSpriteBatch.Draw(outputCollection.LightingBuffer, Vector2.Zero, Color.White);
+            deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
             // Draw UI normally

@@ -43,7 +43,6 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
-            TargetCapturer.CaptureInterfaceTargets();
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
 
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
