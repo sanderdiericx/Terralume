@@ -20,9 +20,9 @@ namespace Terralume.Engine.Utils
             for (int i = 0; i < lightCount; i++)
             {
                 Vector2 position = lightProfiles[i].Item1;
-                Vector4 color = lightProfiles[i].Item2.LightColor;
+                Vector4 color = lightProfiles[i].Item2.Color;
 
-                lightPositionPixels[i] = new HalfVector4(position.X, position.Y, lightProfiles[i].Item2.LightRadius, 1f);
+                lightPositionPixels[i] = new HalfVector4(position.X, position.Y, lightProfiles[i].Item2.Range, lightProfiles[i].Item2.Intensity);
                 lightColorPixels[i] = new Color(color.X, color.Y, color.Z, color.W);
             }
 

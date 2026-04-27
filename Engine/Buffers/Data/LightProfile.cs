@@ -4,13 +4,15 @@ namespace Terralume.Engine.Buffers.Data
 {
     public struct LightProfile
     {
-        public Vector4 LightColor;
-        public float LightRadius;
+        public Vector4 Color;
+        public float Intensity;
+        public float Range;
 
-        public LightProfile(Vector4 lightColor, float lightRadius)
+        public LightProfile(Vector4 color, float intensity, float range)
         {
-            LightColor = lightColor;
-            LightRadius = lightRadius;
+            Color = color;
+            Intensity = intensity;
+            Range = range;
         }
     }
 }

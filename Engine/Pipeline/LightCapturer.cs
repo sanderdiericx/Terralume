@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -19,6 +20,12 @@ namespace Terralume.Engine.Pipeline
             On_Lighting.AddLight_int_int_float_float_float += CaptureTileLight;
         }
 
+        public override void Unload()
+        {
+            On_Lighting.AddLight_Vector2_Vector3 -= CaptureVectorLight;
+            On_Lighting.AddLight_int_int_float_float_float -= CaptureTileLight;
+        }
+
         // Make sure ores dont cast light
         // TO DO: Filter out only ores
         public override void PostSetupContent()
@@ -32,19 +39,13 @@ namespace Terralume.Engine.Pipeline
             }
         }
 
-        public override void Unload()
-        {
-            On_Lighting.AddLight_Vector2_Vector3 -= CaptureVectorLight;
-            On_Lighting.AddLight_int_int_float_float_float -= CaptureTileLight;
-        }
-
         private void CaptureVectorLight(On_Lighting.orig_AddLight_Vector2_Vector3 orig, Vector2 position, Vector3 rgb)
         {
             orig(position, rgb);
 
             Vector2 screenPos = position - Main.screenPosition;
 
-            hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
+            hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
         }
 
         private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
@@ -54,7 +55,7 @@ namespace Terralume.Engine.Pipeline
 
             Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
-            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
+            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
         }
 
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
@@ -73,24 +74,14 @@ namespace Terralume.Engine.Pipeline
 
                     if (tile.HasTile && Main.tileLighted[tile.TileType])
                     {
-                        float r = 0f, g = 0f, b = 0f;
+                        // Note: Right now it gives every torch the same light color; fix: check Tile.FrameY for torch type
+                        bool tileMapped = LightMapper.TileProfiles.TryGetValue(tile.TileType, out LightProfile lightProfile);
 
-                        if (tile.TileType == TileID.Torches)
-                        {
-                            // Note: Right now it gives every torch the same light color; fix: check Tile.FrameY for torch type
-                            r = 1f; g = 0.95f; b = 0.8f;
-                        }
-
-                        else if (tile.TileType == TileID.Campfire)
-                        {
-                            r = 0.9f; g = 0.7f; b = 0.6f;
-                        }
-
-                        if (r > 0 || g > 0 || b > 0)
+                        if (tileMapped)
                         {
                             Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
 
-                            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), RenderConstants.PROJECTILE_LIGHT_RADIUS)));
+                            hookedLights.Add((screenPos, lightProfile));
                         }
                     }
                 }

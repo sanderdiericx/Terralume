@@ -19,7 +19,7 @@ namespace Terralume.Engine.Buffers
         {
             LightingBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
-            // Stores (posX, posY, radius, unused)
+            // Stores (posX, posY, range, intensity)
             LightPositionTexture = new RenderTarget2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4, DepthFormat.None);
 
             // Stores (lightColorRed, lightColorBlue, lightColorGreen, unused)
