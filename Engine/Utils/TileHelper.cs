@@ -17,18 +17,20 @@ namespace Terralume.Engine.Utils
         // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
         public static short[] GetVisibleTiles()
         {
-            Vector2 screenPos = Main.screenPosition;
-            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            Vector2 viewSize = screenSize;
             if (Main.GameViewMatrix != null)
             {
                 viewSize /= Main.GameViewMatrix.Zoom;
             }
 
+            Vector2 trueScreenPosition = Main.screenPosition + (screenSize * 0.5f) - (viewSize * 0.5f);
+
             int strideX = (int)Math.Ceiling(viewSize.X / 16.0) + 2;
             int strideY = (int)Math.Ceiling(viewSize.Y / 16.0) + 2;
 
-            int minTileX = (int)Math.Floor(screenPos.X / 16.0);
-            int minTileY = (int)Math.Floor(screenPos.Y / 16.0);
+            int minTileX = (int)Math.Floor(trueScreenPosition.X / 16.0);
+            int minTileY = (int)Math.Floor(trueScreenPosition.Y / 16.0);
 
             int maxTileX = minTileX + strideX - 1;
             int maxTileY = minTileY + strideY - 1;

@@ -81,6 +81,7 @@ namespace Terralume.Engine.Pipeline
 
             TargetRenderer.CopyWallTarget(deferredSpriteBatch, TargetCollection);
 
+            // Main.screenTarget cannot have background targets for g-buffer composition
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
         }
 

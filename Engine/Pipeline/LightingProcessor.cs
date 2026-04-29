@@ -113,9 +113,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to underground background target view", Color.Green);
+                    Main.NewText($"Switching to lighting buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.UndergroundBackgroundTarget;
+                    currentRenderTarget = outputCollection.LightingBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {

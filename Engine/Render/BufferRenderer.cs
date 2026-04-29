@@ -98,13 +98,22 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Material);
 
-            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            int minTileX = (int)Math.Floor(Main.screenPosition.X / 16f);
-            int minTileY = (int)Math.Floor(Main.screenPosition.Y / 16f);
+            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            Vector2 viewSize = screenSize;
+
+            if (Main.GameViewMatrix != null)
+            {
+                viewSize /= Main.GameViewMatrix.Zoom;
+            }
+
+            Vector2 trueScreenPosition = Main.screenPosition + (screenSize * 0.5f) - (viewSize * 0.5f);
+
+            int minTileX = (int)Math.Floor(trueScreenPosition.X / 16f);
+            int minTileY = (int)Math.Floor(trueScreenPosition.Y / 16f);
 
             effect.Parameters["MaterialParameter_TileStride"].SetValue(TileHelper.GetTileStride());
-            effect.Parameters["MaterialParameter_TileIDTextureSize"].SetValue(new Vector2(bufferCollection.TileIDTexture.Width, bufferCollection.TileIDTexture.Height));
-            effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(Main.screenPosition);
+            effect.Parameters["MaterialParameter_TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(trueScreenPosition);
             effect.Parameters["MaterialParameter_ViewSize"].SetValue(viewSize);
             effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
             effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
