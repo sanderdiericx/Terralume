@@ -39,7 +39,7 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Must be called at On_Main.DrawInterface!
-        public static void ComposeGBuffer(SpriteBatch spriteBatch)
+        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, short[] tileIDs)
         {
             UpdateBuffer();
 
@@ -47,9 +47,6 @@ namespace Terralume.Engine.Pipeline
 
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
             DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
-
-            TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            short[] tileIDs = TileHelper.GetVisibleTiles(tileCaptureParameter);
 
             TileHelper.PackTileIDTexture(BufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(BufferCollection.MaterialTexture, MaterialMapper.MappedTiles);

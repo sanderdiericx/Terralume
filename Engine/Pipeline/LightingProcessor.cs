@@ -47,17 +47,18 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
-            BufferComposer.ComposeGBuffer(deferredSpriteBatch);
+            TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
+            short[] tileIDs = TileHelper.GetVisibleTiles(tileCaptureParameter);
+
+            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs);
 
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            List<(Vector2, LightProfile)> onScreenLights = LightCapturer.GetOnScreenLights(new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height));
+            List<(Vector2, LightProfile)> onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, tileIDs);
             LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, onScreenLights);
-            int activeLights = onScreenLights.Count;
 
-            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, activeLights);
-
+            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, onScreenLights.Count);
 
             KeyboardState keyboardState = Main.keyState;
 

@@ -13,7 +13,6 @@ namespace Terralume.Engine.Utils
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static Color[] tileIDPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
-
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {
             Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
+using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -43,9 +44,7 @@ namespace Terralume.Engine.Pipeline
         {
             orig(position, rgb);
 
-            Vector2 screenPos = position - Main.screenPosition;
-
-            hookedLights.Add((screenPos, new LightProfile(new Vector4(rgb, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
+            hookedLights.Add((position, new LightProfile(new Vector4(rgb, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
         }
 
         private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
@@ -53,35 +52,36 @@ namespace Terralume.Engine.Pipeline
             orig(i, j, r, g, b);
             Vector3 color = new Vector3(r, g, b);
 
-            Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
-
-            hookedLights.Add((screenPos, new LightProfile(new Vector4(r, g, b, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
+            Vector2 worldPos = new Vector2(i * 16 + 8, j * 16 + 8);
+            hookedLights.Add((worldPos, new LightProfile(new Vector4(r, g, b, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
         }
 
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
-        private static void CaptureVisibleTileLights()
+        private static void CaptureVisibleTileLights(TileCaptureParameter tileCaptureParameter, short[] tileIDs)
         {
-            int startX = Math.Clamp((int)(Main.screenPosition.X / 16f) - 2, 0, Main.maxTilesX - 1);
-            int endX = Math.Clamp((int)((Main.screenPosition.X + Main.screenWidth) / 16f) + 2, 0, Main.maxTilesX - 1);
-            int startY = Math.Clamp((int)(Main.screenPosition.Y / 16f) - 2, 0, Main.maxTilesY - 1);
-            int endY = Math.Clamp((int)((Main.screenPosition.Y + Main.screenHeight) / 16f) + 2, 0, Main.maxTilesY - 1);
-
-            for (int i = startX; i < endX; i++)
+            for (int i = (int)tileCaptureParameter.MinTile.Y; i <= tileCaptureParameter.MaxTile.Y; i++)
             {
-                for (int j = startY; j < endY; j++)
+                for (int j = (int)tileCaptureParameter.MinTile.X; j <= tileCaptureParameter.MaxTile.X; j++)
                 {
-                    Tile tile = Main.tile[i, j];
+                    int yIndex = i - (int) tileCaptureParameter.MinTile.Y;
+                    int xIndex = j - (int) tileCaptureParameter.MinTile.X;
 
-                    if (tile.HasTile && Main.tileLighted[tile.TileType])
+                    int index = xIndex + (yIndex * (int) tileCaptureParameter.TileStride.X);
+
+                    if (index < 0 || index >= tileIDs.Length) continue;
+
+                    short tileID = tileIDs[index];
+
+                    if (tileID != -1 && Main.tileLighted[tileID])
                     {
                         // Note: Right now it gives every torch the same light color; fix: check Tile.FrameY for torch type
-                        bool tileMapped = LightMapper.TileProfiles.TryGetValue(tile.TileType, out LightProfile lightProfile);
+                        bool tileMapped = LightMapper.TileProfiles.TryGetValue(tileID, out LightProfile lightProfile);
 
                         if (tileMapped)
                         {
-                            Vector2 screenPos = new Vector2(i * 16 + 8, j * 16 + 8) - Main.screenPosition;
+                            Vector2 worldPos = new Vector2(j * 16 + 8, i * 16 + 8);
 
-                            hookedLights.Add((screenPos, lightProfile));
+                            hookedLights.Add((worldPos, lightProfile));
                         }
                     }
                 }
@@ -89,19 +89,25 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Gets the screen space position and light profile of all lights on screen
-        public static List<(Vector2, LightProfile)> GetOnScreenLights(Vector2 screenSize)
+        //
+        // Note: Before calling this method light positions are stored in world space, this method converts it to screen space
+        public static List<(Vector2, LightProfile)> GetOnScreenLights(TileCaptureParameter tileCaptureParameter, short[] tileIDs)
         {
-            CaptureVisibleTileLights();
+            CaptureVisibleTileLights(tileCaptureParameter, tileIDs);
 
             List<(Vector2, LightProfile)> onScreenLights = new List<(Vector2, LightProfile)>();
 
+            Vector2 zoom = Main.GameViewMatrix.Zoom;
+
             for (int i = 0; i < hookedLights.Count; i++)
             {
-                Vector2 lightPos = hookedLights[i].Item1;
+                Vector2 worldPos = hookedLights[i].Item1;
 
-                if (lightPos.X >= 0 && lightPos.Y >= 0 && lightPos.X < screenSize.X && lightPos.Y < screenSize.Y)
+                Vector2 screenPos = (worldPos - tileCaptureParameter.ScreenPosition) * zoom;
+
+                if (screenPos.X >= 0 && screenPos.Y >= 0 && screenPos.X < tileCaptureParameter.ScreenSize.X && screenPos.Y < tileCaptureParameter.ScreenSize.Y)
                 {
-                    onScreenLights.Add(hookedLights[i]);
+                    onScreenLights.Add((screenPos, hookedLights[i].Item2));
                 }
             }
 
