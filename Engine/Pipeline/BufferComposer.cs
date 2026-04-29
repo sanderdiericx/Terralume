@@ -48,7 +48,8 @@ namespace Terralume.Engine.Pipeline
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
             DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
 
-            short[] tileIDs = TileHelper.GetVisibleTiles();
+            TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
+            short[] tileIDs = TileHelper.GetVisibleTiles(tileCaptureParameter);
 
             TileHelper.PackTileIDTexture(BufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackMaterialTexture(BufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
@@ -56,7 +57,7 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
 
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter);
+            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter, tileIDs);
             BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);
         }

@@ -88,7 +88,7 @@ namespace Terralume.Engine.Render
         }
 
         // Renders a material buffer
-        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter)
+        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter, short[] tileIDs)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -98,24 +98,11 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Material);
 
-            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            Vector2 viewSize = screenSize;
-
-            if (Main.GameViewMatrix != null)
-            {
-                viewSize /= Main.GameViewMatrix.Zoom;
-            }
-
-            Vector2 trueScreenPosition = Main.screenPosition + (screenSize * 0.5f) - (viewSize * 0.5f);
-
-            int minTileX = (int)Math.Floor(trueScreenPosition.X / 16f);
-            int minTileY = (int)Math.Floor(trueScreenPosition.Y / 16f);
-
-            effect.Parameters["MaterialParameter_TileStride"].SetValue(TileHelper.GetTileStride());
+            effect.Parameters["MaterialParameter_TileStride"].SetValue(tileCaptureParameter.TileStride);
             effect.Parameters["MaterialParameter_TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(trueScreenPosition);
-            effect.Parameters["MaterialParameter_ViewSize"].SetValue(viewSize);
-            effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(new Vector2(minTileX, minTileY));
+            effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["MaterialParameter_ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+            effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
             effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["MaterialParameter_DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
 

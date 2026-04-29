@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terraria;
 
@@ -12,36 +13,48 @@ namespace Terralume.Engine.Utils
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static Color[] tileIDPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
-        // Builds a flat array with tile ids of all visible tiles
-        //
-        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
-        public static short[] GetVisibleTiles()
+
+        public static TileCaptureParameter CalculateTileCaptureParameter()
         {
             Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+
             Vector2 viewSize = screenSize;
             if (Main.GameViewMatrix != null)
             {
                 viewSize /= Main.GameViewMatrix.Zoom;
             }
 
-            Vector2 trueScreenPosition = Main.screenPosition + (screenSize * 0.5f) - (viewSize * 0.5f);
+            Vector2 screenPosition = Main.screenPosition + (screenSize * 0.5f) - (viewSize * 0.5f);
 
             int strideX = (int)Math.Ceiling(viewSize.X / 16.0) + 2;
             int strideY = (int)Math.Ceiling(viewSize.Y / 16.0) + 2;
 
-            int minTileX = (int)Math.Floor(trueScreenPosition.X / 16.0);
-            int minTileY = (int)Math.Floor(trueScreenPosition.Y / 16.0);
+            int minTileX = (int)Math.Floor(screenPosition.X / 16.0);
+            int minTileY = (int)Math.Floor(screenPosition.Y / 16.0);
 
             int maxTileX = minTileX + strideX - 1;
             int maxTileY = minTileY + strideY - 1;
 
-            short[] tileIDs = new short[strideX * strideY];
+            return new TileCaptureParameter(screenSize, screenPosition, viewSize, new Vector2(strideX, strideY), new Vector2(minTileX, minTileY), new Vector2(maxTileX, maxTileY));
+        }
+
+
+        // Builds a flat array with tile ids of all visible tiles
+        //
+        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
+        public static short[] GetVisibleTiles(TileCaptureParameter tileCaptureParameter)
+        {
+            Vector2 stride = tileCaptureParameter.TileStride;
+            Vector2 minTile = tileCaptureParameter.MinTile;
+            Vector2 maxTile = tileCaptureParameter.MaxTile;
+
+            short[] tileIDs = new short[(int)stride.X * (int)stride.Y];
 
             int count = 0;
 
-            for (int i = minTileY; i <= maxTileY; i++)
+            for (int i = (int)minTile.Y; i <= maxTile.Y; i++)
             {
-                for (int j = minTileX; j <= maxTileX; j++)
+                for (int j = (int)minTile.X; j <= maxTile.X; j++)
                 {
                     if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY)
                     {
@@ -58,19 +71,6 @@ namespace Terralume.Engine.Utils
 
             return tileIDs;
         }
-
-
-        public static Vector2 GetTileStride()
-        {
-            Vector2 viewSize = new Vector2(Main.screenWidth, Main.screenHeight);
-            if (Main.GameViewMatrix != null)
-            {
-                viewSize /= Main.GameViewMatrix.Zoom;
-            }
-
-            return new Vector2((int)Math.Ceiling(viewSize.X / 16.0) + 2, (int)Math.Ceiling(viewSize.Y / 16.0) + 2);
-        }
-
 
         // Encodes an array of shorts into a 2D texture
         public static void PackTileIDTexture(Texture2D tileIDTexture, short[] tileIDs)
