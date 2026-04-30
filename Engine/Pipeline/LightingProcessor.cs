@@ -20,6 +20,8 @@ namespace Terralume.Engine.Pipeline
         private OutputCollection outputCollection;
         private SpriteBatch deferredSpriteBatch;
 
+        private List<(Vector2, LightProfile)> onScreenLights;
+
         private RenderTarget2D currentRenderTarget;
 
         public override void Load()
@@ -32,6 +34,8 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Lighting);
             });
 
+            onScreenLights = new List<(Vector2, LightProfile)>();
+
             currentRenderTarget = Main.screenTarget;
 
             On_Main.DrawInterface += On_Main_DrawInterface;
@@ -42,6 +46,22 @@ namespace Terralume.Engine.Pipeline
             base.Unload();
 
             On_Main.DrawInterface -= On_Main_DrawInterface;
+        }
+
+        public override void PostSetupContent()
+        {
+            base.PostSetupContent();
+
+            string output = "\n";
+
+            for (int i = 0; i < WallID.Count; i++)
+            {
+                string name = WallID.Search.GetName(i);
+
+                output += $"{name}\n";
+            }
+
+            Mod.Logger.Debug(output);
         }
 
         private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
@@ -56,7 +76,7 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            List<(Vector2, LightProfile)> onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, tileIDs);
+            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, tileIDs);
             LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, onScreenLights);
 
             OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, onScreenLights.Count);
