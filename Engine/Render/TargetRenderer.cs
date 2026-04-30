@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terraria;
-using Terraria.ModLoader;
 
 namespace Terralume.Engine.Render
 {

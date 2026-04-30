@@ -18,7 +18,6 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D EntityTarget;
         public RenderTarget2D PlayerTarget;
         public RenderTarget2D ProjectileTarget;
-        
 
         public RenderTarget2D CopyTarget;
 

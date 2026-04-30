@@ -28,7 +28,7 @@ namespace Terralume.Engine.Pipeline
             On_Main.DoDraw_WallsAndBlacks += On_Main_DoDraw_WallsAndBlacks;
 
             On_Main.DoDraw_Tiles_Solid += On_Main_DoDraw_Tiles_Solid;
-            On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;            
+            On_Main.DoDraw_Tiles_NonSolid += On_Main_DoDraw_Tiles_NonSolid;
 
             On_Main.DrawNPCs += On_Main_DrawNPCs;
             On_Main.DrawPlayers_AfterProjectiles += On_Main_DrawPlayers_AfterProjectiles;

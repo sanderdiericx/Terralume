@@ -1,12 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
-using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Render

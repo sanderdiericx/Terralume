@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
-using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
-using Terralume.Engine.Utils;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
@@ -17,43 +13,40 @@ namespace Terralume.Engine.Pipeline
 
         public override void Load()
         {
-            On_Lighting.AddLight_Vector2_Vector3 += CaptureVectorLight;
-            On_Lighting.AddLight_int_int_float_float_float += CaptureTileLight;
+            On_Lighting.AddLight_Vector2_Vector3 += AddLight_Vector2_Vector3;
+            On_Lighting.AddLight_int_int_float_float_float += AddLight_int_int_float_float_float;
+            On_Lighting.AddLight_Vector2_float_float_float += On_Lighting_AddLight_Vector2_float_float_float;
         }
 
         public override void Unload()
         {
-            On_Lighting.AddLight_Vector2_Vector3 -= CaptureVectorLight;
-            On_Lighting.AddLight_int_int_float_float_float -= CaptureTileLight;
+            On_Lighting.AddLight_Vector2_Vector3 -= AddLight_Vector2_Vector3;
+            On_Lighting.AddLight_int_int_float_float_float -= AddLight_int_int_float_float_float;
+            On_Lighting.AddLight_Vector2_float_float_float -= On_Lighting_AddLight_Vector2_float_float_float;
         }
 
-        // Make sure ores dont cast light
-        // TO DO: Filter out only ores
-        public override void PostSetupContent()
-        {
-            for (int i = 0; i < TileID.Count; i++)
-            {
-                if (Main.tileShine[i] > 0)
-                {
-                    Main.tileShine[i] = 0;
-                }
-            }
-        }
-
-        private void CaptureVectorLight(On_Lighting.orig_AddLight_Vector2_Vector3 orig, Vector2 position, Vector3 rgb)
+        private void AddLight_Vector2_Vector3(On_Lighting.orig_AddLight_Vector2_Vector3 orig, Vector2 position, Vector3 rgb)
         {
             orig(position, rgb);
 
-            hookedLights.Add((position, new LightProfile(new Vector4(rgb, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
+            hookedLights.Add((position, new LightProfile(new Vector4(rgb, 1f), LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange)));
         }
 
-        private void CaptureTileLight(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
+        private void AddLight_int_int_float_float_float(On_Lighting.orig_AddLight_int_int_float_float_float orig, int i, int j, float r, float g, float b)
         {
             orig(i, j, r, g, b);
-            Vector3 color = new Vector3(r, g, b);
+            Vector4 color = new Vector4(r, g, b, 1f);
 
             Vector2 worldPos = new Vector2(i * 16 + 8, j * 16 + 8);
-            hookedLights.Add((worldPos, new LightProfile(new Vector4(r, g, b, 1f), LightMapper.ProjectileLightIntensity, LightMapper.ProjectileLightRange)));
+            hookedLights.Add((worldPos, new LightProfile(color, LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange)));
+        }
+
+        private void On_Lighting_AddLight_Vector2_float_float_float(On_Lighting.orig_AddLight_Vector2_float_float_float orig, Vector2 position, float r, float g, float b)
+        {
+            orig(position, r, g, b);
+            Vector4 color = new Vector4(r, g, b, 1f);
+
+            hookedLights.Add((position, new LightProfile(color, LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange)));
         }
 
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
@@ -63,10 +56,10 @@ namespace Terralume.Engine.Pipeline
             {
                 for (int j = (int)tileCaptureParameter.MinTile.X; j <= tileCaptureParameter.MaxTile.X; j++)
                 {
-                    int yIndex = i - (int) tileCaptureParameter.MinTile.Y;
-                    int xIndex = j - (int) tileCaptureParameter.MinTile.X;
+                    int yIndex = i - (int)tileCaptureParameter.MinTile.Y;
+                    int xIndex = j - (int)tileCaptureParameter.MinTile.X;
 
-                    int index = xIndex + (yIndex * (int) tileCaptureParameter.TileStride.X);
+                    int index = xIndex + (yIndex * (int)tileCaptureParameter.TileStride.X);
 
                     if (index < 0 || index >= tileIDs.Length) continue;
 

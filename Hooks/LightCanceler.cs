@@ -2,7 +2,7 @@
 
 namespace Terralume.Hooks
 {
-    public class LightingHook : GlobalWall
+    public class LightCanceler : GlobalWall
     {
         // Cancel out all lighting influence
         public override void ModifyLight(int i, int j, int type, ref float r, ref float g, ref float b)

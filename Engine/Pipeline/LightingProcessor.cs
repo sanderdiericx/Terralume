@@ -1,11 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SteelSeries.GameSense.DeviceZone;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
-using Terralume.Engine.Mapping;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -66,9 +64,9 @@ namespace Terralume.Engine.Pipeline
             {
                 if (keyboardState.IsKeyDown(Keys.D1))
                 {
-                    Main.NewText($"Switching to layer buffer view", Color.Green);
+                    Main.NewText($"Switching to lighting buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.LayerBuffer;
+                    currentRenderTarget = outputCollection.LightingBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D2))
                 {
@@ -90,41 +88,22 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D5))
                 {
-                    Main.NewText($"Switching to tile target view", Color.Green);
+                    Main.NewText($"Switching to normal buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.TileTarget;
+                    currentRenderTarget = bufferCollection.NormalBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D6))
                 {
-                    Main.NewText($"Switching to non solid tile target view", Color.Green);
+                    Main.NewText($"Switching to layer buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.NonSolidTileTarget;
+                    currentRenderTarget = bufferCollection.LayerBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D7))
-                {
-                    Main.NewText($"Switching to wall target view", Color.Green);
-
-                    currentRenderTarget = targetCollection.WallTarget;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D8))
-                {
-                    Main.NewText($"Switching to background target view", Color.Green);
-
-                    currentRenderTarget = targetCollection.BackgroundTarget;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D9))
-                {
-                    Main.NewText($"Switching to lighting buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.LightingBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D0))
                 {
                     Main.NewText($"Switching to screen target view", Color.Green);
 
                     currentRenderTarget = Main.screenTarget;
                 }
-
             }
 
             deferredSpriteBatch.Begin();
