@@ -107,10 +107,10 @@ namespace Terralume.Engine.Render
             layerParameter.SetUniforms(effect);
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
-            
+
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
-            
+
             effect.Parameters["TileMaterialTexture"].SetValue(bufferCollection.TileMaterialTexture);
             effect.Parameters["WallMaterialTexture"].SetValue(bufferCollection.WallMaterialTexture);
 

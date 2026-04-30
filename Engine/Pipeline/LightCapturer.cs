@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Mapping;
@@ -50,30 +51,26 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
-        private static void CaptureVisibleTileLights(TileCaptureParameter tileCaptureParameter, short[] tileIDs)
+        private static void CaptureVisibleTileLights(TileCaptureParameter tileCaptureParameter, int tilePadding)
         {
-            for (int i = (int)tileCaptureParameter.MinTile.Y; i <= tileCaptureParameter.MaxTile.Y; i++)
+            int minX = (int)tileCaptureParameter.MinTile.X - tilePadding;
+            int maxX = (int)tileCaptureParameter.MaxTile.X + tilePadding;
+            int minY = (int)tileCaptureParameter.MinTile.Y - tilePadding;
+            int maxY = (int)tileCaptureParameter.MaxTile.Y + tilePadding;
+
+            for (int i = minY; i <= maxY; i++)
             {
-                for (int j = (int)tileCaptureParameter.MinTile.X; j <= tileCaptureParameter.MaxTile.X; j++)
+                for (int j = minX; j <= maxX; j++)
                 {
-                    int yIndex = i - (int)tileCaptureParameter.MinTile.Y;
-                    int xIndex = j - (int)tileCaptureParameter.MinTile.X;
+                    if (j < 0 || i < 0 || j >= Main.maxTilesX || i >= Main.maxTilesY) continue;
 
-                    int index = xIndex + (yIndex * (int)tileCaptureParameter.TileStride.X);
+                    Tile tile = Main.tile[j, i];
 
-                    if (index < 0 || index >= tileIDs.Length) continue;
-
-                    short tileID = tileIDs[index];
-
-                    if (tileID != -1 && Main.tileLighted[tileID])
+                    if (tile.HasTile && Main.tileLighted[tile.TileType])
                     {
-                        // Note: Right now it gives every torch the same light color; fix: check Tile.FrameY for torch type
-                        bool tileMapped = LightMapper.TileProfiles.TryGetValue((ushort)tileID, out LightProfile lightProfile);
-
-                        if (tileMapped)
+                        if (LightMapper.TileProfiles.TryGetValue(tile.TileType, out LightProfile lightProfile))
                         {
                             Vector2 worldPos = new Vector2(j * 16 + 8, i * 16 + 8);
-
                             hookedLights.Add((worldPos, lightProfile));
                         }
                     }
@@ -84,9 +81,11 @@ namespace Terralume.Engine.Pipeline
         // Gets the screen space position and light profile of all lights on screen
         //
         // Note: Before calling this method light positions are stored in world space, this method converts it to screen space
-        public static List<(Vector2, LightProfile)> GetOnScreenLights(TileCaptureParameter tileCaptureParameter, short[] tileIDs)
+        public static List<(Vector2, LightProfile)> GetOnScreenLights(TileCaptureParameter tileCaptureParameter, int tilePadding)
         {
-            CaptureVisibleTileLights(tileCaptureParameter, tileIDs);
+            int pixelPadding = (int)Math.Floor(tilePadding * 16.0);
+
+            CaptureVisibleTileLights(tileCaptureParameter, tilePadding);
 
             List<(Vector2, LightProfile)> onScreenLights = new List<(Vector2, LightProfile)>();
 
@@ -98,7 +97,7 @@ namespace Terralume.Engine.Pipeline
 
                 Vector2 screenPos = (worldPos - tileCaptureParameter.ScreenPosition) * zoom;
 
-                if (screenPos.X >= 0 && screenPos.Y >= 0 && screenPos.X < tileCaptureParameter.ScreenSize.X && screenPos.Y < tileCaptureParameter.ScreenSize.Y)
+                if (screenPos.X >= -pixelPadding && screenPos.Y >= -pixelPadding && screenPos.X < tileCaptureParameter.ScreenSize.X + pixelPadding && screenPos.Y < tileCaptureParameter.ScreenSize.Y + pixelPadding)
                 {
                     onScreenLights.Add((screenPos, hookedLights[i].Item2));
                 }

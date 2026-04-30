@@ -4,11 +4,11 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
@@ -63,7 +63,7 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, tileIDs);
+            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, RenderConstants.LightSearchTilePadding);
             LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, onScreenLights);
 
             OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, onScreenLights.Count);
