@@ -4,7 +4,6 @@ static const float PI = 3.14159265359f;
 
 float2 ScreenSize;
 int DepthScale;
-float3 CameraPos;
 
 int ActiveLights;
 float LightDepth;
@@ -112,9 +111,9 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 material = tex2D(MaterialSampler, input.TexCoord).rgb;
     
     float pixelZ = tex2D(DepthSampler, input.TexCoord).r * DepthScale;
-    float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);
+    float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);    
+    float3 viewDir = float3(0.0, 0.0, 1.0);
     
-    float3 viewDir = normalize(CameraPos - pixelPos);
     
     float3 output = float3(0.0, 0.0, 0.0);
     

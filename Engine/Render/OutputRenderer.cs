@@ -23,11 +23,10 @@ namespace Terralume.Engine.Render
             Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
 
             effect.Parameters["ScreenSize"].SetValue(screenSize);
-            effect.Parameters["DepthScale"].SetValue(100); // 100
-            effect.Parameters["CameraPos"].SetValue(new Vector3(bufferCollection.AlbedoBuffer.Width / 2f, bufferCollection.AlbedoBuffer.Height / 2f, 100f)); // 100f
+            effect.Parameters["DepthScale"].SetValue(100);
 
             effect.Parameters["ActiveLights"].SetValue(activeLights);
-            effect.Parameters["LightDepth"].SetValue(85); // 90f
+            effect.Parameters["LightDepth"].SetValue(85);
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
