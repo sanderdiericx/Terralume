@@ -359,7 +359,6 @@ namespace Terralume.Engine.Materials
             { TileID.CrimtaneBrick, new Vector3(0.5f, 0.5f, 0.4f) },
             { TileID.ShroomitePlating, new Vector3(1.0f, 0.3f, 0.4f) },
             { TileID.MushroomStatue, new Vector3(0.0f, 0.8f, 0.2f) },
-            { TileID.Count, new Vector3(0.0f, 0.8f, 0.0f) }
         };
     }
 }

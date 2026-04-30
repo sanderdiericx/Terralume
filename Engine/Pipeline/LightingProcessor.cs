@@ -8,6 +8,9 @@ using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
+using Terraria.Enums;
+using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
@@ -105,6 +108,8 @@ namespace Terralume.Engine.Pipeline
                     currentRenderTarget = Main.screenTarget;
                 }
             }
+
+            Main.NewText(onScreenLights.Count);
 
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);

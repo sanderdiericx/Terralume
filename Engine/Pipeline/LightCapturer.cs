@@ -68,7 +68,7 @@ namespace Terralume.Engine.Pipeline
                     if (tileID != -1 && Main.tileLighted[tileID])
                     {
                         // Note: Right now it gives every torch the same light color; fix: check Tile.FrameY for torch type
-                        bool tileMapped = LightMapper.TileProfiles.TryGetValue(tileID, out LightProfile lightProfile);
+                        bool tileMapped = LightMapper.TileProfiles.TryGetValue((ushort)tileID, out LightProfile lightProfile);
 
                         if (tileMapped)
                         {
