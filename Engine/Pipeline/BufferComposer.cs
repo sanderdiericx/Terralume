@@ -52,7 +52,7 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackShortsIntoTexture(BufferCollection.WallIDTexture, wallIDs);
 
             TileHelper.PackMaterialTexture(BufferCollection.TileMaterialTexture, MaterialMapper.MappedTiles);
-            TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedTiles);
+            TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedWalls);
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
 
