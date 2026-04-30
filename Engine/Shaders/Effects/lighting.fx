@@ -2,11 +2,27 @@
 
 static const float PI = 3.14159265359f;
 
+static const float3x3 SRGB_TO_AP1 = float3x3
+(
+    0.59719, 0.35458, 0.04823,
+    0.07600, 0.90834, 0.01566,
+    0.02840, 0.13383, 0.83777
+);
+
+static const float3x3 AP1_TO_SRGB = float3x3
+(
+    1.60475, -0.53108, -0.07367,
+    -0.10208, 1.10813, -0.00605,
+    -0.00327, -0.07276, 1.17603
+);
+
 float2 ScreenSize;
 int DepthScale;
 
 int ActiveLights;
 float LightDepth;
+
+float Exposure;
 
 float2 LightDataTextureSize;
 
@@ -94,6 +110,9 @@ float3 EnergyConservationFunction(float3 fresnel, float metallic);
 float3 CalculateBRDFSpecular(float distribution, float geometry, float3 fresnel, float3 normal, float3 viewDir, float3 lightDir);
 float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 specular, float3 radianceColor, float3 normal, float3 lightDir);
 
+float3 ToneMappingACES(float3 color);
+float3 RRTAndODTFit(float3 aces);
+
 float3 ToLinear(float3 sRGB);
 float3 ToGamma(float3 linearRGB);
 
@@ -114,8 +133,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);    
     float3 viewDir = float3(0.0, 0.0, 1.0);
     
-    
-    float3 output = float3(0.0, 0.0, 0.0);
+    float3 color = float3(0.0, 0.0, 0.0);
     
     for (int i = 0; i < ActiveLights; i++)
     {        
@@ -133,13 +151,15 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
         
         float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);
         
-        output += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
+        color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
     }
 
-    output = output / (output + float3(1.0, 1.0, 1.0));
-    output = ToGamma(output);
+    color *= Exposure;
+    color = ToneMappingACES(color);
     
-    return float4(output.r, output.g, output.b, albedoOriginal.a);
+    color = ToGamma(color);
+    
+    return float4(color.r, color.g, color.b, albedoOriginal.a);
 }
 
 
@@ -227,6 +247,17 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
     return (energyConservation * (albedo / PI) + specular) * radianceColor * max(dot(normal, lightDir), 0.0);
 }
 
+float3 ToneMappingACES(float3 color)
+{    
+    return mul(AP1_TO_SRGB, RRTAndODTFit(mul(SRGB_TO_AP1, color)));
+}
+
+float3 RRTAndODTFit(float3 aces)
+{
+    float3 a = aces * (aces + 0.0245786) - 0.000090537;
+    float3 b = aces * (0.983729 * aces + 0.4329510) + 0.238081;
+    return a / b;
+}
 
 float3 ToLinear(float3 sRGB)
 {

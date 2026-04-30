@@ -27,6 +27,9 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ActiveLights"].SetValue(activeLights);
             effect.Parameters["LightDepth"].SetValue(85);
+
+            effect.Parameters["Exposure"].SetValue(1.8f);
+
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
