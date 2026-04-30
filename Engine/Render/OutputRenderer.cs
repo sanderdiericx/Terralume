@@ -22,13 +22,15 @@ namespace Terralume.Engine.Render
 
             Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
 
+            float currentZoom = Main.GameViewMatrix.Zoom.X;
+
             effect.Parameters["ScreenSize"].SetValue(screenSize);
-            effect.Parameters["DepthScale"].SetValue(100);
+            effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
 
             effect.Parameters["ActiveLights"].SetValue(activeLights);
-            effect.Parameters["LightDepth"].SetValue(85);
+            effect.Parameters["LightDepth"].SetValue(85f * currentZoom);
 
-            effect.Parameters["Exposure"].SetValue(1.8f);
+            effect.Parameters["Exposure"].SetValue(1.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
 

@@ -17,7 +17,7 @@ static const float3x3 AP1_TO_SRGB = float3x3
 );
 
 float2 ScreenSize;
-int DepthScale;
+float DepthScale;
 
 int ActiveLights;
 float LightDepth;

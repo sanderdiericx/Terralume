@@ -99,7 +99,9 @@ namespace Terralume.Engine.Pipeline
 
                 if (screenPos.X >= -pixelPadding && screenPos.Y >= -pixelPadding && screenPos.X < tileCaptureParameter.ScreenSize.X + pixelPadding && screenPos.Y < tileCaptureParameter.ScreenSize.Y + pixelPadding)
                 {
-                    onScreenLights.Add((screenPos, hookedLights[i].Item2));
+                    LightProfile originalProfile = hookedLights[i].Item2;
+
+                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, originalProfile.Range * zoom.X)));
                 }
             }
 
