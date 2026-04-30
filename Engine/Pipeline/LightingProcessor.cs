@@ -8,8 +8,6 @@ using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
-using Terraria.Enums;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -45,23 +43,12 @@ namespace Terralume.Engine.Pipeline
         {
             base.Unload();
 
-            On_Main.DrawInterface -= On_Main_DrawInterface;
-        }
-
-        public override void PostSetupContent()
-        {
-            base.PostSetupContent();
-
-            string output = "\n";
-
-            for (int i = 0; i < WallID.Count; i++)
+            Main.QueueMainThreadAction(() =>
             {
-                string name = WallID.Search.GetName(i);
+                outputCollection.Dispose();
+            });
 
-                output += $"{name}\n";
-            }
-
-            Mod.Logger.Debug(output);
+            On_Main.DrawInterface -= On_Main_DrawInterface;
         }
 
         private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
@@ -69,9 +56,9 @@ namespace Terralume.Engine.Pipeline
             UpdateBuffer();
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            short[] tileIDs = TileHelper.GetVisibleTiles(tileCaptureParameter);
+            TileHelper.GetVisibleIDs(tileCaptureParameter, out short[] tileIDs, out short[] wallIDs);
 
-            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs);
+            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs, wallIDs);
 
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
@@ -128,8 +115,6 @@ namespace Terralume.Engine.Pipeline
                     currentRenderTarget = Main.screenTarget;
                 }
             }
-
-            Main.NewText(onScreenLights.Count);
 
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);

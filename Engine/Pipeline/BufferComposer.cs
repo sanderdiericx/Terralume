@@ -39,7 +39,7 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Must be called at On_Main.DrawInterface!
-        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, short[] tileIDs)
+        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, short[] tileIDs, short[] wallIDs)
         {
             UpdateBuffer();
 
@@ -48,13 +48,16 @@ namespace Terralume.Engine.Pipeline
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
             DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
 
-            TileHelper.PackTileIDTexture(BufferCollection.TileIDTexture, tileIDs);
-            TileHelper.PackMaterialTexture(BufferCollection.MaterialTexture, MaterialMapper.MappedTiles);
+            TileHelper.PackShortsIntoTexture(BufferCollection.TileIDTexture, tileIDs);
+            TileHelper.PackShortsIntoTexture(BufferCollection.WallIDTexture, wallIDs);
+
+            TileHelper.PackMaterialTexture(BufferCollection.TileMaterialTexture, MaterialMapper.MappedTiles);
+            TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedTiles);
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
 
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter, tileIDs);
+            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
             BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);
         }

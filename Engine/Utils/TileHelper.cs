@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terraria;
+using Terraria.ID;
 
 namespace Terralume.Engine.Utils
 {
+    // TO DO: Optimize Texture.SetData()
     public static class TileHelper
     {
+        private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
-        private static Color[] tileIDPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {
@@ -38,16 +40,17 @@ namespace Terralume.Engine.Utils
         }
 
 
-        // Builds a flat array with tile ids of all visible tiles
+        // Builds a flat array with tile ids of all visible tiles, and a second flat array with ids of all visible wall tiles
         //
-        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles
-        public static short[] GetVisibleTiles(TileCaptureParameter tileCaptureParameter)
+        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles/walls
+        public static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out short[] tileIDs, out short[] wallIDs)
         {
             Vector2 stride = tileCaptureParameter.TileStride;
             Vector2 minTile = tileCaptureParameter.MinTile;
             Vector2 maxTile = tileCaptureParameter.MaxTile;
 
-            short[] tileIDs = new short[(int)stride.X * (int)stride.Y];
+            tileIDs = new short[(int)stride.X * (int)stride.Y];
+            wallIDs = new short[(int)stride.X * (int)stride.Y];
 
             int count = 0;
 
@@ -55,36 +58,38 @@ namespace Terralume.Engine.Utils
             {
                 for (int j = (int)minTile.X; j <= maxTile.X; j++)
                 {
-                    if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY)
+                    if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY) // Out of bounds;
                     {
-                        tileIDs[count] = 0;
+                        tileIDs[count] = -1;
+                        wallIDs[count] = -1;
                     }
                     else
                     {
                         tileIDs[count] = (short)(Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : -1);
+                        wallIDs[count] = (short)(Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : -1);
                     }
 
                     count++;
                 }
             }
-
-            return tileIDs;
         }
 
         // Encodes an array of shorts into a 2D texture
-        public static void PackTileIDTexture(Texture2D tileIDTexture, short[] tileIDs)
+        //
+        // Note: Each texture index stores two shorts
+        public static void PackShortsIntoTexture(Texture2D texture, short[] shorts)
         {
-            int pixelCount = (tileIDs.Length + 1) / 2; // Ceiling division
+            int pixelCount = (shorts.Length + 1) / 2;
 
             int safePixelCount = Math.Min(pixelCount, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
 
             for (int i = 0; i < safePixelCount; i++)
             {
                 int index = i * 2;
-                short u0 = tileIDs[index];
-                short u1 = (index + 1 < tileIDs.Length) ? tileIDs[index + 1] : (short)-1;
+                short u0 = shorts[index];
+                short u1 = (index + 1 < shorts.Length) ? shorts[index + 1] : (short)-1;
 
-                tileIDPixels[i] = new Color(
+                shortPixels[i] = new Color(
                     (byte)(u0 & 0xFF), // low byte of u0
                     (byte)(u0 >> 8), // high byte of u0
                     (byte)(u1 & 0xFF), // low byte of u1
@@ -92,23 +97,28 @@ namespace Terralume.Engine.Utils
                 );
             }
 
-            tileIDTexture.SetData(tileIDPixels);
+            texture.SetData(shortPixels);
         }
 
-        // Encodes a dictionary mapping tile ID to material vector into a texture, the position inside of a color inside the texture refers to its tile ID
-        public static void PackMaterialTexture(Texture2D materialTexture, Dictionary<int, Vector3> mappedMaterials)
+        // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID
+        public static void PackMaterialTexture(Texture2D texture, Dictionary<int, Vector3> mappedMaterials)
         {
-            int materialCount = Math.Min(mappedMaterials.Count, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
+            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
 
-            for (int i = 0; i < materialCount; i++)
+            Array.Clear(materialPixels, 0, materialPixels.Length);
+
+            foreach (var kvp in mappedMaterials)
             {
-                Vector3 color = new Vector3(0.0f, 0.0f, 0.0f);
-                mappedMaterials.TryGetValue(i, out color);
+                int id = kvp.Key;
 
-                materialPixels[i] = new Color(color.X, color.Y, color.Z);
+                if (id >= 0 && id < maxPixels)
+                {
+                    Vector3 color = kvp.Value;
+                    materialPixels[id] = new Color(color.X, color.Y, color.Z);
+                }
             }
 
-            materialTexture.SetData(materialPixels);
+            texture.SetData(materialPixels);
         }
     }
 }

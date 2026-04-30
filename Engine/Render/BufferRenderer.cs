@@ -86,7 +86,7 @@ namespace Terralume.Engine.Render
         }
 
         // Renders a material buffer
-        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter, short[] tileIDs)
+        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -107,11 +107,17 @@ namespace Terralume.Engine.Render
             layerParameter.SetUniforms(effect);
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
+            
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
-            effect.Parameters["MaterialTexture"].SetValue(bufferCollection.MaterialTexture);
+            effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
+            
+            effect.Parameters["TileMaterialTexture"].SetValue(bufferCollection.TileMaterialTexture);
+            effect.Parameters["WallMaterialTexture"].SetValue(bufferCollection.WallMaterialTexture);
 
             device.SamplerStates[2] = SamplerState.PointClamp;
             device.SamplerStates[3] = SamplerState.PointClamp;
+            device.SamplerStates[4] = SamplerState.PointClamp;
+            device.SamplerStates[5] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);

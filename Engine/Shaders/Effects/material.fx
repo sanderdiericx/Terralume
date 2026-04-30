@@ -41,11 +41,36 @@ sampler TileIDSampler = sampler_state
     AddressV = Clamp;
 };
 
-Texture2D MaterialTexture;
+Texture2D WallIDTexture;
 
-sampler MaterialSampler = sampler_state
+sampler WallIDSampler = sampler_state
 {
-    Texture = (MaterialTexture);
+    Texture = (WallIDTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+
+Texture2D TileMaterialTexture;
+
+sampler TileMaterialSampler = sampler_state
+{
+    Texture = (TileMaterialTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D WallMaterialTexture;
+
+sampler WallMaterialSampler = sampler_state
+{
+    Texture = (WallMaterialTexture);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -60,84 +85,94 @@ struct PixelShaderInput
 	float4 Color : COLOR0;
 };
 
+float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, float4 defaultMaterial);
+
 // TO DO: Add player, entity, wall materials. 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {
     float layer = tex2D(LayerSampler, input.TexCoord).r;
-    float4 defaultMaterial = float4(MaterialParameter_DefaultMaterial.r, MaterialParameter_DefaultMaterial.g, MaterialParameter_DefaultMaterial.b, 1.0);
+    float epsilon = 0.0001;
     
-	// Background
-    if (abs(layer - LayerParameter_Background) < 0.0001)
+    float4 defaultMaterial = float4(MaterialParameter_DefaultMaterial.r, MaterialParameter_DefaultMaterial.g, MaterialParameter_DefaultMaterial.b, 1.0);
+    float4 material = defaultMaterial;
+    
+    if (abs(layer - LayerParameter_Background) < epsilon) // Background 
     {
-        return float4(0.0, 1.0, 0.0, 1.0);
+        material = float4(0.0, 1.0, 0.0, 1.0);
+    }
+    else if (abs(layer - LayerParameter_Player) < epsilon || abs(layer - LayerParameter_Entity) < epsilon || abs(layer - LayerParameter_Projectile) < epsilon) // Player, Entity, Projectile
+    {
+        material = defaultMaterial;
+    }
+    else if (abs(layer - LayerParameter_NonSolidTile) < epsilon || abs(layer - LayerParameter_Tile) < epsilon) // Non Solid Tiles, Tiles
+    {
+        material = GetMaterial(TileIDSampler, TileMaterialSampler, input.TexCoord, defaultMaterial);
+    }
+    else if (abs(layer - LayerParameter_Wall) < epsilon) // Walls
+    {
+        material = GetMaterial(WallIDSampler, WallMaterialSampler, input.TexCoord, defaultMaterial);
     }
     
-    if (abs(layer - LayerParameter_Player) < 0.0001 || abs(layer - LayerParameter_Entity) < 0.0001 || abs(layer - LayerParameter_Projectile) < 0.0001)
+    return material;
+}
+
+float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, float4 defaultMaterial)
+{
+    // Convert TexCoord to tile space
+    float2 worldPosition = MaterialParameter_ScreenPosition + (texCoord * MaterialParameter_ViewSize);
+    int worldTileX = (int) floor(worldPosition.x / 16.0);
+    int worldTileY = (int) floor(worldPosition.y / 16.0);
+
+    int tileX = (int) round((float) worldTileX - MaterialParameter_MinTilePosition.x);
+    int tileY = (int) round((float) worldTileY - MaterialParameter_MinTilePosition.y);
+
+    tileX = clamp(tileX, 0, MaterialParameter_TileStride.x - 1);
+    tileY = clamp(tileY, 0, MaterialParameter_TileStride.y - 1);
+
+	// Convert tile space coordinate to tile ID texture index
+    int tileIndex = tileY * MaterialParameter_TileStride.x + tileX;
+
+    int pixelIndex = (int) floor((float) tileIndex / 2.0);
+    int channelIndex = tileIndex - pixelIndex * 2;
+
+    float tileIDPixelX = fmod((float) pixelIndex, MaterialParameter_TileIDTextureSize.x);
+    float tileIDPixelY = floor((float) pixelIndex / MaterialParameter_TileIDTextureSize.x);
+
+    float2 tileUV = (float2(tileIDPixelX, tileIDPixelY) + 0.5) / MaterialParameter_TileIDTextureSize;
+	
+	// Sample from sourced index
+    float4 sampledTile = tex2D(IDSampler, tileUV);
+    float4 channels = sampledTile;
+    
+    // Convert into integer
+    int u0;
+    int u1;
+	
+    if (channelIndex == 0)
+    {
+        u0 = (int) (channels.r * 255 + 0.5);
+        u1 = (int) (channels.g * 255 + 0.5);
+    }
+    else
+    {
+        u0 = (int) (channels.b * 255 + 0.5);
+        u1 = (int) (channels.a * 255 + 0.5);
+    }
+    
+    float tileID = (float) u0 + ((float) u1 * 256.0);
+    
+    // Check for no tile
+    if (tileID == 65535)
     {
         return defaultMaterial;
     }
     
-    if (abs(layer - LayerParameter_NonSolidTile) < 0.0001 || abs(layer - LayerParameter_Tile) < 0.0001)
-    {
-        // Convert TexCoord to tile space
-        float2 worldPosition = MaterialParameter_ScreenPosition + (input.TexCoord * MaterialParameter_ViewSize);
-        int worldTileX = (int) floor(worldPosition.x / 16.0);
-        int worldTileY = (int) floor(worldPosition.y / 16.0);
-
-        int tileX = (int) round((float) worldTileX - MaterialParameter_MinTilePosition.x);
-        int tileY = (int) round((float) worldTileY - MaterialParameter_MinTilePosition.y);
-
-        tileX = clamp(tileX, 0, MaterialParameter_TileStride.x - 1);
-        tileY = clamp(tileY, 0, MaterialParameter_TileStride.y - 1);
-
-	    // Convert tile space coordinate to tile ID texture index
-        int tileIndex = tileY * MaterialParameter_TileStride.x + tileX;
-
-        int pixelIndex = (int) floor((float) tileIndex / 2.0);
-        int channelIndex = tileIndex - pixelIndex * 2;
-
-        float tileIDPixelX = fmod((float) pixelIndex, MaterialParameter_TileIDTextureSize.x);
-        float tileIDPixelY = floor((float) pixelIndex / MaterialParameter_TileIDTextureSize.x);
-
-        float2 tileUV = (float2(tileIDPixelX, tileIDPixelY) + 0.5) / MaterialParameter_TileIDTextureSize;
-	
-	    // Sample from sourced index
-        float4 sampledTile = tex2D(TileIDSampler, tileUV);
-        float4 channels = sampledTile;
+    float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
+    float materialPixelY = floor((float) tileID / MaterialParameter_MaterialTextureSize.x);
     
-        // Convert into integer
-        int u0;
-        int u1;
-	
-        if (channelIndex == 0)
-        {
-            u0 = (int) (channels.r * 255 + 0.5);
-            u1 = (int) (channels.g * 255 + 0.5);
-        }
-        else
-        {
-            u0 = (int) (channels.b * 255 + 0.5);
-            u1 = (int) (channels.a * 255 + 0.5);
-        }
+    float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialParameter_MaterialTextureSize;
     
-        float tileID = (float) u0 + ((float) u1 * 256.0);
-    
-        // Check for no tile
-        if (tileID == 65535)
-        {
-            return defaultMaterial;
-        }
-    
-        float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
-        float materialPixelY = floor((float) tileID / MaterialParameter_MaterialTextureSize.x);
-    
-        float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialParameter_MaterialTextureSize;
-    
-        return tex2D(MaterialSampler, float2(materialUV.x, materialUV.y));
-    }
-    
-    // Walls for now
-    return defaultMaterial;
+    return tex2D(materialSampler, float2(materialUV.x, materialUV.y));
 }
 
 technique Material

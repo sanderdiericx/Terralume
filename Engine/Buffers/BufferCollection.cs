@@ -15,7 +15,10 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D NormalBuffer;
 
         public Texture2D TileIDTexture;
-        public Texture2D MaterialTexture;
+        public Texture2D WallIDTexture;
+
+        public Texture2D TileMaterialTexture;
+        public Texture2D WallMaterialTexture;
 
         public int Width;
         public int Height;
@@ -30,7 +33,10 @@ namespace Terralume.Engine.Buffers
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
             TileIDTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-            MaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+            WallIDTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+
+            TileMaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+            WallMaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
 
             Width = width;
             Height = height;
@@ -51,7 +57,10 @@ namespace Terralume.Engine.Buffers
             NormalBuffer.Dispose();
 
             TileIDTexture.Dispose();
-            MaterialTexture.Dispose();
+            WallIDTexture.Dispose();
+
+            TileMaterialTexture.Dispose();
+            WallMaterialTexture.Dispose();
 
             GC.SuppressFinalize(this);
         }

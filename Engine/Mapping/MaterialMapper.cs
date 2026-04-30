@@ -363,7 +363,7 @@ namespace Terralume.Engine.Materials
 
         public static Dictionary<int, Vector3> MappedWalls = new Dictionary<int, Vector3>()
         {
-            { WallID.None, new Vector3(0.0f, 0.0f, 0.0f) },
+            { WallID.None, new Vector3(0.0f, 0.8f, 0.0f) },
             { WallID.Stone, new Vector3(0.0f, 0.8f, 0.0f) },
             { WallID.DirtUnsafe, new Vector3(0.0f, 0.9f, 0.0f) },
             { WallID.EbonstoneUnsafe, new Vector3(0.0f, 0.8f, 0.0f) },
