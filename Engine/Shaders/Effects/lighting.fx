@@ -16,10 +16,10 @@ static const float3x3 AP1_TO_SRGB = float3x3
     -0.00327, -0.07276, 1.17603
 );
 
+float3 Ambient;
+
 float2 ScreenSize;
 float DepthScale;
-
-int ActiveLights;
 float LightDepth;
 
 float Exposure;
@@ -158,22 +158,23 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 viewDir = float3(0.0, 0.0, 1.0);
     
     float4 gridData = tex2Dlod(LightGridSampler, float4(input.TexCoord.x, input.TexCoord.y, 0, 0));
-    float startIndex = gridData.r;
-    float lightCount = gridData.g;
+    float startIndex = round(gridData.r);
+    float lightCount = round(gridData.g);
+    
+    float3 color = Ambient * albedo;
 
-    float3 color = float3(0.0, 0.0, 0.0);
-
-    // Loop over lights affecting this tile
-    for (int i = 0; i < lightCount; i++)
+    [loop]
+    for (int i = 0; i < (int) lightCount; i++)
     {
         float linearIndex = startIndex + (float) i;
-    
+
         float ix = fmod(linearIndex, LightIndexTextureSize.x);
         float iy = floor(linearIndex / LightIndexTextureSize.x);
         float2 indexUV = (float2(ix, iy) + 0.5) / LightIndexTextureSize;
-    
-        float lightDataIndex = tex2Dlod(LightIndexSampler, float4(indexUV.x, indexUV.y, 0, 0)).r;
 
+        float rawIndex = tex2Dlod(LightIndexSampler, float4(indexUV.x, indexUV.y, 0, 0)).r;
+        float lightDataIndex = round(rawIndex);
+    
         float lx = fmod(lightDataIndex, LightDataTextureSize.x);
         float ly = floor(lightDataIndex / LightDataTextureSize.x);
         float2 lightUV = (float2(lx, ly) + 0.5) / LightDataTextureSize;
@@ -226,11 +227,13 @@ float3 BaseReflectivityFunction(float metallic, float3 albedo)
 
 float3 RadianceFunction(float3 lightColor, float intensity, float dist, float range)
 {
-    float scaledDist = dist / range;
+    float normalizedDist = dist / range;
+    
+    float window = saturate(1.0 - normalizedDist * normalizedDist);
+    window = window * window;
     
     float3 incomingLight = lightColor * intensity;
-    
-    return incomingLight * (1.0 / (scaledDist * scaledDist + 1.0));
+    return incomingLight * window / (normalizedDist * normalizedDist + 1.0);
 }
 
 float NormalDistributionFunction(float roughness, float3 normal, float3 halfVector)

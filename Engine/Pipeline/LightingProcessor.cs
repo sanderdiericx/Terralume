@@ -66,12 +66,9 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, RenderConstants.LIGHT_SEARCH_TILE_PADDING);
             LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, outputCollection.LightGridTexture, outputCollection.LightIndexTexture, onScreenLights, tileCaptureParameter.ScreenSize);
 
-            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, onScreenLights.Count);
-
-            Main.NewText(onScreenLights.Count);
+            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             KeyboardState keyboardState = Main.keyState;
-
             if (keyboardState.IsKeyDown(Keys.LeftAlt))
             {
                 if (keyboardState.IsKeyDown(Keys.D1))

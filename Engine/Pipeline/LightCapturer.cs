@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
 using Terraria;
 using Terraria.ModLoader;
@@ -80,7 +81,7 @@ namespace Terralume.Engine.Pipeline
 
         // Gets the screen space position and light profile of all lights on screen
         //
-        // Note: Before calling this method light positions are stored in world space, this method converts it to screen space
+        // Note: Before calling this method light elements are stored in world space with their original range and intensity, this method converts the position to screen space then applies a global range and intensity modifier
         public static List<(Vector2, LightProfile)> GetOnScreenLights(TileCaptureParameter tileCaptureParameter, int tilePadding)
         {
             int pixelPadding = (int)Math.Floor(tilePadding * 16.0);
@@ -98,15 +99,13 @@ namespace Terralume.Engine.Pipeline
                 Vector2 screenPos = (worldPos - tileCaptureParameter.ScreenPosition) * zoom;
 
                 LightProfile originalProfile = hookedLights[i].Item2;
+                
                 float range = originalProfile.Range * zoom.X;
-                float minVisibleThreshold = 0.02f;
-                float distanceMultiplier = (float)Math.Sqrt(Math.Max(0, (originalProfile.Intensity / minVisibleThreshold) - 1.0));
-                float cullRadius = range * distanceMultiplier;
 
                 // Check if the light's bounding box intersects the screen
-                if (screenPos.X + cullRadius >= 0 && screenPos.X - cullRadius < tileCaptureParameter.ScreenSize.X && screenPos.Y + cullRadius >= 0 && screenPos.Y - cullRadius < tileCaptureParameter.ScreenSize.Y)
+                if (screenPos.X + range >= 0 && screenPos.X - range < tileCaptureParameter.ScreenSize.X && screenPos.Y + range >= 0 && screenPos.Y - range < tileCaptureParameter.ScreenSize.Y)
                 {
-                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, range)));
+                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity + RenderConstants.GLOBAL_INTENSITY_MODIFIER, range + RenderConstants.GLOBAL_RANGE_MODIFIER)));
                 }
             }
 

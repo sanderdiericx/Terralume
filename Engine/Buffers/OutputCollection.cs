@@ -29,9 +29,13 @@ namespace Terralume.Engine.Buffers
             int gridWidth = (int)Math.Ceiling((double)width / RenderConstants.LIGHT_GRID_TILE_SIZE);
             int gridHeight = (int)Math.Ceiling((double)height / RenderConstants.LIGHT_GRID_TILE_SIZE);
 
+            int maxIndices = gridWidth * gridHeight * RenderConstants.MAX_LIGHTS_PER_TILE;
+            int indexTextureSize = (int)Math.Ceiling(Math.Sqrt(maxIndices));
+            indexTextureSize = Math.Min(indexTextureSize, 4096);
+
             // LightGridTexture: (start index for tile in index list, light count for each tile) LightIndexTexture (light data index)
             LightGridTexture = new Texture2D(graphicsDevice, gridWidth, gridHeight, false, SurfaceFormat.Vector4);
-            LightIndexTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_INDEX_RESOLUTION, RenderConstants.LIGHT_INDEX_RESOLUTION, false, SurfaceFormat.Vector4);
+            LightIndexTexture = new Texture2D(graphicsDevice, indexTextureSize, indexTextureSize, false, SurfaceFormat.Vector4);
 
             Width = width;
             Height = height;

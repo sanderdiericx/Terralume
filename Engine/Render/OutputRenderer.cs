@@ -10,7 +10,7 @@ namespace Terralume.Engine.Render
     public static class OutputRenderer
     {
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderLightingBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection, int activeLights)
+        public static void RenderLightingBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -24,16 +24,17 @@ namespace Terralume.Engine.Render
 
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
+            effect.Parameters["Ambient"].SetValue(new Vector3(0.02f, 0.02f, 0.025f));
+
             effect.Parameters["ScreenSize"].SetValue(screenSize);
             effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
 
-            effect.Parameters["ActiveLights"].SetValue(activeLights);
             effect.Parameters["LightDepth"].SetValue(85f * currentZoom);
 
             effect.Parameters["Exposure"].SetValue(1.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
-            effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_INDEX_RESOLUTION, RenderConstants.LIGHT_INDEX_RESOLUTION));
+            effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
