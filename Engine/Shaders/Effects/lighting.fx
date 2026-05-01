@@ -25,6 +25,7 @@ float LightDepth;
 float Exposure;
 
 float2 LightDataTextureSize;
+float2 LightIndexTextureSize;
 
 Texture2D DepthBuffer;
 
@@ -86,6 +87,29 @@ sampler LightColorSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D LightGridTexture;
+sampler LightGridSampler = sampler_state
+{
+    Texture = (LightGridTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D LightIndexTexture;
+sampler LightIndexSampler = sampler_state
+{
+    Texture = (LightIndexTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+
 struct PixelShaderInput
 {
     float4 Position : SV_POSITION;
@@ -133,24 +157,35 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);    
     float3 viewDir = float3(0.0, 0.0, 1.0);
     
+    float4 gridData = tex2Dlod(LightGridSampler, float4(input.TexCoord.x, input.TexCoord.y, 0, 0));
+    float startIndex = gridData.r;
+    float lightCount = gridData.g;
+
     float3 color = float3(0.0, 0.0, 0.0);
+
+    // Loop over lights affecting this tile
+    for (int i = 0; i < lightCount; i++)
+    {
+        float linearIndex = startIndex + (float) i;
     
-    for (int i = 0; i < ActiveLights; i++)
-    {        
-        // Sample light position, intensity, radius and color for this index from the data textures
-        float xIndex = fmod((float) i, LightDataTextureSize.x);
-        float yIndex = floor((float) i / LightDataTextureSize.x);
-        float2 lightUV = (float2(xIndex, yIndex) + 0.5) / LightDataTextureSize;
-        
+        float ix = fmod(linearIndex, LightIndexTextureSize.x);
+        float iy = floor(linearIndex / LightIndexTextureSize.x);
+        float2 indexUV = (float2(ix, iy) + 0.5) / LightIndexTextureSize;
+    
+        float lightDataIndex = tex2Dlod(LightIndexSampler, float4(indexUV.x, indexUV.y, 0, 0)).r;
+
+        float lx = fmod(lightDataIndex, LightDataTextureSize.x);
+        float ly = floor(lightDataIndex / LightDataTextureSize.x);
+        float2 lightUV = (float2(lx, ly) + 0.5) / LightDataTextureSize;
+    
         float4 positionSample = tex2Dlod(LightPositionSampler, float4(lightUV.x, lightUV.y, 0, 0));
         float4 colorSample = tex2Dlod(LightColorSampler, float4(lightUV.x, lightUV.y, 0, 0));
-        
+    
         float3 lightPos = float3(positionSample.r, positionSample.g, LightDepth);
         float lightRange = positionSample.b;
         float lightIntensity = positionSample.w;
-        
         float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);
-        
+    
         color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
     }
 

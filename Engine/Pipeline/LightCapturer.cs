@@ -97,11 +97,16 @@ namespace Terralume.Engine.Pipeline
 
                 Vector2 screenPos = (worldPos - tileCaptureParameter.ScreenPosition) * zoom;
 
-                if (screenPos.X >= -pixelPadding && screenPos.Y >= -pixelPadding && screenPos.X < tileCaptureParameter.ScreenSize.X + pixelPadding && screenPos.Y < tileCaptureParameter.ScreenSize.Y + pixelPadding)
-                {
-                    LightProfile originalProfile = hookedLights[i].Item2;
+                LightProfile originalProfile = hookedLights[i].Item2;
+                float range = originalProfile.Range * zoom.X;
+                float minVisibleThreshold = 0.02f;
+                float distanceMultiplier = (float)Math.Sqrt(Math.Max(0, (originalProfile.Intensity / minVisibleThreshold) - 1.0));
+                float cullRadius = range * distanceMultiplier;
 
-                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, originalProfile.Range * zoom.X)));
+                // Check if the light's bounding box intersects the screen
+                if (screenPos.X + cullRadius >= 0 && screenPos.X - cullRadius < tileCaptureParameter.ScreenSize.X && screenPos.Y + cullRadius >= 0 && screenPos.Y - cullRadius < tileCaptureParameter.ScreenSize.Y)
+                {
+                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, range)));
                 }
             }
 

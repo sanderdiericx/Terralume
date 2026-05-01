@@ -63,8 +63,8 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, RenderConstants.LightSearchTilePadding);
-            LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, onScreenLights);
+            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter, RenderConstants.LIGHT_SEARCH_TILE_PADDING);
+            LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, outputCollection.LightGridTexture, outputCollection.LightIndexTexture, onScreenLights, tileCaptureParameter.ScreenSize);
 
             OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection, onScreenLights.Count);
 

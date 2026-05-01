@@ -33,6 +33,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["Exposure"].SetValue(1.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
+            effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_INDEX_RESOLUTION, RenderConstants.LIGHT_INDEX_RESOLUTION));
 
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
@@ -40,6 +41,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["LightPositionTexture"].SetValue(outputCollection.LightPositionTexture);
             effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);
+            effect.Parameters["LightGridTexture"].SetValue(outputCollection.LightGridTexture);
+            effect.Parameters["LightIndexTexture"].SetValue(outputCollection.LightIndexTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(targetCollection.BackgroundTarget, Vector2.Zero, Color.White);

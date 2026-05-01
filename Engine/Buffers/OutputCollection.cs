@@ -12,6 +12,9 @@ namespace Terralume.Engine.Buffers
         public Texture2D LightPositionTexture;
         public Texture2D LightColorTexture;
 
+        public Texture2D LightGridTexture;
+        public Texture2D LightIndexTexture;
+
         public int Width;
         public int Height;
 
@@ -19,11 +22,16 @@ namespace Terralume.Engine.Buffers
         {
             LightingBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
-            // Stores (posX, posY, range, intensity)
-            LightPositionTexture = new RenderTarget2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4, DepthFormat.None);
+            // LightPositionTexture: (posX, posY, range, intensity) LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
+            LightPositionTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
+            LightColorTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.Color);
 
-            // Stores (lightColorRed, lightColorBlue, lightColorGreen, unused)
-            LightColorTexture = new RenderTarget2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.Color, DepthFormat.None);
+            int gridWidth = (int)Math.Ceiling((double)width / RenderConstants.LIGHT_GRID_TILE_SIZE);
+            int gridHeight = (int)Math.Ceiling((double)height / RenderConstants.LIGHT_GRID_TILE_SIZE);
+
+            // LightGridTexture: (start index for tile in index list, light count for each tile) LightIndexTexture (light data index)
+            LightGridTexture = new Texture2D(graphicsDevice, gridWidth, gridHeight, false, SurfaceFormat.Vector4);
+            LightIndexTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_INDEX_RESOLUTION, RenderConstants.LIGHT_INDEX_RESOLUTION, false, SurfaceFormat.Vector4);
 
             Width = width;
             Height = height;
@@ -40,6 +48,9 @@ namespace Terralume.Engine.Buffers
 
             LightPositionTexture.Dispose();
             LightColorTexture.Dispose();
+
+            LightGridTexture.Dispose();
+            LightIndexTexture.Dispose();
 
             GC.SuppressFinalize(this);
         }
