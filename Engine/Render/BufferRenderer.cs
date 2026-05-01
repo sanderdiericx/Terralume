@@ -119,7 +119,7 @@ namespace Terralume.Engine.Render
             device.SamplerStates[4] = SamplerState.PointClamp;
             device.SamplerStates[5] = SamplerState.PointClamp;
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
@@ -138,8 +138,9 @@ namespace Terralume.Engine.Render
             Effect effect = EffectManager.GetEffect(EffectType.Normal);
 
             effect.Parameters["ScreenSize"].SetValue(new Vector2(Main.screenTarget.Width, Main.screenTarget.Height));
+            effect.Parameters["NormalStrength"].SetValue(1.0f);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 

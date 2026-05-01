@@ -154,6 +154,9 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
         color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
     }
 
+    float3 emissive = albedo * material.b * 5.0;
+    color += emissive;
+    
     color *= Exposure;
     color = ToneMappingACES(color);
     
