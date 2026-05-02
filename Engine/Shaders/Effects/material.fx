@@ -141,7 +141,7 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
     float2 tileUV = (float2(tileIDPixelX, tileIDPixelY) + 0.5) / MaterialParameter_TileIDTextureSize;
 	
 	// Sample from sourced index
-    float4 sampledTile = tex2D(IDSampler, tileUV);
+    float4 sampledTile = tex2Dlod(IDSampler, float4(tileUV.x, tileUV.y, 0, 0));
     float4 channels = sampledTile;
     
     // Convert into integer
@@ -172,7 +172,7 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
     
     float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialParameter_MaterialTextureSize;
     
-    return tex2D(materialSampler, float2(materialUV.x, materialUV.y));
+    return tex2Dlod(materialSampler, float4(materialUV.x, materialUV.y, 0, 0));
 }
 
 technique Material
