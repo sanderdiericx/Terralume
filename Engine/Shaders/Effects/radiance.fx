@@ -146,15 +146,15 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     {
         float linearIndex = startIndex + (float) i;
 
-        float ix = fmod(linearIndex, LightIndexTextureSize.x);
-        float iy = floor(linearIndex / LightIndexTextureSize.x);
+        float iy = floor((linearIndex + 0.5) / LightIndexTextureSize.x);
+        float ix = linearIndex - (iy * LightIndexTextureSize.x);
         float2 indexUV = (float2(ix, iy) + 0.5) / LightIndexTextureSize;
 
         float rawIndex = tex2Dlod(LightIndexSampler, float4(indexUV.x, indexUV.y, 0, 0)).r;
         float lightDataIndex = round(rawIndex);
     
-        float lx = fmod(lightDataIndex, LightDataTextureSize.x);
-        float ly = floor(lightDataIndex / LightDataTextureSize.x);
+        float ly = floor((lightDataIndex + 0.5) / LightDataTextureSize.x);
+        float lx = lightDataIndex - (ly * LightDataTextureSize.x);
         float2 lightUV = (float2(lx, ly) + 0.5) / LightDataTextureSize;
     
         float4 positionSample = tex2Dlod(LightPositionSampler, float4(lightUV.x, lightUV.y, 0, 0));
