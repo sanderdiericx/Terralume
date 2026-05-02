@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Shaders;
@@ -24,14 +25,9 @@ namespace Terralume.Engine.Render
 
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
-            effect.Parameters["Ambient"].SetValue(new Vector3(0.02f, 0.02f, 0.025f));
-
             effect.Parameters["ScreenSize"].SetValue(screenSize);
             effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
-
             effect.Parameters["LightDepth"].SetValue(85f * currentZoom);
-
-            effect.Parameters["Exposure"].SetValue(1.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
@@ -44,6 +40,30 @@ namespace Terralume.Engine.Render
             effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);
             effect.Parameters["LightGridTexture"].SetValue(outputCollection.LightGridTexture);
             effect.Parameters["LightIndexTexture"].SetValue(outputCollection.LightIndexTexture);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.AlbedoBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        public static void RenderOutputBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(outputCollection.OutputBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Output);
+
+            effect.Parameters["Ambient"].SetValue(new Vector3(0.02f, 0.02f, 0.025f));
+            effect.Parameters["Exposure"].SetValue(1.1f);
+
+            effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
+
+            device.SamplerStates[1] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(targetCollection.BackgroundTarget, Vector2.Zero, Color.White);

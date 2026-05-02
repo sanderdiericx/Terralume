@@ -6,6 +6,7 @@
         Depth,
         Normal,
         Material,
-        Radiance
+        Radiance,
+        Output
     }
 }

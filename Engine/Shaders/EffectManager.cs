@@ -16,6 +16,7 @@ namespace Terralume.Engine.Shaders
             { EffectType.Material, "material" },
             { EffectType.Normal, "normal" },
             { EffectType.Radiance, "radiance" },
+            { EffectType.Output, "output" },
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

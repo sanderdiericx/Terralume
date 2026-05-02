@@ -2,27 +2,9 @@
 
 static const float PI = 3.14159265359f;
 
-static const float3x3 SRGB_TO_AP1 = float3x3
-(
-    0.59719, 0.35458, 0.04823,
-    0.07600, 0.90834, 0.01566,
-    0.02840, 0.13383, 0.83777
-);
-
-static const float3x3 AP1_TO_SRGB = float3x3
-(
-    1.60475, -0.53108, -0.07367,
-    -0.10208, 1.10813, -0.00605,
-    -0.00327, -0.07276, 1.17603
-);
-
-float3 Ambient;
-
 float2 ScreenSize;
 float DepthScale;
 float LightDepth;
-
-float Exposure;
 
 float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
@@ -134,11 +116,7 @@ float3 EnergyConservationFunction(float3 fresnel, float metallic);
 float3 CalculateBRDFSpecular(float distribution, float geometry, float3 fresnel, float3 normal, float3 viewDir, float3 lightDir);
 float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 specular, float3 radianceColor, float3 normal, float3 lightDir);
 
-float3 ToneMappingACES(float3 color);
-float3 RRTAndODTFit(float3 aces);
-
 float3 ToLinear(float3 sRGB);
-float3 ToGamma(float3 linearRGB);
 
 float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 {     
@@ -161,7 +139,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float startIndex = round(gridData.r);
     float lightCount = round(gridData.g);
     
-    float3 color = Ambient * albedo;
+    float3 color = float3(0.0, 0.0, 0.0);
 
     [loop]
     for (int i = 0; i < (int) lightCount; i++)
@@ -192,12 +170,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 
     float3 emissive = albedo * material.b * 5.0;
     color += emissive;
-    
-    color *= Exposure;
-    color = ToneMappingACES(color);
-    
-    color = ToGamma(color);
-    
+        
     return float4(color.r, color.g, color.b, albedoOriginal.a);
 }
 
@@ -288,26 +261,9 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
     return (energyConservation * (albedo / PI) + specular) * radianceColor * max(dot(normal, lightDir), 0.0);
 }
 
-float3 ToneMappingACES(float3 color)
-{    
-    return mul(AP1_TO_SRGB, RRTAndODTFit(mul(SRGB_TO_AP1, color)));
-}
-
-float3 RRTAndODTFit(float3 aces)
-{
-    float3 a = aces * (aces + 0.0245786) - 0.000090537;
-    float3 b = aces * (0.983729 * aces + 0.4329510) + 0.238081;
-    return a / b;
-}
-
 float3 ToLinear(float3 sRGB)
 {
     return pow(sRGB, 2.2);
-}
-
-float3 ToGamma(float3 linearRGB)
-{
-    return pow(linearRGB, 1.0 / 2.2);
 }
 
 technique Radiance

@@ -66,17 +66,17 @@ namespace Terralume.Engine.Pipeline
             LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
-
-            // Main.NewText(onScreenLights.Count);
+            
+            OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             KeyboardState keyboardState = Main.keyState;
             if (keyboardState.IsKeyDown(Keys.LeftAlt))
             {
                 if (keyboardState.IsKeyDown(Keys.D1))
                 {
-                    Main.NewText($"Switching to lighting buffer view", Color.Green);
+                    Main.NewText($"Switching to output buffer view", Color.Green);
 
-                    currentRenderTarget = outputCollection.RadianceBuffer;
+                    currentRenderTarget = outputCollection.OutputBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D2))
                 {
@@ -110,9 +110,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D7))
                 {
-                    Main.NewText($"Switching to screen target view", Color.Green);
+                    Main.NewText($"Switching to radiance buffer view", Color.Green);
 
-                    currentRenderTarget = Main.screenTarget;
+                    currentRenderTarget = outputCollection.RadianceBuffer;
                 }
             }
 
