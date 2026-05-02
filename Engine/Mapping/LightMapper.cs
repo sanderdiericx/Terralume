@@ -7,12 +7,19 @@ namespace Terralume.Engine.Mapping
 {
     internal static class LightMapper
     {
-        public static float DefaultLightIntensity = 3.5f;
-        public static float DefaultLightRange = 215f;
+        // Default light values for all lights captured by AddLight methods
+        public static float DefaultLightIntensity = 2.0f;
+        public static float DefaultLightRange = 115f;
 
-        // public static float DefaultLightIntensity = 1.5f;
-        // public static float DefaultLightRange = 100f;
+        // Some light sources captured by AddLight methods (such as held torches) need custom light profiles
+        //
+        // Note: Custom lights are currently identified by color (Need a better ID system in the future)
+        public static Dictionary<Vector4, LightProfile> DefaultLightExceptions = new Dictionary<Vector4, LightProfile>()
+        {
+            { new Vector4(1.00f, 0.95f, 0.80f, 1f), new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 215f) } // Held torches
+        };
 
+        // Light profiles linked to light emitting tiles via GetVisibleTileLights
         public static Dictionary<ushort, LightProfile> TileProfiles = new Dictionary<ushort, LightProfile>
         {
             { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 215f) },

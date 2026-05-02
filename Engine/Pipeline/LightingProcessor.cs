@@ -68,7 +68,7 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
-            Main.NewText(onScreenLights.Count);
+            // Main.NewText(onScreenLights.Count);
 
             KeyboardState keyboardState = Main.keyState;
             if (keyboardState.IsKeyDown(Keys.LeftAlt))

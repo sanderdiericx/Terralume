@@ -51,7 +51,10 @@ namespace Terralume.Engine.Pipeline
             orig(position, r, g, b);
             Vector4 color = new Vector4(r, g, b, 1f);
 
-            hookedLights.Add((position, new LightProfile(color, LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange), false));
+            LightProfile lightProfile = new LightProfile(color, LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange);
+            LightMapper.DefaultLightExceptions.TryGetValue(color, out lightProfile);
+
+            hookedLights.Add((position, lightProfile, false));
         }
 
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
