@@ -29,7 +29,7 @@ namespace Terralume.Engine.Pipeline
                 outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
-                EffectManager.LoadEffect(EffectType.Lighting);
+                EffectManager.LoadEffect(EffectType.Radiance);
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
@@ -64,9 +64,9 @@ namespace Terralume.Engine.Pipeline
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
-            LightHelper.PackLightTextures(outputCollection.LightPositionTexture, outputCollection.LightColorTexture, outputCollection.LightGridTexture, outputCollection.LightIndexTexture, onScreenLights, tileCaptureParameter.ScreenSize);
+            LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
-            OutputRenderer.RenderLightingBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
+            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             // Main.NewText(onScreenLights.Count);
 
@@ -77,7 +77,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText($"Switching to lighting buffer view", Color.Green);
 
-                    currentRenderTarget = outputCollection.LightingBuffer;
+                    currentRenderTarget = outputCollection.RadianceBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D2))
                 {

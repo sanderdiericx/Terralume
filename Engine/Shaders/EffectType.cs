@@ -6,6 +6,6 @@
         Depth,
         Normal,
         Material,
-        Lighting
+        Radiance
     }
 }

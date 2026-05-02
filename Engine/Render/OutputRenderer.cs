@@ -10,15 +10,15 @@ namespace Terralume.Engine.Render
     public static class OutputRenderer
     {
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderLightingBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
+        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(outputCollection.LightingBuffer);
+            device.SetRenderTarget(outputCollection.RadianceBuffer);
             device.Clear(Color.Transparent);
 
-            Effect effect = EffectManager.GetEffect(EffectType.Lighting);
+            Effect effect = EffectManager.GetEffect(EffectType.Radiance);
 
             Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
 

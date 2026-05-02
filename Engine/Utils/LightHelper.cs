@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
+using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 
@@ -18,7 +19,7 @@ namespace Terralume.Engine.Utils
 
         private static List<int>[] tileBuckets;
 
-        public static void PackLightTextures(Texture2D lightPositionTexture, Texture2D lightColorTexture, Texture2D lightGridTexture, Texture2D lightIndexTexture, List<(Vector2, LightProfile)> lightProfiles, Vector2 screenSize)
+        public static void PackLightTextures(OutputCollection outputCollection, List<(Vector2, LightProfile)> lightProfiles, Vector2 screenSize)
         {
             Array.Clear(lightPositionPixels, 0, lightPositionPixels.Length);
             Array.Clear(lightColorPixels, 0, lightColorPixels.Length);
@@ -45,17 +46,17 @@ namespace Terralume.Engine.Utils
                 lightColorPixels[i] = new Color(color.X, color.Y, color.Z, color.W);
             }
 
-            lightPositionTexture.SetData(lightPositionPixels);
-            lightColorTexture.SetData(lightColorPixels);
+            outputCollection.LightPositionTexture.SetData(lightPositionPixels);
+            outputCollection.LightColorTexture.SetData(lightColorPixels);
 
             // Initialize grid data and index arrays based on screen size
             int gridWidth = (int)Math.Ceiling(screenSize.X / RenderConstants.LIGHT_GRID_TILE_SIZE);
             int gridHeight = (int)Math.Ceiling(screenSize.Y / RenderConstants.LIGHT_GRID_TILE_SIZE);
             int totalTiles = gridWidth * gridHeight;
             
-            if (indexPixels == null || indexPixels.Length != lightIndexTexture.Width * lightIndexTexture.Height)
+            if (indexPixels == null || indexPixels.Length != outputCollection.LightIndexTexture.Width * outputCollection.LightIndexTexture.Height)
             {
-                indexPixels = new Vector4[lightIndexTexture.Width * lightIndexTexture.Height];
+                indexPixels = new Vector4[outputCollection.LightIndexTexture.Width * outputCollection.LightIndexTexture.Height];
             }
 
             if (gridPixels == null || gridPixels.Length != totalTiles)
@@ -121,8 +122,8 @@ namespace Terralume.Engine.Utils
                 gridPixels[i] = new Vector4(startIndexForTile, writtenCount, 0, 0);
             }
 
-            lightGridTexture.SetData(gridPixels);
-            lightIndexTexture.SetData(indexPixels);
+            outputCollection.LightGridTexture.SetData(gridPixels);
+            outputCollection.LightIndexTexture.SetData(indexPixels);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Terralume.Engine.Buffers
 {
     public class OutputCollection : IDisposable
     {
-        public RenderTarget2D LightingBuffer;
+        public RenderTarget2D RadianceBuffer;
 
         public Texture2D LightPositionTexture;
         public Texture2D LightColorTexture;
@@ -20,7 +20,7 @@ namespace Terralume.Engine.Buffers
 
         public OutputCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
-            LightingBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
             // LightPositionTexture: (posX, posY, range, intensity) LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
             LightPositionTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
@@ -48,7 +48,7 @@ namespace Terralume.Engine.Buffers
 
         public void Dispose()
         {
-            LightingBuffer.Dispose();
+            RadianceBuffer.Dispose();
 
             LightPositionTexture.Dispose();
             LightColorTexture.Dispose();

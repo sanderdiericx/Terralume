@@ -310,7 +310,7 @@ float3 ToGamma(float3 linearRGB)
     return pow(linearRGB, 1.0 / 2.2);
 }
 
-technique Lighting
+technique Radiance
 {
     pass Pass1
     {
