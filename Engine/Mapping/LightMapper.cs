@@ -7,7 +7,7 @@ namespace Terralume.Engine.Mapping
 {
     internal static class LightMapper
     {
-        public static float DefaultLightIntensity = 2.5f;
+        public static float DefaultLightIntensity = 3.5f;
         public static float DefaultLightRange = 215f;
 
         // public static float DefaultLightIntensity = 1.5f;
@@ -15,7 +15,7 @@ namespace Terralume.Engine.Mapping
 
         public static Dictionary<ushort, LightProfile> TileProfiles = new Dictionary<ushort, LightProfile>
         {
-            { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 7.5f, 220f) },
+            { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 215f) },
             { TileID.Furnaces, new LightProfile(new Vector4(1.00f, 0.60f, 0.20f, 1f), 8.0f, 240f) },
             { TileID.Platforms, new LightProfile(new Vector4(1.00f, 1.00f, 1.00f, 1f), 0.1f, 1f) },
             { TileID.Saplings, new LightProfile(new Vector4(0.50f, 0.80f, 0.50f, 1f), 1.5f, 60f) },
