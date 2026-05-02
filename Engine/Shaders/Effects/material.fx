@@ -169,10 +169,18 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
     
     float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
     float materialPixelY = floor((float) tileID / MaterialParameter_MaterialTextureSize.x);
-    
+
     float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialParameter_MaterialTextureSize;
     
-    return tex2Dlod(materialSampler, float4(materialUV.x, materialUV.y, 0, 0));
+    float4 sampledMaterial = tex2Dlod(materialSampler, float4(materialUV.x, materialUV.y, 0, 0));
+    
+    // Tile ID was never given a material vector
+    if (sampledMaterial.a < 0.01)
+    {
+        return defaultMaterial;
+    }
+    
+    return sampledMaterial;
 }
 
 technique Material

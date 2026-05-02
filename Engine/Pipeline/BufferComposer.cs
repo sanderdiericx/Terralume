@@ -39,7 +39,7 @@ namespace Terralume.Engine.Pipeline
         }
 
         // Must be called at On_Main.DrawInterface!
-        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, short[] tileIDs, short[] wallIDs)
+        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, ushort[] tileIDs, ushort[] wallIDs)
         {
             UpdateBuffer();
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
@@ -53,7 +52,7 @@ namespace Terralume.Engine.Utils
             int gridWidth = (int)Math.Ceiling(screenSize.X / RenderConstants.LIGHT_GRID_TILE_SIZE);
             int gridHeight = (int)Math.Ceiling(screenSize.Y / RenderConstants.LIGHT_GRID_TILE_SIZE);
             int totalTiles = gridWidth * gridHeight;
-            
+
             if (indexPixels == null || indexPixels.Length != outputCollection.LightIndexTexture.Width * outputCollection.LightIndexTexture.Height)
             {
                 indexPixels = new Vector4[outputCollection.LightIndexTexture.Width * outputCollection.LightIndexTexture.Height];

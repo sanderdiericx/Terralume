@@ -31,7 +31,7 @@ namespace Terralume.Engine.Mapping
             { TileID.Sunflower, new LightProfile(new Vector4(1.00f, 0.90f, 0.40f, 1f), 2.0f, 120f) },
             { TileID.ShadowOrbs, new LightProfile(new Vector4(0.40f, 0.10f, 0.60f, 1f), 5.0f, 160f) },
             { TileID.Candles, new LightProfile(new Vector4(1.00f, 0.90f, 0.70f, 1f), 5.0f, 160f) },
-            { TileID.Chandeliers, new LightProfile(new Vector4(1.00f, 0.90f, 0.70f, 1f), 5.5f, 250f) },
+            { TileID.Chandeliers, new LightProfile(new Vector4(1.00f, 0.90f, 0.70f, 1f), 2.5f, 200f) },
             { TileID.Jackolanterns, new LightProfile(new Vector4(1.00f, 0.60f, 0.10f, 1f), 6.0f, 190f) },
             { TileID.Meteorite, new LightProfile(new Vector4(0.80f, 0.40f, 0.10f, 1f), 2.5f, 90f) },
             { TileID.HangingLanterns, new LightProfile(new Vector4(1.00f, 0.85f, 0.60f, 1f), 7.0f, 210f) },

@@ -12,7 +12,7 @@ namespace Terralume.Engine.Pipeline
     class LightCapturer : ModSystem
     {
         private static List<(Vector2, LightProfile, bool)> hookedLights = new List<(Vector2, LightProfile, bool)>();
-        
+
         private static List<(Vector2, LightProfile)> mergedLights = new List<(Vector2, LightProfile)>();
         private static List<(Vector2, LightProfile)> onScreenLights = new List<(Vector2, LightProfile)>();
 
@@ -138,7 +138,7 @@ namespace Terralume.Engine.Pipeline
 
             // Capture tile lights into hookedLights
             CaptureVisibleTileLights(tileCaptureParameter);
-            
+
             // Merge hookedLights into mergedLights
             MergeHookedLights();
 
@@ -152,7 +152,7 @@ namespace Terralume.Engine.Pipeline
                 Vector2 screenPos = (worldPos - tileCaptureParameter.ScreenPosition) * zoom;
 
                 LightProfile originalProfile = mergedLights[i].Item2;
-                
+
                 float range = originalProfile.Range * zoom.X;
 
                 // Check if the light's bounding box intersects the screen

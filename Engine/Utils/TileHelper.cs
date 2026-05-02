@@ -42,15 +42,15 @@ namespace Terralume.Engine.Utils
 
         // Builds a flat array with tile ids of all visible tiles, and a second flat array with ids of all visible wall tiles
         //
-        // Note: Indices without tiles will recieve tile ID -1 by default, this method supports max 32,767 different tiles/walls
-        public static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out short[] tileIDs, out short[] wallIDs)
+        // Note: Indices without tiles will recieve tile ID 65535 by default, this method supports max 65534 different tiles/walls
+        public static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs)
         {
             Vector2 stride = tileCaptureParameter.TileStride;
             Vector2 minTile = tileCaptureParameter.MinTile;
             Vector2 maxTile = tileCaptureParameter.MaxTile;
 
-            tileIDs = new short[(int)stride.X * (int)stride.Y];
-            wallIDs = new short[(int)stride.X * (int)stride.Y];
+            tileIDs = new ushort[(int)stride.X * (int)stride.Y];
+            wallIDs = new ushort[(int)stride.X * (int)stride.Y];
 
             int count = 0;
 
@@ -60,13 +60,13 @@ namespace Terralume.Engine.Utils
                 {
                     if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY) // Out of bounds;
                     {
-                        tileIDs[count] = -1;
-                        wallIDs[count] = -1;
+                        tileIDs[count] = 65535;
+                        wallIDs[count] = 65535;
                     }
                     else
                     {
-                        tileIDs[count] = (short)(Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : -1);
-                        wallIDs[count] = (short)(Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : -1);
+                        tileIDs[count] = (Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : (ushort)65535);
+                        wallIDs[count] = (Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : (ushort)65535);
                     }
 
                     count++;
@@ -77,7 +77,7 @@ namespace Terralume.Engine.Utils
         // Encodes an array of shorts into a 2D texture
         //
         // Note: Each texture index stores two shorts
-        public static void PackShortsIntoTexture(Texture2D texture, short[] shorts)
+        public static void PackShortsIntoTexture(Texture2D texture, ushort[] shorts)
         {
             int pixelCount = (shorts.Length + 1) / 2;
 
@@ -86,8 +86,8 @@ namespace Terralume.Engine.Utils
             for (int i = 0; i < safePixelCount; i++)
             {
                 int index = i * 2;
-                short u0 = shorts[index];
-                short u1 = (index + 1 < shorts.Length) ? shorts[index + 1] : (short)-1;
+                ushort u0 = shorts[index];
+                ushort u1 = (index + 1 < shorts.Length) ? shorts[index + 1] : (ushort)65535;
 
                 shortPixels[i] = new Color(
                     (byte)(u0 & 0xFF), // low byte of u0

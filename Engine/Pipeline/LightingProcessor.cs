@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
-using Terralume.Engine.Constants;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -56,7 +55,7 @@ namespace Terralume.Engine.Pipeline
             UpdateBuffer();
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            TileHelper.GetVisibleIDs(tileCaptureParameter, out short[] tileIDs, out short[] wallIDs);
+            TileHelper.GetVisibleIDs(tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs);
 
             BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs, wallIDs);
 
