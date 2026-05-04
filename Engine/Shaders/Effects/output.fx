@@ -29,23 +29,15 @@ sampler RadianceSampler = sampler_state
     AddressV = Clamp;
 };
 
-
-struct PixelShaderInput
-{
-    float4 Position : SV_POSITION;
-    float2 TexCoord : TEXCOORD0;
-    float4 Color : COLOR0;
-};
-
 float3 ToneMappingACES(float3 color);
 float3 RRTAndODTFit(float3 aces);
 
 float3 ToLinear(float3 sRGB);
 float3 ToGamma(float3 linearRGB);
 
-float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float4 albedoOriginal = tex2D(AlbedoSampler, input.TexCoord);
+    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
     if (albedoOriginal.a < 0.01)
     {
         discard;
@@ -54,7 +46,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 albedo = ToLinear(albedoOriginal.rgb);
     
     float3 ambient = Ambient * albedo;
-    float4 direct = tex2D(RadianceSampler, input.TexCoord);
+    float4 direct = tex2D(RadianceSampler, uv);
     
     float3 color = direct.rgb + ambient;
     

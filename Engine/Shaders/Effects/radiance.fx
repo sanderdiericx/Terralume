@@ -91,15 +91,6 @@ sampler LightIndexSampler = sampler_state
     AddressV = Clamp;
 };
 
-
-struct PixelShaderInput
-{
-    float4 Position : SV_POSITION;
-    float2 TexCoord : TEXCOORD0;
-    float4 Color : COLOR0;
-};
-
-
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
@@ -118,9 +109,9 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
 
 float3 ToLinear(float3 sRGB);
 
-float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {     
-    float4 albedoOriginal = tex2D(AlbedoSampler, input.TexCoord);
+    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
     
     if (albedoOriginal.a < 0.01)
     {
@@ -128,16 +119,16 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     }
     
     float3 albedo = ToLinear(albedoOriginal.rgb);
-    float3 normal = normalize(tex2D(NormalSampler, input.TexCoord).rgb * 2.0 - 1.0);
-    float3 material = tex2D(MaterialSampler, input.TexCoord).rgb;
+    float3 normal = normalize(tex2D(NormalSampler, uv).rgb * 2.0 - 1.0);
+    float3 material = tex2D(MaterialSampler, uv).rgb;
     
-    float pixelZ = tex2D(DepthSampler, input.TexCoord).r * DepthScale;
-    float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);    
+    float pixelZ = tex2D(DepthSampler, uv).r * DepthScale;
+    float3 pixelPos = float3(uv.x * ScreenSize.x, uv.y * ScreenSize.y, pixelZ);
     float3 viewDir = float3(0.0, 0.0, 1.0);
     
     float lightPositionZ = LightDepth * DepthScale;
     
-    float4 gridData = tex2Dlod(LightGridSampler, float4(input.TexCoord.x, input.TexCoord.y, 0, 0));
+    float4 gridData = tex2Dlod(LightGridSampler, float4(uv.x, uv.y, 0, 0));
     float startIndex = round(gridData.r);
     float lightCount = round(gridData.g);
     

@@ -40,23 +40,25 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Copies Main.screen target into a custom render target, the albedo map represents each pixels diffuse color
-        // Note: For this to copy a true albedo buffer, vanilla lighting must be disabled
-        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
+        // Renders the noise texture for material variation on tiles and walls
+        public static void RenderNoiseBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(bufferCollection.AlbedoBuffer);
+            device.SetRenderTarget(bufferCollection.NoiseBuffer);
             device.Clear(Color.Transparent);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            Effect effect = EffectManager.GetEffect(EffectType.Noise);
 
-            // We bake the underground background into the albedo buffer because it is affected by lights (and is not present in Main.screenTarget)
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundTarget, Vector2.Zero, Color.White);
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
-            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
+            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
 
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
@@ -96,14 +98,17 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Material);
 
-            effect.Parameters["MaterialParameter_TileStride"].SetValue(tileCaptureParameter.TileStride);
-            effect.Parameters["MaterialParameter_TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["MaterialParameter_ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
-            effect.Parameters["MaterialParameter_ViewSize"].SetValue(tileCaptureParameter.ViewSize);
-            effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
-            effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["MaterialParameter_DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
+            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
+            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
+
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+
+            effect.Parameters["DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
             effect.Parameters["MaterialVariationFactor"].SetValue(0.4f);
+
+            effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
 
             layerParameter.SetUniforms(effect);
 
@@ -140,6 +145,7 @@ namespace Terralume.Engine.Render
             Effect effect = EffectManager.GetEffect(EffectType.Normal);
 
             effect.Parameters["ScreenSize"].SetValue(new Vector2(Main.screenTarget.Width, Main.screenTarget.Height));
+
             effect.Parameters["NormalStrength"].SetValue(1.0f);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
@@ -149,25 +155,23 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders the noise texture for material variation on tiles and walls
-        public static void RenderNoiseBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
+        // Copies Main.screen target into a custom render target, the albedo map represents each pixels diffuse color
+        // Note: For this to copy a true albedo buffer, vanilla lighting must be disabled
+        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(bufferCollection.NoiseBuffer);
+            device.SetRenderTarget(bufferCollection.AlbedoBuffer);
             device.Clear(Color.Transparent);
 
-            Effect effect = EffectManager.GetEffect(EffectType.Noise);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
-            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+            // We bake the underground background into the albedo buffer because it is affected by lights (and is not present in Main.screenTarget)
+            spriteBatch.Draw(targetCollection.UndergroundBackgroundTarget, Vector2.Zero, Color.White);
 
-            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
-            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
-            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);

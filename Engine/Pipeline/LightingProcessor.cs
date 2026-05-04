@@ -67,7 +67,7 @@ namespace Terralume.Engine.Pipeline
             LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
-            
+
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             KeyboardState keyboardState = Main.keyState;

@@ -1,22 +1,25 @@
 ﻿sampler2D ScreenSampler : register(s0);
 
-float2 MaterialParameter_TileStride;
-float2 MaterialParameter_ScreenPosition;
-float2 MaterialParameter_MinTilePosition;
-float2 MaterialParameter_ViewSize;
-float2 MaterialParameter_TileIDTextureSize;
-float2 MaterialParameter_MaterialTextureSize;
-float3 MaterialParameter_DefaultMaterial;
+float2 TileStride;
+float2 MinTilePosition;
+
+float2 ScreenPosition;
+float2 ViewSize;
+
+float3 DefaultMaterial;
 float MaterialVariationFactor;
 
-float LayerParameter_Background;
-float LayerParameter_Tile;
-float LayerParameter_NonSolidTile;
-float LayerParameter_Wall;
-float LayerParameter_Entity;
-float LayerParameter_Player;
-float LayerParameter_Projectile;
-float LayerParameter_Other;
+float2 MaterialTextureSize;
+float2 TileIDTextureSize;
+
+float BackgroundLayer;
+float TileLayer;
+float NonSolidTileLayer;
+float WallLayer;
+float EntityLayer;
+float ProjectileLayer;
+float PlayerLayer;
+float OtherLayer;
 
 Texture2D LayerBuffer;
 
@@ -91,71 +94,63 @@ sampler WallMaterialSampler = sampler_state
     AddressV = Clamp;
 };
 
-
-struct PixelShaderInput
-{
-	float4 Position : SV_POSITION;
-	float2 TexCoord : TEXCOORD0;
-	float4 Color : COLOR0;
-};
-
-float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, float4 defaultMaterial);
+float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 uv, float4 defaultMaterial);
 
 // TO DO: Add player, entity, wall materials. 
-float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float layer = tex2D(LayerSampler, input.TexCoord).r;
+    float layer = tex2D(LayerSampler, uv).r;
     float epsilon = 0.0001;
     
-    float4 defaultMaterial = float4(MaterialParameter_DefaultMaterial.r, MaterialParameter_DefaultMaterial.g, MaterialParameter_DefaultMaterial.b, 1.0);
+    float4 defaultMaterial = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
     float4 material = defaultMaterial;
     
-    if (abs(layer - LayerParameter_Background) < epsilon) // Background 
+    if (abs(layer - BackgroundLayer) < epsilon) // Background 
     {
         material = float4(0.0, 1.0, 0.0, 1.0);
     }
-    else if (abs(layer - LayerParameter_Player) < epsilon || abs(layer - LayerParameter_Entity) < epsilon || abs(layer - LayerParameter_Projectile) < epsilon) // Player, Entity, Projectile
+    else if (abs(layer - PlayerLayer) < epsilon || abs(layer - EntityLayer) < epsilon || abs(layer - ProjectileLayer) < epsilon) // Player, Entity, Projectile
     {
         material = defaultMaterial;
     }
-    else if (abs(layer - LayerParameter_NonSolidTile) < epsilon || abs(layer - LayerParameter_Tile) < epsilon) // Non Solid Tiles, Tiles
+    else if (abs(layer - NonSolidTileLayer) < epsilon || abs(layer - TileLayer) < epsilon) // Non Solid Tiles, Tiles
     {
-        material = GetMaterial(TileIDSampler, TileMaterialSampler, input.TexCoord, defaultMaterial);
+        material = GetMaterial(TileIDSampler, TileMaterialSampler, uv, defaultMaterial);
     }
-    else if (abs(layer - LayerParameter_Wall) < epsilon) // Walls
+    else if (abs(layer - WallLayer) < epsilon) // Walls
     {
-        material = GetMaterial(WallIDSampler, WallMaterialSampler, input.TexCoord, defaultMaterial);
+        material = GetMaterial(WallIDSampler, WallMaterialSampler, uv, defaultMaterial);
     }
     
     return material;
 }
 
-float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, float4 defaultMaterial)
+float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 uv, float4 defaultMaterial)
 {
-    float roughnessVariation = (tex2D(NoiseSampler, texCoord) - 0.5) * MaterialVariationFactor;
+    float roughnessVariation = (tex2D(NoiseSampler, uv) - 0.5) * MaterialVariationFactor;
     float4 variation = float4(0.0, roughnessVariation, 0.0, 0.0);
     
     // Convert TexCoord to tile space
-    float2 worldPosition = MaterialParameter_ScreenPosition + (texCoord * MaterialParameter_ViewSize);
+    float2 worldPosition = ScreenPosition + (uv * ViewSize);
     int worldTileX = (int) floor(worldPosition.x / 16.0);
     int worldTileY = (int) floor(worldPosition.y / 16.0);
 
-    int tileX = (int) round((float) worldTileX - MaterialParameter_MinTilePosition.x);
-    int tileY = (int) round((float) worldTileY - MaterialParameter_MinTilePosition.y);
+    int tileX = (int) round((float) worldTileX - MinTilePosition.x);
+    int tileY = (int) round((float) worldTileY - MinTilePosition.y);
 
-    tileX = clamp(tileX, 0, MaterialParameter_TileStride.x - 1);
-    tileY = clamp(tileY, 0, MaterialParameter_TileStride.y - 1);
+    tileX = clamp(tileX, 0, TileStride.x - 1);
+    tileY = clamp(tileY, 0, TileStride.y - 1);
 
 	// Convert tile space coordinate to tile ID texture index
-    int tileIndex = tileY * MaterialParameter_TileStride.x + tileX;
+    int tileIndex = tileY * TileStride.x + tileX;
 
     int pixelIndex = (int) floor((float) tileIndex / 2.0);
     int channelIndex = tileIndex - pixelIndex * 2;
 
-    float tileIDPixelX = fmod((float) pixelIndex, MaterialParameter_TileIDTextureSize.x);
-    float tileIDPixelY = floor((float) pixelIndex / MaterialParameter_TileIDTextureSize.x);
+    float tileIDPixelX = fmod((float) pixelIndex, TileIDTextureSize.x);
+    float tileIDPixelY = floor((float) pixelIndex / TileIDTextureSize.x);
 
-    float2 tileUV = (float2(tileIDPixelX, tileIDPixelY) + 0.5) / MaterialParameter_TileIDTextureSize;
+    float2 tileUV = (float2(tileIDPixelX, tileIDPixelY) + 0.5) / TileIDTextureSize;
 	
 	// Sample from sourced index
     float4 sampledTile = tex2Dlod(IDSampler, float4(tileUV.x, tileUV.y, 0, 0));
@@ -184,10 +179,10 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
         return defaultMaterial + variation;
     }
     
-    float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
-    float materialPixelY = floor((float) tileID / MaterialParameter_MaterialTextureSize.x);
+    float materialPixelX = fmod((float) tileID, MaterialTextureSize.x);
+    float materialPixelY = floor((float) tileID / MaterialTextureSize.x);
 
-    float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialParameter_MaterialTextureSize;
+    float2 materialUV = (float2(materialPixelX, materialPixelY) + 0.5) / MaterialTextureSize;
     
     float4 sampledMaterial = tex2Dlod(materialSampler, float4(materialUV.x, materialUV.y, 0, 0));
     

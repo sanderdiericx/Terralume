@@ -1,13 +1,13 @@
 ﻿sampler2D ScreenSampler : register(s0);
 
-float LayerParameter_Background;
-float LayerParameter_Tile;
-float LayerParameter_NonSolidTile;
-float LayerParameter_Wall;
-float LayerParameter_Entity;
-float LayerParameter_Player;
-float LayerParameter_Projectile;
-float LayerParameter_Other;
+float BackgroundLayer;
+float TileLayer;
+float NonSolidTileLayer;
+float WallLayer;
+float EntityLayer;
+float ProjectileLayer;
+float PlayerLayer;
+float OtherLayer;
 
 Texture2D TileTarget;
 
@@ -81,58 +81,41 @@ sampler ProjectileSampler = sampler_state
     AddressV = Clamp;
 };
 
-struct PixelShaderInput
+float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float4 Position : SV_POSITION;
-    float2 TexCoord : TEXCOORD0;
-    float4 Color : COLOR0;
-};
-
-float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
-{
-    // Background
-    if (tex2D(ScreenSampler, input.TexCoord).a < 0.01)
+    float4 layer = float4(OtherLayer, 0.0, 0.0, 1.0);
+    float epsilon = 0.01;
+    
+    if (tex2D(ScreenSampler, uv).a < epsilon) // Background
     {
-        return float4(LayerParameter_Background, LayerParameter_Background, LayerParameter_Background, 1.0);
+        layer = float4(BackgroundLayer, 0.0, 0.0, 1.0);
     }
-
-    // Player
-    if (tex2D(PlayerSampler, input.TexCoord).a > 0.01)
+    else if (tex2D(PlayerSampler, uv).a > epsilon) // Player
     {
-        return float4(LayerParameter_Player, LayerParameter_Player, LayerParameter_Player, 1.0);
+        layer = float4(PlayerLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(EntitySampler, uv).a > epsilon) // Entity
+    {
+        layer = float4(EntityLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(ProjectileSampler, uv).a > epsilon) // Projectile
+    {
+        layer = float4(ProjectileLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(NonSolidTileSampler, uv).a > epsilon) // Non Solid Tiles
+    {
+        layer = float4(NonSolidTileLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
+    {
+        layer = float4(TileLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(WallSampler, uv).a > epsilon) // Wall
+    {
+        layer = float4(WallLayer, 0.0, 0.0, 1.0);
     }
     
-    // Entity
-    if (tex2D(EntitySampler, input.TexCoord).a > 0.01)
-    {
-        return float4(LayerParameter_Entity, LayerParameter_Entity, LayerParameter_Entity, 1.0);
-    }
-    
-    // Projectile
-    if (tex2D(ProjectileSampler, input.TexCoord).a > 0.01)
-    {
-        return float4(LayerParameter_Projectile, LayerParameter_Projectile, LayerParameter_Projectile, 1.0);
-    }
-    
-    // Non Solid Tiles
-    if (tex2D(NonSolidTileSampler, input.TexCoord).a > 0.01)
-    {
-        return float4(LayerParameter_NonSolidTile, LayerParameter_NonSolidTile, LayerParameter_NonSolidTile, 1.0);
-    }
-    
-    // Tiles
-    if (tex2D(TileSampler, input.TexCoord).a > 0.01)
-    {
-        return float4(LayerParameter_Tile, LayerParameter_Tile, LayerParameter_Tile, 1.0);
-    }
-    
-    // Not a Wall
-    if (tex2D(WallSampler, input.TexCoord).a > 0.01)
-    {
-        return float4(LayerParameter_Wall, LayerParameter_Wall, LayerParameter_Wall, 1.0);
-    }
-    
-    return float4(LayerParameter_Other, LayerParameter_Other, LayerParameter_Other, 1.0);
+    return layer;
 }
 
 technique Layer

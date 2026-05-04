@@ -9,32 +9,32 @@ namespace Terralume.Engine.Buffers.Data
         public float NonSolidTile;
         public float Wall;
         public float Entity;
-        public float Player;
         public float Projectile;
+        public float Player;
         public float Other;
 
-        public LayerParameter(float background, float tile, float nonSolidTile, float wall, float entity, float player, float projectile, float other)
+        public LayerParameter(float background, float tile, float nonSolidTile, float wall, float entity, float projectile, float player, float other)
         {
             Background = background;
             Tile = tile;
             NonSolidTile = nonSolidTile;
             Wall = wall;
             Entity = entity;
-            Player = player;
             Projectile = projectile;
+            Player = player;
             Other = other;
         }
 
         public void SetUniforms(Effect effect)
         {
-            effect.Parameters["LayerParameter_Background"].SetValue(Background);
-            effect.Parameters["LayerParameter_Tile"].SetValue(Tile);
-            effect.Parameters["LayerParameter_NonSolidTile"].SetValue(NonSolidTile);
-            effect.Parameters["LayerParameter_Wall"].SetValue(Wall);
-            effect.Parameters["LayerParameter_Entity"].SetValue(Entity);
-            effect.Parameters["LayerParameter_Player"].SetValue(Player);
-            effect.Parameters["LayerParameter_Projectile"].SetValue(Projectile);
-            effect.Parameters["LayerParameter_Other"].SetValue(Other);
+            effect.Parameters["BackgroundLayer"].SetValue(Background);
+            effect.Parameters["TileLayer"].SetValue(Tile);
+            effect.Parameters["NonSolidTileLayer"].SetValue(NonSolidTile);
+            effect.Parameters["WallLayer"].SetValue(Wall);
+            effect.Parameters["EntityLayer"].SetValue(Entity);
+            effect.Parameters["ProjectileLayer"].SetValue(Projectile);
+            effect.Parameters["PlayerLayer"].SetValue(Player);
+            effect.Parameters["OtherLayer"].SetValue(Other);
         }
     }
 }

@@ -9,23 +9,16 @@ float2 ViewSize;
 float TileLayer;
 float WallLayer;
 
-struct PixelShaderInput
-{
-    float4 Position : SV_POSITION;
-    float2 TexCoord : TEXCOORD0;
-    float4 Color : COLOR0;
-};
-
 float Random(float2 st);
 float FBM(float2 uv);
 float ValueNoise(float2 uv);
 
-float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float layer = tex2D(LayerSampler, input.TexCoord);
+    float layer = tex2D(LayerSampler, uv);
     float epsilon = 0.01;
     
-    float2 worldPos = ScreenPosition + input.TexCoord * ViewSize;
+    float2 worldPos = ScreenPosition + uv * ViewSize;
     float2 pos = worldPos / 16.0;
 
     float value = 1.0;
