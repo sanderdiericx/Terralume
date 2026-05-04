@@ -29,6 +29,7 @@ namespace Terralume.Engine.Pipeline
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
                 EffectManager.LoadEffect(EffectType.Radiance);
+                EffectManager.LoadEffect(EffectType.Output);
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
@@ -65,7 +66,7 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
-            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
+            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
             
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
@@ -113,6 +114,12 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText($"Switching to radiance buffer view", Color.Green);
 
                     currentRenderTarget = outputCollection.RadianceBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D8))
+                {
+                    Main.NewText($"Switching to noise buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.NoiseBuffer;
                 }
             }
 

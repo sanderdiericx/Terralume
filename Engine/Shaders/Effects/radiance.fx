@@ -135,6 +135,8 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
     float3 pixelPos = float3(input.TexCoord.x * ScreenSize.x, input.TexCoord.y * ScreenSize.y, pixelZ);    
     float3 viewDir = float3(0.0, 0.0, 1.0);
     
+    float lightPositionZ = LightDepth * DepthScale;
+    
     float4 gridData = tex2Dlod(LightGridSampler, float4(input.TexCoord.x, input.TexCoord.y, 0, 0));
     float startIndex = round(gridData.r);
     float lightCount = round(gridData.g);
@@ -160,7 +162,7 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
         float4 positionSample = tex2Dlod(LightPositionSampler, float4(lightUV.x, lightUV.y, 0, 0));
         float4 colorSample = tex2Dlod(LightColorSampler, float4(lightUV.x, lightUV.y, 0, 0));
     
-        float3 lightPos = float3(positionSample.r, positionSample.g, LightDepth);
+        float3 lightPos = float3(positionSample.r, positionSample.g, lightPositionZ);
         float lightRange = positionSample.b;
         float lightIntensity = positionSample.w;
         float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);

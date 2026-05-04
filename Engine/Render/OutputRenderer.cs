@@ -11,7 +11,7 @@ namespace Terralume.Engine.Render
     public static class OutputRenderer
     {
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
+        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -27,7 +27,7 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ScreenSize"].SetValue(screenSize);
             effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
-            effect.Parameters["LightDepth"].SetValue(85f * currentZoom);
+            effect.Parameters["LightDepth"].SetValue(0.85f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
@@ -58,8 +58,8 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Output);
 
-            effect.Parameters["Ambient"].SetValue(new Vector3(0.02f, 0.02f, 0.025f));
-            effect.Parameters["Exposure"].SetValue(1.1f);
+            effect.Parameters["Ambient"].SetValue(new Vector3(0.002f, 0.002f, 0.0025f));
+            effect.Parameters["Exposure"].SetValue(0.8f);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
 

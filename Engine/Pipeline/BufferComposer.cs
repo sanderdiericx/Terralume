@@ -25,6 +25,7 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Depth);
                 EffectManager.LoadEffect(EffectType.Material);
                 EffectManager.LoadEffect(EffectType.Normal);
+                EffectManager.LoadEffect(EffectType.Noise);
             });
         }
 
@@ -38,7 +39,7 @@ namespace Terralume.Engine.Pipeline
             });
         }
 
-        // Must be called at On_Main.DrawInterface!
+        // Must be called at On_Main.DrawInterface to not break :(
         public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, ushort[] tileIDs, ushort[] wallIDs)
         {
             UpdateBuffer();
@@ -55,6 +56,7 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedWalls);
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
+            BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
 
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
             BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);

@@ -103,10 +103,12 @@ namespace Terralume.Engine.Render
             effect.Parameters["MaterialParameter_MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
             effect.Parameters["MaterialParameter_MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["MaterialParameter_DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
+            effect.Parameters["MaterialVariationFactor"].SetValue(0.4f);
 
             layerParameter.SetUniforms(effect);
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
+            effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
 
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
@@ -142,6 +144,30 @@ namespace Terralume.Engine.Render
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Renders the noise texture for material variation on tiles and walls
+        public static void RenderNoiseBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.NoiseBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Noise);
+
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+
+            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
+            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);

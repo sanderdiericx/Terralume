@@ -17,6 +17,7 @@ namespace Terralume.Engine.Shaders
             { EffectType.Normal, "normal" },
             { EffectType.Radiance, "radiance" },
             { EffectType.Output, "output" },
+            { EffectType.Noise, "noise" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

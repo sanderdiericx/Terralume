@@ -7,6 +7,7 @@ float2 MaterialParameter_ViewSize;
 float2 MaterialParameter_TileIDTextureSize;
 float2 MaterialParameter_MaterialTextureSize;
 float3 MaterialParameter_DefaultMaterial;
+float MaterialVariationFactor;
 
 float LayerParameter_Background;
 float LayerParameter_Tile;
@@ -22,6 +23,18 @@ Texture2D LayerBuffer;
 sampler LayerSampler = sampler_state
 {
     Texture = (LayerBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+Texture2D NoiseBuffer;
+
+sampler NoiseSampler = sampler_state
+{
+    Texture = (NoiseBuffer);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -78,6 +91,7 @@ sampler WallMaterialSampler = sampler_state
     AddressV = Clamp;
 };
 
+
 struct PixelShaderInput
 {
 	float4 Position : SV_POSITION;
@@ -118,6 +132,9 @@ float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
 
 float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, float4 defaultMaterial)
 {
+    float roughnessVariation = (tex2D(NoiseSampler, texCoord) - 0.5) * MaterialVariationFactor;
+    float4 variation = float4(0.0, roughnessVariation, 0.0, 0.0);
+    
     // Convert TexCoord to tile space
     float2 worldPosition = MaterialParameter_ScreenPosition + (texCoord * MaterialParameter_ViewSize);
     int worldTileX = (int) floor(worldPosition.x / 16.0);
@@ -164,7 +181,7 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
     // Check for no tile
     if (tileID == 65535)
     {
-        return defaultMaterial;
+        return defaultMaterial + variation;
     }
     
     float materialPixelX = fmod((float) tileID, MaterialParameter_MaterialTextureSize.x);
@@ -177,10 +194,10 @@ float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 texCoord, 
     // Tile ID was never given a material vector
     if (sampledMaterial.a < 0.01)
     {
-        return defaultMaterial;
+        return defaultMaterial + variation;
     }
     
-    return sampledMaterial;
+    return sampledMaterial + variation;
 }
 
 technique Material

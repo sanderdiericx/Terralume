@@ -14,6 +14,8 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D MaterialBuffer;
         public RenderTarget2D NormalBuffer;
 
+        public RenderTarget2D NoiseBuffer;
+
         public Texture2D TileIDTexture;
         public Texture2D WallIDTexture;
 
@@ -31,6 +33,8 @@ namespace Terralume.Engine.Buffers
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+
+            NoiseBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             TileIDTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             WallIDTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
@@ -55,6 +59,8 @@ namespace Terralume.Engine.Buffers
             AlbedoBuffer.Dispose();
             MaterialBuffer.Dispose();
             NormalBuffer.Dispose();
+
+            NoiseBuffer.Dispose();
 
             TileIDTexture.Dispose();
             WallIDTexture.Dispose();

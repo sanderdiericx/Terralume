@@ -1,0 +1,86 @@
+﻿sampler2D LayerSampler : register(s0);
+
+static const float AMPLITUDE = 0.5;
+static const float FREQUENCY = 0.3;
+
+float2 ScreenPosition;
+float2 ViewSize;
+
+float TileLayer;
+float WallLayer;
+
+struct PixelShaderInput
+{
+    float4 Position : SV_POSITION;
+    float2 TexCoord : TEXCOORD0;
+    float4 Color : COLOR0;
+};
+
+float Random(float2 st);
+float FBM(float2 uv);
+float ValueNoise(float2 uv);
+
+float4 PixelShaderFunction(PixelShaderInput input) : COLOR0
+{
+    float layer = tex2D(LayerSampler, input.TexCoord);
+    float epsilon = 0.01;
+    
+    float2 worldPos = ScreenPosition + input.TexCoord * ViewSize;
+    float2 pos = worldPos / 16.0;
+
+    float value = 1.0;
+    
+    if (abs(layer - TileLayer) < epsilon || abs(layer - WallLayer) < epsilon)
+    {
+        value = FBM(pos);
+    }
+    
+    return float4(value, 0.0, 0.0, 1.0);
+}
+
+float Random(float2 st)
+{
+    return frac(sin(dot(st.xy, float2(12.9898, 78.233))) * 43758.5453123);
+}
+
+float FBM(float2 uv)
+{
+    float amplitude = AMPLITUDE;
+    float frequency = FREQUENCY;
+    
+    float value = 0.0;
+    
+    [unroll]
+    for (int i = 0; i < 5; i++)
+    {
+        value += amplitude * ValueNoise(uv * frequency);
+        frequency *= 2.0;
+        amplitude *= 0.5;
+    }
+    
+    return value;
+}
+
+float ValueNoise(float2 uv)
+{
+    float2 i = floor(uv);
+    float2 f = frac(uv);
+    
+    float a = Random(i);
+    float b = Random(i + float2(1.0, 0.0));
+    float c = Random(i + float2(0.0, 1.0));
+    float d = Random(i + float2(1.0, 1.0));
+    
+    float2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+    
+    return lerp(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+
+technique Noise
+{
+    pass Pass1
+    {
+        PixelShader = compile ps_3_0 PixelShaderFunction();
+    }
+}

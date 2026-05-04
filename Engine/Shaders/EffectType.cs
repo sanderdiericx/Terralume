@@ -7,6 +7,7 @@
         Normal,
         Material,
         Radiance,
-        Output
+        Output,
+        Noise
     }
 }
