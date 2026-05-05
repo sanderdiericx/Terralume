@@ -127,7 +127,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 
 float4 GetMaterial(sampler IDSampler, sampler materialSampler, float2 uv, float4 defaultMaterial)
 {
-    float roughnessVariation = (tex2D(NoiseSampler, uv) - 0.5) * MaterialVariationFactor;
+    float roughnessVariation = (tex2D(NoiseSampler, uv).r - 0.5) * MaterialVariationFactor;
     float4 variation = float4(0.0, roughnessVariation, 0.0, 0.0);
     
     // Convert TexCoord to tile space

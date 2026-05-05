@@ -2,6 +2,7 @@
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
@@ -54,6 +55,9 @@ namespace Terralume.Engine.Pipeline
 
             TileHelper.PackMaterialTexture(BufferCollection.TileMaterialTexture, MaterialMapper.MappedTiles);
             TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedWalls);
+
+            TileHelper.PackNoiseTexture(BufferCollection.TileNoiseTexture, NoiseMapper.MappedTiles);
+            TileHelper.PackNoiseTexture(BufferCollection.WallNoiseTexture, NoiseMapper.MappedWalls);
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
             BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);

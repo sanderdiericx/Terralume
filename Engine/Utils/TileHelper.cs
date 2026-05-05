@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
@@ -14,6 +15,7 @@ namespace Terralume.Engine.Utils
     {
         private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static HalfVector2[] noisePixels = new HalfVector2[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {
@@ -119,6 +121,27 @@ namespace Terralume.Engine.Utils
             }
 
             texture.SetData(materialPixels);
+        }
+
+        // Encodes a dictionary (mapping ID to noise vector) into a texture (HalfVector2)
+        public static void PackNoiseTexture(Texture2D texture, Dictionary<int, Vector2> mappedNoise)
+        {
+            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
+
+            Array.Clear(noisePixels, 0, noisePixels.Length);
+
+            foreach (var kvp in mappedNoise)
+            {
+                int id = kvp.Key;
+
+                if (id >= 0 && id < maxPixels)
+                {
+                    Vector2 noise = kvp.Value;
+                    noisePixels[id] = new HalfVector2(noise.X, noise.Y);
+                }
+            }
+
+            texture.SetData(noisePixels);
         }
     }
 }

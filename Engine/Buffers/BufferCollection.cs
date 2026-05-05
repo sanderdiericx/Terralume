@@ -21,6 +21,9 @@ namespace Terralume.Engine.Buffers
         public Texture2D TileMaterialTexture;
         public Texture2D WallMaterialTexture;
 
+        public Texture2D TileNoiseTexture;
+        public Texture2D WallNoiseTexture;
+
         public int Width;
         public int Height;
 
@@ -39,6 +42,9 @@ namespace Terralume.Engine.Buffers
 
             TileMaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             WallMaterialTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+
+            TileNoiseTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION, false, SurfaceFormat.HalfVector2);
+            WallNoiseTexture = new Texture2D(graphicsDevice, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION, false, SurfaceFormat.HalfVector2);
 
             Width = width;
             Height = height;
@@ -64,6 +70,9 @@ namespace Terralume.Engine.Buffers
 
             TileMaterialTexture.Dispose();
             WallMaterialTexture.Dispose();
+
+            TileNoiseTexture.Dispose();
+            WallNoiseTexture.Dispose();
 
             GC.SuppressFinalize(this);
         }

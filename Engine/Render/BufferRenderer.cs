@@ -1,8 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using log4net.Filter;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.InteropServices;
+using System.Security.Claims;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Materials;
 using Terralume.Engine.Shaders;
 using Terraria;
@@ -51,11 +55,25 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Noise);
 
+            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
+            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
+
             effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
+            effect.Parameters["DefaultNoise"].SetValue(NoiseMapper.DefaultNoise);
+
+            effect.Parameters["NoiseTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["IDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+
+            effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
+            effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
+            
+            effect.Parameters["TileNoiseTexture"].SetValue(bufferCollection.TileNoiseTexture);
+            effect.Parameters["WallNoiseTexture"].SetValue(bufferCollection.WallNoiseTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);

@@ -27,6 +27,11 @@ namespace Terralume.Engine.Render
             effect.Parameters["ScreenSize"].SetValue(screenSize);
             effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
             effect.Parameters["LightDepth"].SetValue(0.85f);
+            
+            effect.Parameters["TileDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.TileDepth);
+            effect.Parameters["WallDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.WallDepth);
+            
+            effect.Parameters["AlbedoVariationFactor"].SetValue(0.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
@@ -34,6 +39,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
             effect.Parameters["MaterialBuffer"].SetValue(bufferCollection.MaterialBuffer);
+            effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
 
             effect.Parameters["LightPositionTexture"].SetValue(outputCollection.LightPositionTexture);
             effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);
