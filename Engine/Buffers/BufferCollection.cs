@@ -12,6 +12,7 @@ namespace Terralume.Engine.Buffers
 
         public RenderTarget2D DepthBuffer;
         public RenderTarget2D MaterialBuffer;
+        public RenderTarget2D HeightBuffer;
         public RenderTarget2D NormalBuffer;
         public RenderTarget2D AlbedoBuffer;
 
@@ -34,6 +35,7 @@ namespace Terralume.Engine.Buffers
 
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
             MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            HeightBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -62,6 +64,7 @@ namespace Terralume.Engine.Buffers
 
             DepthBuffer.Dispose();
             MaterialBuffer.Dispose();
+            HeightBuffer.Dispose();
             NormalBuffer.Dispose();
             AlbedoBuffer.Dispose();
 

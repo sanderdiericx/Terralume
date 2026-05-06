@@ -25,6 +25,7 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
                 EffectManager.LoadEffect(EffectType.Material);
+                EffectManager.LoadEffect(EffectType.Height);
                 EffectManager.LoadEffect(EffectType.Normal);
                 EffectManager.LoadEffect(EffectType.Noise);
             });
@@ -64,6 +65,7 @@ namespace Terralume.Engine.Pipeline
 
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
             BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
+            BufferRenderer.RenderHeightBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);
         }

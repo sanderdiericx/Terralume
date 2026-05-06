@@ -145,7 +145,25 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders a normal buffer by converting pixels to greyscale and then running a weighted sobel filter over it
+        // Pass over Main.screenTarget to convert pixels to greyscale, this then acts as our height map
+        public static void RenderHeightBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.HeightBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Height);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
+            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Renders a normal buffer by taking the heightmap and then running a weighted sobel filter over it
         public static void RenderNormalBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;

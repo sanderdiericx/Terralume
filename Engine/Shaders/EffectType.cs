@@ -10,6 +10,7 @@
         Output,
         Noise,
         SSAO,
-        SSAOBlur
+        SSAOBlur,
+        Height
     }
 }
