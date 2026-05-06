@@ -1,4 +1,4 @@
-﻿sampler2D ScreenSampler : register(s0);
+﻿sampler2D LayerSampler : register(s0);
 
 float BackgroundDepth;
 float TileDepth;
@@ -17,18 +17,6 @@ float EntityLayer;
 float ProjectileLayer;
 float PlayerLayer;
 float OtherLayer;
-
-Texture2D LayerBuffer;
-
-sampler LayerSampler = sampler_state
-{
-    Texture = (LayerBuffer);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {

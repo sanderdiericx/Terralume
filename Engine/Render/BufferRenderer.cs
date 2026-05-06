@@ -93,10 +93,8 @@ namespace Terralume.Engine.Render
             depthParameter.SetUniforms(effect);
             layerParameter.SetUniforms(effect);
 
-            effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
-
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
-            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
