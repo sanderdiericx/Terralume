@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Render;
 using Terraria;
 using Terraria.ModLoader;
@@ -18,7 +19,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
             });
 
@@ -127,7 +128,7 @@ namespace Terralume.Engine.Pipeline
             if (!TargetCollection.IsValid())
             {
                 TargetCollection.Dispose();
-                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
             }
         }
     }

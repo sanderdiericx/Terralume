@@ -26,7 +26,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
                 EffectManager.LoadEffect(EffectType.Radiance);
@@ -71,7 +71,7 @@ namespace Terralume.Engine.Pipeline
             OutputRenderer.RenderSSAOBlurBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
-            LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
+            LightHelper.PackLightTextures(outputCollection, onScreenLights, RenderConstants.SCREEN_SIZE);
 
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, depthParameter);
 
@@ -156,7 +156,7 @@ namespace Terralume.Engine.Pipeline
             if (!outputCollection.IsValid())
             {
                 outputCollection.Dispose();
-                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
             }
         }
     }

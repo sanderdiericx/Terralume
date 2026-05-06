@@ -20,7 +20,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
 
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
@@ -74,7 +74,7 @@ namespace Terralume.Engine.Pipeline
             if (!BufferCollection.IsValid())
             {
                 BufferCollection.Dispose();
-                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
             }
         }
     }

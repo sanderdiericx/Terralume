@@ -19,7 +19,7 @@ namespace Terralume.Engine.Utils
 
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {
-            Vector2 screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            Vector2 screenSize = RenderConstants.SCREEN_SIZE;
 
             Vector2 viewSize = screenSize;
             if (Main.GameViewMatrix != null)
@@ -38,7 +38,7 @@ namespace Terralume.Engine.Utils
             int maxTileX = minTileX + strideX - 1;
             int maxTileY = minTileY + strideY - 1;
 
-            return new TileCaptureParameter(screenSize, screenPosition, viewSize, new Vector2(strideX, strideY), new Vector2(minTileX, minTileY), new Vector2(maxTileX, maxTileY));
+            return new TileCaptureParameter(screenPosition, viewSize, new Vector2(strideX, strideY), new Vector2(minTileX, minTileY), new Vector2(maxTileX, maxTileY));
         }
 
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
@@ -25,7 +24,7 @@ namespace Terralume.Engine.Render
             Vector2 screenSize = RenderConstants.SCREEN_SIZE;
             Vector2 halfScreenSize = screenSize / 2f;
             Vector2 noiseScale = halfScreenSize / 4f;
-            
+
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
             effect.Parameters["ScreenSize"].SetValue(screenSize);

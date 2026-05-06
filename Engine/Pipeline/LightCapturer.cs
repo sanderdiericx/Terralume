@@ -156,7 +156,7 @@ namespace Terralume.Engine.Pipeline
                 float range = originalProfile.Range * zoom.X;
 
                 // Check if the light's bounding box intersects the screen
-                if (screenPos.X + range >= 0 && screenPos.X - range < tileCaptureParameter.ScreenSize.X && screenPos.Y + range >= 0 && screenPos.Y - range < tileCaptureParameter.ScreenSize.Y)
+                if (screenPos.X + range >= 0 && screenPos.X - range < RenderConstants.SCREEN_SIZE.X && screenPos.Y + range >= 0 && screenPos.Y - range < RenderConstants.SCREEN_SIZE.Y)
                 {
                     onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity + RenderConstants.GLOBAL_INTENSITY_MODIFIER, range + RenderConstants.GLOBAL_RANGE_MODIFIER)));
                 }
