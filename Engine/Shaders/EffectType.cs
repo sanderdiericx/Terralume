@@ -8,6 +8,8 @@
         Material,
         Radiance,
         Output,
-        Noise
+        Noise,
+        SSAO,
+        SSAOBlur
     }
 }

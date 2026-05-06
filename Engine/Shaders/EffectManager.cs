@@ -17,7 +17,9 @@ namespace Terralume.Engine.Shaders
             { EffectType.Normal, "normal" },
             { EffectType.Radiance, "radiance" },
             { EffectType.Output, "output" },
-            { EffectType.Noise, "noise" }
+            { EffectType.Noise, "noise" },
+            { EffectType.SSAO, "ssao" },
+            { EffectType.SSAOBlur, "ssaoblur" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

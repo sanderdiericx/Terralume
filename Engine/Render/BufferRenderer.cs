@@ -1,8 +1,5 @@
-﻿using log4net.Filter;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.InteropServices;
-using System.Security.Claims;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
@@ -71,7 +68,7 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
-            
+
             effect.Parameters["TileNoiseTexture"].SetValue(bufferCollection.TileNoiseTexture);
             effect.Parameters["WallNoiseTexture"].SetValue(bufferCollection.WallNoiseTexture);
 

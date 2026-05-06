@@ -18,6 +18,8 @@ namespace Terralume.Engine.Constants
 
         public static readonly float NORMAL_STRENGTH = 1.0f;
 
+        public static readonly int SSAO_SAMPLE_COUNT = 16;
+
         public static readonly float GLOBAL_RANGE_MODIFIER = 0f;
         public static readonly float GLOBAL_INTENSITY_MODIFIER = 0f;
 

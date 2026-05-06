@@ -8,7 +8,7 @@ using Terralume.Engine.Constants;
 
 namespace Terralume.Engine.Utils
 {
-    public class LightHelper
+    public static class LightHelper
     {
         private static HalfVector4[] lightPositionPixels = new HalfVector4[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
         private static Color[] lightColorPixels = new Color[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];

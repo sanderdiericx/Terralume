@@ -63,6 +63,11 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
+            OutputHelper.GenerateSSAONoiseTexture(outputCollection.SSAONoiseTexture);
+
+            OutputRenderer.RenderSSAOBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+            OutputRenderer.RenderSSAOBlurBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
@@ -123,9 +128,15 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to projectile target view", Color.Green);
+                    Main.NewText($"Switching to ssao buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.ProjectileTarget;
+                    currentRenderTarget = outputCollection.SSAOBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D0))
+                {
+                    Main.NewText($"Switching to ssao blur buffer view", Color.Green);
+
+                    currentRenderTarget = outputCollection.SSAOBlurBuffer;
                 }
             }
 
