@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -11,7 +12,7 @@ namespace Terralume.Engine.Render
 {
     public static class OutputRenderer
     {
-        public static void RenderSSAOBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection)
+        public static void RenderSSAOBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, DepthParameter depthParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -21,7 +22,7 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.SSAO);
 
-            Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
+            Vector2 screenSize = RenderConstants.SCREEN_SIZE;
             Vector2 halfScreenSize = screenSize / 2f;
             Vector2 noiseScale = halfScreenSize / 4f;
             
@@ -31,10 +32,10 @@ namespace Terralume.Engine.Render
             effect.Parameters["HalfScreenSize"].SetValue(halfScreenSize);
             effect.Parameters["NoiseScale"].SetValue(noiseScale);
 
-            effect.Parameters["Radius"].SetValue(16f);
-            effect.Parameters["Bias"].SetValue(0.025f);
-            effect.Parameters["DepthScale"].SetValue(85f * currentZoom);
-            effect.Parameters["BackgroundDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.BackgroundDepth);
+            effect.Parameters["Radius"].SetValue(RenderConstants.SSAO_RADIUS);
+            effect.Parameters["Bias"].SetValue(RenderConstants.SSAO_BIAS);
+            effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
+            effect.Parameters["BackgroundDepth"].SetValue(depthParameter.BackgroundDepth);
             effect.Parameters["Samples"].SetValue(OutputHelper.GenerateSSAOKernel());
 
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
@@ -57,10 +58,8 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.SSAOBlur);
 
-            Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
-
-            effect.Parameters["ScreenSize"].SetValue(screenSize);
-            effect.Parameters["DepthFalloff"].SetValue(10f);
+            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            effect.Parameters["DepthFalloff"].SetValue(RenderConstants.SSAO_DEPTH_FALLOFF);
 
             effect.Parameters["SSAOBuffer"].SetValue(outputCollection.SSAOBuffer);
 
@@ -72,7 +71,7 @@ namespace Terralume.Engine.Render
         }
 
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection)
+        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, DepthParameter depthParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -82,16 +81,14 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Radiance);
 
-            Vector2 screenSize = new Vector2(bufferCollection.AlbedoBuffer.Width, bufferCollection.AlbedoBuffer.Height);
-
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
-            effect.Parameters["ScreenSize"].SetValue(screenSize);
-            effect.Parameters["DepthScale"].SetValue(100f * currentZoom);
-            effect.Parameters["LightDepth"].SetValue(0.85f);
+            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
+            effect.Parameters["LightDepth"].SetValue(RenderConstants.LIGHT_DEPTH);
 
-            effect.Parameters["TileDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.TileDepth);
-            effect.Parameters["WallDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.WallDepth);
+            effect.Parameters["TileDepth"].SetValue(depthParameter.TileDepth);
+            effect.Parameters["WallDepth"].SetValue(depthParameter.WallDepth);
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
@@ -125,8 +122,8 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Output);
 
-            effect.Parameters["Ambient"].SetValue(new Vector3(0.1f, 0.1f, 0.125f));
-            effect.Parameters["Exposure"].SetValue(0.8f);
+            effect.Parameters["Ambient"].SetValue(RenderConstants.AMBIENT);
+            effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SSAOBlurBuffer"].SetValue(outputCollection.SSAOBlurBuffer);

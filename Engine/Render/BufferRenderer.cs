@@ -156,7 +156,7 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Normal);
 
-            effect.Parameters["ScreenSize"].SetValue(new Vector2(Main.screenTarget.Width, Main.screenTarget.Height));
+            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
 
             effect.Parameters["NormalStrength"].SetValue(RenderConstants.NORMAL_STRENGTH);
 

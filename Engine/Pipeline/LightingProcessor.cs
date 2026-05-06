@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -55,6 +56,7 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
+            DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
             TileHelper.GetVisibleIDs(tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs);
 
@@ -65,13 +67,13 @@ namespace Terralume.Engine.Pipeline
 
             OutputHelper.GenerateSSAONoiseTexture(outputCollection.SSAONoiseTexture);
 
-            OutputRenderer.RenderSSAOBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+            OutputRenderer.RenderSSAOBuffer(deferredSpriteBatch, outputCollection, bufferCollection, depthParameter);
             OutputRenderer.RenderSSAOBlurBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightHelper.PackLightTextures(outputCollection, onScreenLights, tileCaptureParameter.ScreenSize);
 
-            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, depthParameter);
 
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
