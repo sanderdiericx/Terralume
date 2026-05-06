@@ -11,7 +11,7 @@ namespace Terralume.Engine.Render
 {
     public static class OutputRenderer
     {
-        public static void RenderSSAOBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, DepthParameter depthParameter)
+        public static void RenderSSAOBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -34,9 +34,10 @@ namespace Terralume.Engine.Render
             effect.Parameters["Radius"].SetValue(RenderConstants.SSAO_RADIUS);
             effect.Parameters["Bias"].SetValue(RenderConstants.SSAO_BIAS);
             effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
-            effect.Parameters["BackgroundDepth"].SetValue(depthParameter.BackgroundDepth);
+            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
             effect.Parameters["Samples"].SetValue(OutputHelper.GenerateSSAOKernel());
 
+            effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
             effect.Parameters["NoiseTexture"].SetValue(outputCollection.SSAONoiseTexture);
 
@@ -70,7 +71,7 @@ namespace Terralume.Engine.Render
         }
 
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, DepthParameter depthParameter)
+        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -86,14 +87,16 @@ namespace Terralume.Engine.Render
             effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
             effect.Parameters["LightDepth"].SetValue(RenderConstants.LIGHT_DEPTH);
 
-            effect.Parameters["TileDepth"].SetValue(depthParameter.TileDepth);
-            effect.Parameters["WallDepth"].SetValue(depthParameter.WallDepth);
+            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
+            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
+            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
 
+            effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
             effect.Parameters["MaterialBuffer"].SetValue(bufferCollection.MaterialBuffer);

@@ -6,13 +6,26 @@ float2 ScreenSize;
 float DepthScale;
 float LightDepth;
 
-float TileDepth;
-float WallDepth;
+float BackgroundLayer;
+float TileLayer;
+float WallLayer;
 
 float AlbedoVariationFactor;
 
 float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
+
+Texture2D LayerBuffer;
+
+sampler LayerSampler = sampler_state
+{
+    Texture = (LayerBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 Texture2D DepthBuffer;
 
@@ -128,14 +141,16 @@ float3 ToLinear(float3 sRGB);
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {     
-    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
-    if (albedoOriginal.a < 0.01)
+    float layer = tex2D(LayerSampler, uv).r;
+    
+    if (abs(layer - BackgroundLayer) < 0.01)
     {
         discard;
     }
     
-    float depth = tex2D(DepthSampler, uv).r;
-    if (abs(depth - TileDepth) < 0.01 || abs(depth - WallDepth) < 0.01)
+    // Albedo noise variation
+    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
+    if (abs(layer - TileLayer) < 0.01 || abs(layer - WallLayer) < 0.01)
     {
         float variation = (tex2D(NoiseSampler, uv).r - 0.5) * AlbedoVariationFactor;
         float3 albedoVariation = float3(-variation, -variation, -variation);
@@ -148,6 +163,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float3 normal = normalize(tex2D(NormalSampler, uv).rgb * 2.0 - 1.0);
     float3 material = tex2D(MaterialSampler, uv).rgb;
     
+    float depth = tex2D(DepthSampler, uv).r;
     float pixelZ = depth * DepthScale;
     float3 pixelPos = float3(uv.x * ScreenSize.x, uv.y * ScreenSize.y, pixelZ);
     float3 viewDir = float3(0.0, 0.0, 1.0);

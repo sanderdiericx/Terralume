@@ -9,9 +9,22 @@ float2 NoiseScale;
 float Radius;
 float Bias;
 float DepthScale;
-float BackgroundDepth;
+
+float BackgroundLayer;
 
 float3 Samples[SAMPLE_COUNT];
+
+Texture2D LayerBuffer;
+
+sampler LayerSampler = sampler_state
+{
+    Texture = (LayerBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 Texture2D NormalBuffer;
 
@@ -39,13 +52,14 @@ sampler NoiseSampler = sampler_state
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float depth = tex2D(DepthSampler, uv).r;
+    float layer = tex2D(LayerSampler, uv).r;
     
-    if (abs(depth - BackgroundDepth) < 0.01)
+    if (abs(layer - BackgroundLayer) < 0.01)
     {
         return float4(1.0, 0.0, 0.0, 1.0);
     }
     
+    float depth = tex2D(DepthSampler, uv).r;
     float pixelZ = depth * DepthScale;
     float3 pixelPos = float3(uv.x * ScreenSize.x, uv.y * ScreenSize.y, pixelZ);
     
