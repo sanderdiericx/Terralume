@@ -123,7 +123,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
             effect.Parameters["DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
-            effect.Parameters["MaterialVariationFactor"].SetValue(0.4f);
+            effect.Parameters["MaterialVariationFactor"].SetValue(RenderConstants.MATERIAL_VARIATION_FACTOR);
 
             effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
@@ -164,7 +164,7 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ScreenSize"].SetValue(new Vector2(Main.screenTarget.Width, Main.screenTarget.Height));
 
-            effect.Parameters["NormalStrength"].SetValue(1.0f);
+            effect.Parameters["NormalStrength"].SetValue(RenderConstants.NORMAL_STRENGTH);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);

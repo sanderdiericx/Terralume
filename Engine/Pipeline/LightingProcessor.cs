@@ -121,6 +121,12 @@ namespace Terralume.Engine.Pipeline
 
                     currentRenderTarget = bufferCollection.NoiseBuffer;
                 }
+                else if (keyboardState.IsKeyDown(Keys.D9))
+                {
+                    Main.NewText($"Switching to projectile target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.ProjectileTarget;
+                }
             }
 
             deferredSpriteBatch.Begin();

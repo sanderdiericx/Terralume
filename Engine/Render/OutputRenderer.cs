@@ -31,7 +31,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["TileDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.TileDepth);
             effect.Parameters["WallDepth"].SetValue(RenderConstants.DEPTH_PARAMETER.WallDepth);
             
-            effect.Parameters["AlbedoVariationFactor"].SetValue(0.1f);
+            effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
