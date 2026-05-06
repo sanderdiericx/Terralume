@@ -127,7 +127,6 @@ namespace Terralume.Engine.Render
 
             layerParameter.SetUniforms(effect);
 
-            effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
 
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
@@ -142,7 +141,7 @@ namespace Terralume.Engine.Render
             device.SamplerStates[5] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
-            spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
