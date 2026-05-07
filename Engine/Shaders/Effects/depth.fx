@@ -1,5 +1,7 @@
 ﻿sampler2D LayerSampler : register(s0);
 
+float HeightVariationFactor;
+
 float BackgroundDepth;
 float TileDepth;
 float NonSolidTileDepth;
@@ -17,6 +19,19 @@ float EntityLayer;
 float ProjectileLayer;
 float PlayerLayer;
 float OtherLayer;
+
+Texture2D HeightBuffer;
+
+sampler HeightSampler = sampler_state
+{
+    Texture = (HeightBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
@@ -53,6 +68,9 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     {
         depth = float4(PlayerDepth, 0.0, 0.0, 1.0);
     }
+    
+    float height = (tex2D(HeightSampler, uv).r - 0.5) * HeightVariationFactor;
+    depth.r += height;
     
     return depth;
 }

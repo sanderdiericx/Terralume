@@ -25,6 +25,7 @@ namespace Terralume.Engine.Constants
 
         public static readonly float ALBEDO_VARIATION_FACTOR = 0.15f;
         public static readonly float MATERIAL_VARIATION_FACTOR = 0.3f;
+        public static readonly float HEIGHT_VARIATION_FACTOR = 0.3f;
 
         public static readonly float NORMAL_STRENGTH = 1.0f;
 

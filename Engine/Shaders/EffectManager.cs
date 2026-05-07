@@ -20,7 +20,7 @@ namespace Terralume.Engine.Shaders
             { EffectType.Noise, "noise" },
             { EffectType.SSAO, "ssao" },
             { EffectType.SSAOBlur, "ssaoblur" },
-            { EffectType.Height, "ssaoblur" }
+            { EffectType.Height, "height" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();
