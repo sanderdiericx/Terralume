@@ -140,16 +140,16 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
 float3 ToLinear(float3 sRGB);
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
-{     
+{   
+    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
     float layer = tex2D(LayerSampler, uv).r;
     
-    if (abs(layer - BackgroundLayer) < 0.01)
+    if (abs(layer - BackgroundLayer) < 0.01 && albedoOriginal.a < 0.01)
     {
         discard;
     }
     
     // Albedo noise variation
-    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
     if (abs(layer - TileLayer) < 0.01 || abs(layer - WallLayer) < 0.01)
     {
         float variation = (tex2D(NoiseSampler, uv).r - 0.5) * AlbedoVariationFactor;
