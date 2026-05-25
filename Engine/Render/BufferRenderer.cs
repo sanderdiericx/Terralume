@@ -90,12 +90,8 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Depth);
 
-            effect.Parameters["HeightVariationFactor"].SetValue(RenderConstants.HEIGHT_VARIATION_FACTOR);
-
             depthParameter.SetUniforms(effect);
             layerParameter.SetUniforms(effect);
-
-            effect.Parameters["HeightBuffer"].SetValue(bufferCollection.HeightBuffer);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
