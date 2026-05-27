@@ -62,10 +62,10 @@ namespace Terralume.Engine.Pipeline
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
             BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
-            
+
             BufferRenderer.RenderHeightBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
-            
+
             BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
             BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);

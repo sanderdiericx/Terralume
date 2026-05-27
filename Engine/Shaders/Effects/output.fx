@@ -29,16 +29,6 @@ sampler RadianceSampler = sampler_state
     AddressV = Clamp;
 };
 
-Texture2D SSAOBlurBuffer;
-sampler SSAOBlurSampler = sampler_state
-{
-    Texture = (SSAOBlurBuffer);
-    MinFilter = Linear;
-    MagFilter = Linear;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
 float3 ToneMappingACES(float3 color);
 float3 RRTAndODTFit(float3 aces);
 
@@ -55,8 +45,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     float3 albedo = ToLinear(albedoOriginal.rgb);
     
-    float ao = tex2D(SSAOBlurSampler, uv).r;
-    float3 ambient = Ambient * albedo * ao;
+    float3 ambient = Ambient * albedo;
     
     float4 direct = tex2D(RadianceSampler, uv);
     

@@ -9,8 +9,6 @@
         Radiance,
         Output,
         Noise,
-        SSAO,
-        SSAOBlur,
         Height
     }
 }

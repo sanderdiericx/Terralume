@@ -18,8 +18,6 @@ namespace Terralume.Engine.Shaders
             { EffectType.Radiance, "radiance" },
             { EffectType.Output, "output" },
             { EffectType.Noise, "noise" },
-            { EffectType.SSAO, "ssao" },
-            { EffectType.SSAOBlur, "ssaoblur" },
             { EffectType.Height, "height" }
         };
 

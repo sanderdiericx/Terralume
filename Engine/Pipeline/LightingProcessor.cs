@@ -31,8 +31,6 @@ namespace Terralume.Engine.Pipeline
 
                 EffectManager.LoadEffect(EffectType.Radiance);
                 EffectManager.LoadEffect(EffectType.Output);
-                EffectManager.LoadEffect(EffectType.SSAO);
-                EffectManager.LoadEffect(EffectType.SSAOBlur);
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
@@ -67,11 +65,6 @@ namespace Terralume.Engine.Pipeline
 
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
-
-            OutputHelper.GenerateSSAONoiseTexture(outputCollection.SSAONoiseTexture);
-
-            OutputRenderer.RenderSSAOBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
-            OutputRenderer.RenderSSAOBlurBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightHelper.PackLightTextures(outputCollection, onScreenLights, RenderConstants.SCREEN_SIZE);
@@ -132,18 +125,6 @@ namespace Terralume.Engine.Pipeline
                     currentRenderTarget = bufferCollection.NoiseBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
-                {
-                    Main.NewText($"Switching to ssao buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.SSAOBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D0))
-                {
-                    Main.NewText($"Switching to ssao blur buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.SSAOBlurBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.NumPad7))
                 {
                     Main.NewText($"Switching to height buffer view", Color.Green);
 

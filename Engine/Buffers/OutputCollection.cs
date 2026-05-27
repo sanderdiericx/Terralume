@@ -10,11 +10,6 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D RadianceBuffer;
         public RenderTarget2D OutputBuffer;
 
-        public RenderTarget2D SSAOBuffer;
-        public RenderTarget2D SSAOBlurBuffer;
-
-        public Texture2D SSAONoiseTexture;
-
         public Texture2D LightPositionTexture;
         public Texture2D LightColorTexture;
 
@@ -28,11 +23,6 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             OutputBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-
-            SSAOBuffer = new RenderTarget2D(graphicsDevice, width / 2, height / 2, false, SurfaceFormat.Single, DepthFormat.None);
-            SSAOBlurBuffer = new RenderTarget2D(graphicsDevice, width / 2, height / 2, false, SurfaceFormat.Single, DepthFormat.None);
-
-            SSAONoiseTexture = new Texture2D(graphicsDevice, 4, 4);
 
             // LightPositionTexture: (posX, posY, range, intensity) LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
             LightPositionTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
@@ -62,11 +52,6 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer.Dispose();
             OutputBuffer.Dispose();
-
-            SSAOBuffer.Dispose();
-            SSAOBlurBuffer.Dispose();
-
-            SSAONoiseTexture.Dispose();
 
             LightPositionTexture.Dispose();
             LightColorTexture.Dispose();
