@@ -14,7 +14,11 @@ static const float3x3 AP1_TO_SRGB = float3x3
     -0.00327, -0.07276, 1.17603
 );
 
-float3 Ambient;
+float2 ScreenSize;
+
+float AORadius;
+float AOStrength;
+
 float Exposure;
 
 Texture2D RadianceBuffer;
@@ -28,6 +32,20 @@ sampler RadianceSampler = sampler_state
     AddressU = Clamp;
     AddressV = Clamp;
 };
+
+Texture2D SDFBuffer;
+
+sampler SDFSampler = sampler_state
+{
+    Texture = (SDFBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+float SDFAO(float2 uv, float2 texelSize);
 
 float3 ToneMappingACES(float3 color);
 float3 RRTAndODTFit(float3 aces);
@@ -45,11 +63,10 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     float3 albedo = ToLinear(albedoOriginal.rgb);
     
-    float3 ambient = Ambient * albedo;
-    
+    float ao = SDFAO(uv, 1.0 / ScreenSize);
     float4 direct = tex2D(RadianceSampler, uv);
     
-    float3 color = direct.rgb + ambient;
+    float3 color = direct.rgb * ao;
     
     color *= Exposure;
     color = ToneMappingACES(color);
@@ -57,6 +74,47 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     color = ToGamma(color);
     
     return float4(color.r, color.g, color.b, albedoOriginal.a);
+}
+
+float SDFAO(float2 uv, float2 texelSize)
+{
+    float2 sdf = tex2Dlod(SDFSampler, float4(uv, 0, 0)).rg;
+    
+    if (sdf.r < 0.0)
+    {
+        return 1.0;
+    }
+
+    float ao = 0.0;
+    int numDirections = 8;
+    int numSteps = 4;
+    float stepSize = AORadius / numSteps;
+
+    for (int d = 0; d < numDirections; d++)
+    {
+        float angle = (d / (float) numDirections) * 6.28318;
+        float2 dir = float2(cos(angle), sin(angle));
+
+        float dirOcclusion = 0.0;
+        float weight = 1.0;
+        float totalWeight = 0.0;
+
+        for (int s = 1; s <= numSteps; s++)
+        {
+            float2 sampleUV = uv + dir * texelSize * stepSize * s;
+            float sampledDist = tex2Dlod(SDFSampler, float4(sampleUV, 0, 0)).r;
+
+            float occ = 1.0 - saturate(sampledDist / (stepSize * s));
+            dirOcclusion += occ * weight;
+            totalWeight += weight;
+            weight *= 0.6;
+        }
+
+        ao += dirOcclusion / totalWeight;
+    }
+
+    ao /= numDirections;
+    return lerp(AOStrength, 1.0, 1.0 - ao);
 }
 
 float3 ToneMappingACES(float3 color)

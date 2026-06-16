@@ -158,7 +158,7 @@ namespace Terralume.Engine.Pipeline
                 // Check if the light's bounding box intersects the screen
                 if (screenPos.X + range >= 0 && screenPos.X - range < RenderConstants.SCREEN_SIZE.X && screenPos.Y + range >= 0 && screenPos.Y - range < RenderConstants.SCREEN_SIZE.Y)
                 {
-                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity + RenderConstants.GLOBAL_INTENSITY_MODIFIER, range + RenderConstants.GLOBAL_RANGE_MODIFIER)));
+                    onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, range)));
                 }
             }
 

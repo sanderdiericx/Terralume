@@ -140,10 +140,15 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Output);
 
-            effect.Parameters["Ambient"].SetValue(RenderConstants.AMBIENT);
+            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            
+            effect.Parameters["AORadius"].SetValue(40f);
+            effect.Parameters["AOStrength"].SetValue(0.001f);
+
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
+            effect.Parameters["SDFBuffer"].SetValue(outputCollection.SDFBufferFinal);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 
