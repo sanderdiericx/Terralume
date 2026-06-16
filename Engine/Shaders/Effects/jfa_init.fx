@@ -1,14 +1,22 @@
 ﻿sampler2D LayerSampler : register(s0);
 
-float TileLayer;
+float SeedLayer;
 float2 ScreenSize;
+bool Exclusive;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float4 seed = float4(-1.0, -1.0, 0.0, 0.0);
-    
     float layer = tex2Dlod(LayerSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
-    if (abs(layer - TileLayer) < 0.01)
+    
+    bool isMatch = abs(layer - SeedLayer) < 0.01;
+    
+    if (Exclusive)
+    {
+        isMatch = !isMatch;
+    }
+    
+    if (isMatch)
     {
         float2 val = float2(uv.x, uv.y) * ScreenSize;
         

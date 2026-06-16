@@ -11,6 +11,7 @@
         Noise,
         Height,
         JFAInit,
-        JFA
+        JFA,
+        SDFCombine
     }
 }

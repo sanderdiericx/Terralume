@@ -16,16 +16,41 @@ namespace Terralume.Engine.Render
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            RenderTarget2D readTarget = outputCollection.SDFBufferA;
-            RenderTarget2D writeTarget = outputCollection.SDFBufferB;
+            JFAPass(device, spriteBatch, outputCollection, bufferCollection, outputCollection.JFATileBuffer, layerParameter.Tile, false);
+            JFAPass(device, spriteBatch, outputCollection, bufferCollection, outputCollection.JFAAirBuffer, layerParameter.Tile, true);
+
+            // Combine into final signed SDF
+            Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombine);
+
+            combineEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            combineEffect.Parameters["SeedLayer"].SetValue(layerParameter.Tile);
+
+            combineEffect.Parameters["JFATileBuffer"].SetValue(outputCollection.JFATileBuffer);
+            combineEffect.Parameters["JFAAirBuffer"].SetValue(outputCollection.JFAAirBuffer);
+
+            device.SetRenderTarget(outputCollection.SDFBufferFinal);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, combineEffect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        private static void JFAPass(GraphicsDevice device, SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, RenderTarget2D outputTarget, float seedLayer, bool exclusive)
+        {
+            RenderTarget2D readTarget = outputCollection.JFABufferA;
+            RenderTarget2D writeTarget = outputCollection.JFABufferB;
 
             device.SetRenderTarget(readTarget);
             device.Clear(Color.Transparent);
 
             Effect jfaInitEffect = EffectManager.GetEffect(EffectType.JFAInit);
 
-            jfaInitEffect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
+            jfaInitEffect.Parameters["SeedLayer"].SetValue(seedLayer);
             jfaInitEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            jfaInitEffect.Parameters["Exclusive"].SetValue(exclusive);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaInitEffect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
@@ -53,14 +78,12 @@ namespace Terralume.Engine.Render
                 writeTarget = temp;
             }
 
-            device.SetRenderTarget(outputCollection.SDFBufferFinal);
+            device.SetRenderTarget(outputTarget);
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
             spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
         }
 
         // Uses the composed G-Buffer to compute lighting for the albedo buffer

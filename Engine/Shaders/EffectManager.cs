@@ -20,7 +20,8 @@ namespace Terralume.Engine.Shaders
             { EffectType.Noise, "noise" },
             { EffectType.Height, "height" },
             { EffectType.JFAInit, "jfa_init" },
-            { EffectType.JFA, "jfa" }
+            { EffectType.JFA, "jfa" },
+            { EffectType.SDFCombine, "sdf_combine" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();
