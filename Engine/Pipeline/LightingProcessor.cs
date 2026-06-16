@@ -31,6 +31,8 @@ namespace Terralume.Engine.Pipeline
 
                 EffectManager.LoadEffect(EffectType.Radiance);
                 EffectManager.LoadEffect(EffectType.Output);
+                EffectManager.LoadEffect(EffectType.JFAInit);
+                EffectManager.LoadEffect(EffectType.JFA);
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
@@ -68,6 +70,8 @@ namespace Terralume.Engine.Pipeline
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightHelper.PackLightTextures(outputCollection, onScreenLights, RenderConstants.SCREEN_SIZE);
+
+            OutputRenderer.RenderSDFBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
 
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
 
@@ -129,6 +133,12 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText($"Switching to height buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.HeightBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D0))
+                {
+                    Main.NewText($"Switching to sdf buffer view", Color.Green);
+
+                    currentRenderTarget = outputCollection.SDFBufferFinal;
                 }
             }
 

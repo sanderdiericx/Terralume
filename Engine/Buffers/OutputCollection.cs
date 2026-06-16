@@ -10,6 +10,10 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D RadianceBuffer;
         public RenderTarget2D OutputBuffer;
 
+        public RenderTarget2D SDFBufferA;
+        public RenderTarget2D SDFBufferB;
+        public RenderTarget2D SDFBufferFinal;
+
         public Texture2D LightPositionTexture;
         public Texture2D LightColorTexture;
 
@@ -23,6 +27,10 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             OutputBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            
+            SDFBufferA = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.HalfVector2, DepthFormat.None);
+            SDFBufferB = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.HalfVector2, DepthFormat.None);
+            SDFBufferFinal = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.HalfVector2, DepthFormat.None);
 
             // LightPositionTexture: (posX, posY, range, intensity) LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
             LightPositionTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
@@ -52,6 +60,10 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer.Dispose();
             OutputBuffer.Dispose();
+
+            SDFBufferA.Dispose();
+            SDFBufferB.Dispose();
+            SDFBufferFinal.Dispose();
 
             LightPositionTexture.Dispose();
             LightColorTexture.Dispose();

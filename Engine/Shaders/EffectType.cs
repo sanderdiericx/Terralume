@@ -9,6 +9,8 @@
         Radiance,
         Output,
         Noise,
-        Height
+        Height,
+        JFAInit,
+        JFA
     }
 }

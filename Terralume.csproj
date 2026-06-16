@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -7,7 +7,7 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
-
+	
 	<!-- References -->
 
 </Project>
