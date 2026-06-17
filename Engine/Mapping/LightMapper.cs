@@ -9,7 +9,8 @@ namespace Terralume.Engine.Mapping
     {
         // Default light values for all lights captured by AddLight methods
         public static float DefaultLightIntensity = 2.0f;
-        public static float DefaultLightRange = 115f;
+        // public static float DefaultLightRange = 115f;
+        public static float DefaultLightRange = 500f;
 
         // Some light sources captured by AddLight methods (such as held torches) need custom light profiles
         //

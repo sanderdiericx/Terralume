@@ -61,7 +61,7 @@ namespace Terralume.Engine.Render
             jfaEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
 
             Vector2 size = readTarget.Size();
-            int initJumpSize = (int)Math.Ceiling(Math.Max(size.X, size.Y) / 2);
+            int initJumpSize = (int)Math.Max(size.X, size.Y);
 
             for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
             {
@@ -117,6 +117,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
             effect.Parameters["MaterialBuffer"].SetValue(bufferCollection.MaterialBuffer);
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
+            effect.Parameters["SDFBuffer"].SetValue(outputCollection.SDFBufferFinal);
 
             effect.Parameters["LightPositionTexture"].SetValue(outputCollection.LightPositionTexture);
             effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);

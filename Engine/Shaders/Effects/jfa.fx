@@ -5,8 +5,8 @@ float2 JumpSizeUV;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float2 currentSeed = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0.0, 0.0));
-    float currentDistance = length((uv * ScreenSize) - currentSeed);
+    float2 currentSeed = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0.0, 0.0));    
+    float currentDistance = (currentSeed.x >= 0.0) ? length((uv * ScreenSize) - currentSeed) : 1e9;
     
     for (int i = -1; i <= 1; i++)
     {
