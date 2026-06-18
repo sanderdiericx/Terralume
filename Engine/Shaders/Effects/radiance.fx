@@ -138,7 +138,7 @@ sampler LightIndexSampler = sampler_state
     AddressV = Clamp;
 };
 
-float Occlusion(float2 uv);
+float Occlusion(float2 sdf);
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
@@ -159,6 +159,9 @@ float3 ToLinear(float3 sRGB);
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {   
+    float noise = tex2Dlod(NoiseSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
+    float2 sdf = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0, 0));
+    
     float4 albedoOriginal = tex2D(AlbedoSampler, uv);
     float layer = tex2D(LayerSampler, uv).r;
     
@@ -166,11 +169,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     {
         discard;
     }
-    
+
     // Albedo noise variation
     if (abs(layer - TileLayer) < 0.01 || abs(layer - WallLayer) < 0.01)
     {
-        float variation = (tex2D(NoiseSampler, uv).r - 0.5) * AlbedoVariationFactor;
+        float variation = (noise - 0.5) * AlbedoVariationFactor;
         float3 albedoVariation = float3(-variation, -variation, -variation);
         
         albedoOriginal.rgb = clamp(albedoOriginal.rgb + albedoVariation, 0.0, 1.0);
@@ -193,7 +196,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float lightCount = round(gridData.g);
     
     float3 color = float3(0.0, 0.0, 0.0);
-
+    
     [loop]
     for (int i = 0; i < (int) lightCount; i++)
     {
@@ -222,18 +225,15 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         
         float dist = length(lightPos.xy - pixelPos.xy);
         float haloFalloff = exp(-dist / (lightRange * VolumetricRange));
-        float tileSDF = tex2Dlod(SDFSampler, float4(uv, 0, 0)).r;
-        float bleedAttenuation = saturate(0.5 + tileSDF * 0.05);
+        float bleedAttenuation = saturate(0.5 + sdf.r * 0.05);
         
         float3 volumetric = lightColor * lightIntensity * haloFalloff * bleedAttenuation * VolumetricStrength;
-        
-        float noise = tex2Dlod(NoiseSampler, float4(uv.x, uv.y, 0.0, 0.0)).r - 0.5;
-        float volumetricNoise = 1.0 + noise * VolumetricNoiseContrast;
+        float volumetricNoise = 1.0 + (noise - 0.5) * VolumetricNoiseContrast;
 
         color += volumetric * volumetricNoise;
     }
  
-    color *= Occlusion(uv);
+    color *= Occlusion(sdf);
     
     float3 emissive = albedo * material.b * 5.0;
     color += emissive;
@@ -241,11 +241,9 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     return float4(color.r, color.g, color.b, albedoOriginal.a);
 }
 
-float Occlusion(float2 uv)
+float Occlusion(float2 sdf)
 {
     float occlusion = 1.0;
-    
-    float2 sdf = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0.0, 0.0));
     
     if (sdf.r < 0.0)
     {
