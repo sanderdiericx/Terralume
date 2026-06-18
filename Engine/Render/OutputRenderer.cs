@@ -108,6 +108,10 @@ namespace Terralume.Engine.Render
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
+            
+            effect.Parameters["OcclusionFactor"].SetValue(0.04f);
+            effect.Parameters["VolumetricStrength"].SetValue(0.04f);
+            effect.Parameters["VolumetricRange"].SetValue(0.1f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
@@ -123,8 +127,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);
             effect.Parameters["LightGridTexture"].SetValue(outputCollection.LightGridTexture);
             effect.Parameters["LightIndexTexture"].SetValue(outputCollection.LightIndexTexture);
-
-            effect.Parameters["OcclusionFactor"].SetValue(0.04f);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.AlbedoBuffer, Vector2.Zero, Color.White);

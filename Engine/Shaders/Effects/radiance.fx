@@ -16,6 +16,9 @@ float OcclusionFactor;
 float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
 
+float VolumetricStrength;
+float VolumetricRange;
+
 Texture2D LayerBuffer;
 
 sampler LayerSampler = sampler_state
@@ -215,6 +218,13 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);
     
         color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
+        
+        float dist = length(lightPos.xy - pixelPos.xy);
+        float haloFalloff = exp(-dist / (lightRange * VolumetricRange));
+        float tileSDF = tex2Dlod(SDFSampler, float4(uv, 0, 0)).r;
+        float bleedAttenuation = saturate(0.5 + tileSDF * 0.05);
+        
+        color += lightColor * lightIntensity * haloFalloff * bleedAttenuation * VolumetricStrength;
     }
  
     color *= Occlusion(uv);
