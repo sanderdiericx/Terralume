@@ -59,12 +59,14 @@ namespace Terralume.Engine.Render
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
             effect.Parameters["DefaultNoise"].SetValue(NoiseMapper.DefaultNoise);
+            effect.Parameters["BackgroundNoise"].SetValue(NoiseMapper.BackgroundNoise);
 
             effect.Parameters["NoiseTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["IDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
 
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
 
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);

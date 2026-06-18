@@ -112,6 +112,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["OcclusionFactor"].SetValue(0.04f);
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
+            effect.Parameters["VolumetricNoiseContrast"].SetValue(0.6f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));

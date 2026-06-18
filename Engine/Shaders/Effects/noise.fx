@@ -7,12 +7,14 @@ float2 ScreenPosition;
 float2 ViewSize;
 
 float2 DefaultNoise;
+float2 BackgroundNoise;
 
 float2 NoiseTextureSize;
 float2 IDTextureSize;
 
 float TileLayer;
 float WallLayer;
+float BackgroundLayer;
 
 Texture2D TileIDTexture;
 
@@ -93,6 +95,10 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         float2 noise = GetNoise(ID, WallNoiseSampler);
         
         value = FBM(pos, noise.x, noise.y);
+    }
+    else
+    {
+        value = FBM(pos, BackgroundNoise.x, BackgroundNoise.y);
     }
     
     return float4(value, 0.0, 0.0, 1.0);

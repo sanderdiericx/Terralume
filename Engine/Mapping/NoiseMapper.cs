@@ -7,6 +7,7 @@ namespace Terralume.Engine.Mapping
     public static class NoiseMapper
     {
         public static Vector2 DefaultNoise = new Vector2(0.5f, 0.3f);
+        public static Vector2 BackgroundNoise = new Vector2(0.5f, 0.3f);
 
         public static Dictionary<int, Vector2> MappedTiles = new Dictionary<int, Vector2>()
         {

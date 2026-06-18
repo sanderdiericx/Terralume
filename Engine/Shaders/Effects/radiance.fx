@@ -18,6 +18,7 @@ float2 LightIndexTextureSize;
 
 float VolumetricStrength;
 float VolumetricRange;
+float VolumetricNoiseContrast;
 
 Texture2D LayerBuffer;
 
@@ -224,7 +225,12 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         float tileSDF = tex2Dlod(SDFSampler, float4(uv, 0, 0)).r;
         float bleedAttenuation = saturate(0.5 + tileSDF * 0.05);
         
-        color += lightColor * lightIntensity * haloFalloff * bleedAttenuation * VolumetricStrength;
+        float3 volumetric = lightColor * lightIntensity * haloFalloff * bleedAttenuation * VolumetricStrength;
+        
+        float noise = tex2Dlod(NoiseSampler, float4(uv.x, uv.y, 0.0, 0.0)).r - 0.5;
+        float volumetricNoise = 1.0 + noise * VolumetricNoiseContrast;
+
+        color += volumetric * volumetricNoise;
     }
  
     color *= Occlusion(uv);
