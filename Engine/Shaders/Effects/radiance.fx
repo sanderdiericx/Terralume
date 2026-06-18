@@ -11,6 +11,7 @@ float TileLayer;
 float WallLayer;
 
 float AlbedoVariationFactor;
+float OcclusionFactor;
 
 float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
@@ -133,7 +134,7 @@ sampler LightIndexSampler = sampler_state
     AddressV = Clamp;
 };
 
-float SDFShadow(float2 pixelPos, float2 lightPos);
+float Occlusion(float2 uv);
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
@@ -213,43 +214,26 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         float lightIntensity = positionSample.w;
         float3 lightColor = float3(colorSample.r, colorSample.g, colorSample.b);
     
-        color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange) * SDFShadow(pixelPos.xy, lightPos.xy);
+        color += CalculatePointLight(pixelPos, lightPos, lightColor, albedo, material, normal, viewDir, lightIntensity, lightRange);
     }
  
+    color *= Occlusion(uv);
+    
     float3 emissive = albedo * material.b * 5.0;
     color += emissive;
         
     return float4(color.r, color.g, color.b, albedoOriginal.a);
 }
 
-float SDFShadow(float2 pixelPos, float2 lightPos)
+float Occlusion(float2 uv)
 {
-    float2 dir = normalize(lightPos - pixelPos);
-    float maxDist = length(lightPos - pixelPos);
-    float2 currentPosition = pixelPos;
-
     float occlusion = 1.0;
-
-    for (int i = 0; i < 32; i++)
+    
+    float2 sdf = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0.0, 0.0));
+    
+    if (sdf.r < 0.0)
     {
-        float2 currentUV = currentPosition / ScreenSize;
-        float2 currentSDF = tex2Dlod(SDFSampler, float4(currentUV.x, currentUV.y, 0.0, 0.0));
-
-        // We hit a tile
-        if (currentSDF.r < 0)
-        {
-            occlusion = 0.0;
-            break;
-        }
-
-        currentPosition = currentPosition + dir * max(currentSDF.g, 0.5);
-
-        // We moved past the light
-        if (length(currentPosition - pixelPos) > maxDist)
-        {
-            occlusion = 1.0;
-            break;
-        }
+        occlusion = exp(OcclusionFactor * sdf.r);
     }
 
     return occlusion;

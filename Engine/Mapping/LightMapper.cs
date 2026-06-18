@@ -9,21 +9,20 @@ namespace Terralume.Engine.Mapping
     {
         // Default light values for all lights captured by AddLight methods
         public static float DefaultLightIntensity = 2.0f;
-        // public static float DefaultLightRange = 115f;
-        public static float DefaultLightRange = 500f;
+        public static float DefaultLightRange = 115f;
 
         // Some light sources captured by AddLight methods (such as held torches) need custom light profiles
         //
         // Note: Custom lights are currently identified by color (Need a better ID system in the future)
         public static Dictionary<Vector4, LightProfile> DefaultLightExceptions = new Dictionary<Vector4, LightProfile>()
         {
-            { new Vector4(1.00f, 0.95f, 0.80f, 1f), new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 215f) } // Held torches
+            { new Vector4(1.00f, 0.95f, 0.80f, 1f), new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) } // Held torches
         };
 
         // Light profiles linked to light emitting tiles via GetVisibleTileLights
         public static Dictionary<ushort, LightProfile> TileProfiles = new Dictionary<ushort, LightProfile>
         {
-            { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 215f) },
+            { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },
             { TileID.Furnaces, new LightProfile(new Vector4(1.00f, 0.60f, 0.20f, 1f), 8.0f, 240f) },
             { TileID.Platforms, new LightProfile(new Vector4(1.00f, 1.00f, 1.00f, 1f), 0.1f, 1f) },
             { TileID.Saplings, new LightProfile(new Vector4(0.50f, 0.80f, 0.50f, 1f), 1.5f, 60f) },

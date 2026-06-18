@@ -124,6 +124,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["LightGridTexture"].SetValue(outputCollection.LightGridTexture);
             effect.Parameters["LightIndexTexture"].SetValue(outputCollection.LightIndexTexture);
 
+            effect.Parameters["OcclusionFactor"].SetValue(0.04f);
+
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.AlbedoBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();

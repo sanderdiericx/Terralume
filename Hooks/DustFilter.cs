@@ -9,6 +9,7 @@ namespace Terralume.Hooks
         // Make sure ores dont create light casting dust
         public override void PostSetupContent()
         {
+            /*
             for (int i = 0; i < TileID.Count; i++)
             {
                 if (TileID.Sets.Ore[i] && Main.tileShine[i] > 0)
@@ -16,6 +17,7 @@ namespace Terralume.Hooks
                     Main.tileShine[i] = 0;
                 }
             }
+            */
         }
     }
 }
