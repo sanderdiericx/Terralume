@@ -55,12 +55,7 @@ float3 ToGamma(float3 linearRGB);
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float4 albedoOriginal = tex2D(AlbedoSampler, uv);
-    if (albedoOriginal.a < 0.01)
-    {
-        discard;
-    }
-    
+    float4 albedoOriginal = tex2D(AlbedoSampler, uv);    
     float3 albedo = ToLinear(albedoOriginal.rgb);
     
     float ao = SDFAO(uv, 1.0 / ScreenSize);

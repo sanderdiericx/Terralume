@@ -130,9 +130,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to height buffer view", Color.Green);
+                    Main.NewText($"Switching to projectile target view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.HeightBuffer;
+                    currentRenderTarget = targetCollection.ProjectileTarget;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {

@@ -1,5 +1,7 @@
 ﻿sampler2D ScreenSampler : register(s0);
 
+static const float3 LUMINANCE = float3(1.0, 1.0, 1.0);
+
 float BackgroundLayer;
 float TileLayer;
 float NonSolidTileLayer;
@@ -86,33 +88,35 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float4 layer = float4(OtherLayer, 0.0, 0.0, 1.0);
     float epsilon = 0.01;
     
-    if (tex2D(ScreenSampler, uv).a < epsilon) // Background
-    {
-        layer = float4(BackgroundLayer, 0.0, 0.0, 1.0);
-    }
-    else if (tex2D(PlayerSampler, uv).a > epsilon) // Player
+    float4 projectile = tex2D(ProjectileSampler, uv);
+    
+    if (tex2D(PlayerSampler, uv).a > epsilon) // Player
     {
         layer = float4(PlayerLayer, 0.0, 0.0, 1.0);
+    }
+    else if (projectile.a > epsilon || dot(projectile.rgb, LUMINANCE) > 0.01) // Projectile
+    {
+        layer = float4(ProjectileLayer, 0.0, 0.0, 1.0);
     }
     else if (tex2D(EntitySampler, uv).a > epsilon) // Entity
     {
         layer = float4(EntityLayer, 0.0, 0.0, 1.0);
     }
-    else if (tex2D(ProjectileSampler, uv).a > epsilon) // Projectile
+    else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
     {
-        layer = float4(ProjectileLayer, 0.0, 0.0, 1.0);
+        layer = float4(TileLayer, 0.0, 0.0, 1.0);
     }
     else if (tex2D(NonSolidTileSampler, uv).a > epsilon) // Non Solid Tiles
     {
         layer = float4(NonSolidTileLayer, 0.0, 0.0, 1.0);
     }
-    else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
-    {
-        layer = float4(TileLayer, 0.0, 0.0, 1.0);
-    }
     else if (tex2D(WallSampler, uv).a > epsilon) // Wall
     {
         layer = float4(WallLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(ScreenSampler, uv).a < epsilon) // Background
+    {
+        layer = float4(BackgroundLayer, 0.0, 0.0, 1.0);
     }
     
     return layer;
