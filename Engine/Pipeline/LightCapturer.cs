@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
-using Terralume.Engine.Mapping;
+using Terralume.Engine.Mapping.Registry;
 using Terraria;
 using Terraria.ModLoader;
 

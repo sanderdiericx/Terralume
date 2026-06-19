@@ -4,6 +4,7 @@ using System;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Shaders;
 using Terraria;
 
@@ -108,14 +109,14 @@ namespace Terralume.Engine.Render
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
-            
+
             effect.Parameters["OcclusionFactor"].SetValue(0.04f);
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
             effect.Parameters["VolumetricNoiseContrast"].SetValue(0.6f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
-            effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(outputCollection.LightIndexTexture.Width, outputCollection.LightIndexTexture.Height));
+            effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(LightPacker.LightIndexTexture.Width, LightPacker.LightIndexTexture.Height));
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
@@ -124,10 +125,10 @@ namespace Terralume.Engine.Render
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
             effect.Parameters["SDFBuffer"].SetValue(outputCollection.SDFBufferFinal);
 
-            effect.Parameters["LightPositionTexture"].SetValue(outputCollection.LightPositionTexture);
-            effect.Parameters["LightColorTexture"].SetValue(outputCollection.LightColorTexture);
-            effect.Parameters["LightGridTexture"].SetValue(outputCollection.LightGridTexture);
-            effect.Parameters["LightIndexTexture"].SetValue(outputCollection.LightIndexTexture);
+            effect.Parameters["LightPositionTexture"].SetValue(LightPacker.LightPositionTexture);
+            effect.Parameters["LightColorTexture"].SetValue(LightPacker.LightColorTexture);
+            effect.Parameters["LightGridTexture"].SetValue(LightPacker.LightGridTexture);
+            effect.Parameters["LightIndexTexture"].SetValue(LightPacker.LightIndexTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.AlbedoBuffer, Vector2.Zero, Color.White);
@@ -147,7 +148,7 @@ namespace Terralume.Engine.Render
             Effect effect = EffectManager.GetEffect(EffectType.Output);
 
             effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
-            
+
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);
 

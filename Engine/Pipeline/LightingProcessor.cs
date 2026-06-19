@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
@@ -65,16 +66,14 @@ namespace Terralume.Engine.Pipeline
 
             BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs, wallIDs);
 
+            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
+            LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
+
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
-            LightHelper.PackLightTextures(outputCollection, onScreenLights, RenderConstants.SCREEN_SIZE);
-
             OutputRenderer.RenderSDFBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
-
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
-
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             KeyboardState keyboardState = Main.keyState;

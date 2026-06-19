@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terraria.ID;
 
-namespace Terralume.Engine.Mapping
+namespace Terralume.Engine.Mapping.Registry
 {
     internal static class LightMapper
     {

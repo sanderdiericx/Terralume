@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Terraria.ID;
 
-namespace Terralume.Engine.Materials
+namespace Terralume.Engine.Mapping.Registry
 {
     public static class MaterialMapper
     {

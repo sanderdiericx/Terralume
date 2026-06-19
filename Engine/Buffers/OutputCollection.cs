@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using Terralume.Engine.Constants;
 using Terraria;
 
 namespace Terralume.Engine.Buffers
@@ -18,12 +17,6 @@ namespace Terralume.Engine.Buffers
 
         public RenderTarget2D SDFBufferFinal;
 
-        public Texture2D LightPositionTexture;
-        public Texture2D LightColorTexture;
-
-        public Texture2D LightGridTexture;
-        public Texture2D LightIndexTexture;
-
         public int Width;
         public int Height;
 
@@ -31,29 +24,14 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             OutputBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-            
+
             JFABufferA = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
             JFABufferB = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
-            
+
             JFATileBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
             JFAAirBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
 
             SDFBufferFinal = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
-
-            // LightPositionTexture: (posX, posY, range, intensity) LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
-            LightPositionTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
-            LightColorTexture = new Texture2D(graphicsDevice, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.Color);
-
-            int gridWidth = (int)Math.Ceiling((double)width / RenderConstants.LIGHT_GRID_TILE_SIZE);
-            int gridHeight = (int)Math.Ceiling((double)height / RenderConstants.LIGHT_GRID_TILE_SIZE);
-
-            int maxIndices = gridWidth * gridHeight * RenderConstants.MAX_LIGHTS_PER_TILE;
-            int indexTextureSize = (int)Math.Ceiling(Math.Sqrt(maxIndices));
-            indexTextureSize = Math.Min(indexTextureSize, 4096);
-
-            // LightGridTexture: (start index for tile in index list, light count for each tile) LightIndexTexture (light data index)
-            LightGridTexture = new Texture2D(graphicsDevice, gridWidth, gridHeight, false, SurfaceFormat.Vector4);
-            LightIndexTexture = new Texture2D(graphicsDevice, indexTextureSize, indexTextureSize, false, SurfaceFormat.Vector4);
 
             Width = width;
             Height = height;
@@ -76,12 +54,6 @@ namespace Terralume.Engine.Buffers
             JFAAirBuffer.Dispose();
 
             SDFBufferFinal.Dispose();
-
-            LightPositionTexture.Dispose();
-            LightColorTexture.Dispose();
-
-            LightGridTexture.Dispose();
-            LightIndexTexture.Dispose();
 
             GC.SuppressFinalize(this);
         }
