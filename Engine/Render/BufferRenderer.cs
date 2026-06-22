@@ -68,8 +68,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
             effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
 
-            effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
-            effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
+            effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
+            effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
 
             effect.Parameters["TileNoiseTexture"].SetValue(bufferCollection.TileNoiseTexture);
             effect.Parameters["WallNoiseTexture"].SetValue(bufferCollection.WallNoiseTexture);
@@ -129,8 +129,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
 
-            effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
-            effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
+            effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
+            effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
 
             effect.Parameters["TileMaterialTexture"].SetValue(MaterialPacker.TileMaterialTexture);
             effect.Parameters["WallMaterialTexture"].SetValue(MaterialPacker.WallMaterialTexture);

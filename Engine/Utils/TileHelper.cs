@@ -6,13 +6,11 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terraria;
-using Terraria.ID;
 
 namespace Terralume.Engine.Utils
 {
     public static class TileHelper
     {
-        private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static HalfVector2[] noisePixels = new HalfVector2[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public static TileCaptureParameter CalculateTileCaptureParameter()
@@ -37,67 +35,6 @@ namespace Terralume.Engine.Utils
             int maxTileY = minTileY + strideY - 1;
 
             return new TileCaptureParameter(screenPosition, viewSize, new Vector2(strideX, strideY), new Vector2(minTileX, minTileY), new Vector2(maxTileX, maxTileY));
-        }
-
-
-        // Builds a flat array with tile ids of all visible tiles, and a second flat array with ids of all visible wall tiles
-        //
-        // Note: Indices without tiles will recieve tile ID 65535 by default, this method supports max 65534 different tiles/walls
-        public static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs)
-        {
-            Vector2 stride = tileCaptureParameter.TileStride;
-            Vector2 minTile = tileCaptureParameter.MinTile;
-            Vector2 maxTile = tileCaptureParameter.MaxTile;
-
-            tileIDs = new ushort[(int)stride.X * (int)stride.Y];
-            wallIDs = new ushort[(int)stride.X * (int)stride.Y];
-
-            int count = 0;
-
-            for (int i = (int)minTile.Y; i <= maxTile.Y; i++)
-            {
-                for (int j = (int)minTile.X; j <= maxTile.X; j++)
-                {
-                    if (j < 0 || j >= Main.maxTilesX || i < 0 || i >= Main.maxTilesY) // Out of bounds;
-                    {
-                        tileIDs[count] = 65535;
-                        wallIDs[count] = 65535;
-                    }
-                    else
-                    {
-                        tileIDs[count] = (Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : (ushort)65535);
-                        wallIDs[count] = (Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : (ushort)65535);
-                    }
-
-                    count++;
-                }
-            }
-        }
-
-        // Encodes an array of shorts into a 2D texture
-        //
-        // Note: Each texture index stores two shorts
-        public static void PackShortsIntoTexture(Texture2D texture, ushort[] shorts)
-        {
-            int pixelCount = (shorts.Length + 1) / 2;
-
-            int safePixelCount = Math.Min(pixelCount, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
-
-            for (int i = 0; i < safePixelCount; i++)
-            {
-                int index = i * 2;
-                ushort u0 = shorts[index];
-                ushort u1 = (index + 1 < shorts.Length) ? shorts[index + 1] : (ushort)65535;
-
-                shortPixels[i] = new Color(
-                    (byte)(u0 & 0xFF), // low byte of u0
-                    (byte)(u0 >> 8), // high byte of u0
-                    (byte)(u1 & 0xFF), // low byte of u1
-                    (byte)(u1 >> 8) // high byte of u1
-                );
-            }
-
-            texture.SetData(shortPixels);
         }
 
         // Encodes a dictionary (mapping ID to noise vector) into a texture (HalfVector2)

@@ -62,9 +62,7 @@ namespace Terralume.Engine.Pipeline
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            TileHelper.GetVisibleIDs(tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs);
-
-            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter, tileIDs, wallIDs);
+            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter);
 
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);

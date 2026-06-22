@@ -38,8 +38,11 @@ namespace Terralume.Engine.Mapping
         {
             base.Unload();
 
-            TileMaterialTexture.Dispose();
-            WallMaterialTexture.Dispose();
+            Main.QueueMainThreadAction(() =>
+            {
+                TileMaterialTexture.Dispose();
+                WallMaterialTexture.Dispose();
+            });
         }
 
         public static void PackTileMaterialTexture()
