@@ -74,7 +74,7 @@ namespace Terralume.Engine.Pipeline
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
             OutputRenderer.RenderSDFBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
-            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
+            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             // START DEBUG
