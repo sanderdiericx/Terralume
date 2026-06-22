@@ -10,6 +10,7 @@ namespace Terralume.Engine.Constants
 
         public static readonly int LIGHT_DATA_RESOLUTION = 64;
         public static readonly int MATERIAL_DATA_RESOLUTION = 256;
+        public static readonly int SUN_OCCLUSION_DATA_RESOLUTION = 256;
 
         public static readonly int LIGHT_GRID_TILE_SIZE = 16;
         public static readonly int MAX_LIGHTS_PER_TILE = 255;

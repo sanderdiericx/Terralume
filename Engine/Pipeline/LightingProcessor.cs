@@ -67,6 +67,9 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
+            SunOcclusionTracker.UpdateOccluders();
+            SunOcclusionTracker.PackSunOcclusionTexture(tileCaptureParameter);
+
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
