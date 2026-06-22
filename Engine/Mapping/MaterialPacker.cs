@@ -47,44 +47,14 @@ namespace Terralume.Engine.Mapping
 
         public static void PackTileMaterialTexture()
         {
-            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
-
-            Array.Clear(materialPixels, 0, materialPixels.Length);
-
-            foreach (var kvp in tiles)
-            {
-                int id = kvp.Key;
-
-                if (id >= 0 && id < maxPixels)
-                {
-                    Vector3 color = kvp.Value;
-                    materialPixels[id] = new Color(color.X, color.Y, color.Z);
-                }
-            }
-
-            TileMaterialTexture.SetData(materialPixels);
+            PackMaterialTexture(TileMaterialTexture, tiles);
 
             TilesValid = true;
         }
 
         public static void PackWallMaterialTexture()
         {
-            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
-
-            Array.Clear(materialPixels, 0, materialPixels.Length);
-
-            foreach (var kvp in walls)
-            {
-                int id = kvp.Key;
-
-                if (id >= 0 && id < maxPixels)
-                {
-                    Vector3 color = kvp.Value;
-                    materialPixels[id] = new Color(color.X, color.Y, color.Z);
-                }
-            }
-
-            WallMaterialTexture.SetData(materialPixels);
+            PackMaterialTexture(WallMaterialTexture, walls);
 
             WallsValid = true;
         }
@@ -101,6 +71,27 @@ namespace Terralume.Engine.Mapping
             walls = new Dictionary<int, Vector3>(mappedWalls);
 
             WallsValid = false;
+        }
+
+        // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID
+        private static void PackMaterialTexture(Texture2D texture, Dictionary<int, Vector3> mappedMaterials)
+        {
+            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
+
+            Array.Clear(materialPixels, 0, materialPixels.Length);
+
+            foreach (var kvp in mappedMaterials)
+            {
+                int id = kvp.Key;
+
+                if (id >= 0 && id < maxPixels)
+                {
+                    Vector3 color = kvp.Value;
+                    materialPixels[id] = new Color(color.X, color.Y, color.Z);
+                }
+            }
+
+            texture.SetData(materialPixels);
         }
     }
 }
