@@ -10,11 +10,9 @@ using Terraria.ID;
 
 namespace Terralume.Engine.Utils
 {
-    // TO DO: Optimize Texture.SetData()
     public static class TileHelper
     {
         private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
-        private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
         private static HalfVector2[] noisePixels = new HalfVector2[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public static TileCaptureParameter CalculateTileCaptureParameter()
@@ -100,27 +98,6 @@ namespace Terralume.Engine.Utils
             }
 
             texture.SetData(shortPixels);
-        }
-
-        // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID
-        public static void PackMaterialTexture(Texture2D texture, Dictionary<int, Vector3> mappedMaterials)
-        {
-            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
-
-            Array.Clear(materialPixels, 0, materialPixels.Length);
-
-            foreach (var kvp in mappedMaterials)
-            {
-                int id = kvp.Key;
-
-                if (id >= 0 && id < maxPixels)
-                {
-                    Vector3 color = kvp.Value;
-                    materialPixels[id] = new Color(color.X, color.Y, color.Z);
-                }
-            }
-
-            texture.SetData(materialPixels);
         }
 
         // Encodes a dictionary (mapping ID to noise vector) into a texture (HalfVector2)

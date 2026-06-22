@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Shaders;
 using Terraria;
@@ -131,8 +132,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["TileIDTexture"].SetValue(bufferCollection.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(bufferCollection.WallIDTexture);
 
-            effect.Parameters["TileMaterialTexture"].SetValue(bufferCollection.TileMaterialTexture);
-            effect.Parameters["WallMaterialTexture"].SetValue(bufferCollection.WallMaterialTexture);
+            effect.Parameters["TileMaterialTexture"].SetValue(MaterialPacker.TileMaterialTexture);
+            effect.Parameters["WallMaterialTexture"].SetValue(MaterialPacker.WallMaterialTexture);
 
             device.SamplerStates[2] = SamplerState.PointClamp;
             device.SamplerStates[3] = SamplerState.PointClamp;

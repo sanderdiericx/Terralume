@@ -2,6 +2,7 @@
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
@@ -28,6 +29,9 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Normal);
                 EffectManager.LoadEffect(EffectType.Noise);
             });
+
+            MaterialPacker.SetTileMaterials(MaterialMapper.MappedTiles);
+            MaterialPacker.SetWallMaterials(MaterialMapper.MappedWalls);
         }
 
         public override void Unload()
@@ -40,7 +44,7 @@ namespace Terralume.Engine.Pipeline
             });
         }
 
-        // Must be called at On_Main.DrawInterface to not break :(
+        // Must be called at On_Main.DrawInterface to not break
         public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter, ushort[] tileIDs, ushort[] wallIDs)
         {
             UpdateBuffer();
@@ -53,8 +57,8 @@ namespace Terralume.Engine.Pipeline
             TileHelper.PackShortsIntoTexture(BufferCollection.TileIDTexture, tileIDs);
             TileHelper.PackShortsIntoTexture(BufferCollection.WallIDTexture, wallIDs);
 
-            TileHelper.PackMaterialTexture(BufferCollection.TileMaterialTexture, MaterialMapper.MappedTiles);
-            TileHelper.PackMaterialTexture(BufferCollection.WallMaterialTexture, MaterialMapper.MappedWalls);
+            if (!MaterialPacker.TilesValid) MaterialPacker.PackTileMaterialTexture();
+            if (!MaterialPacker.WallsValid) MaterialPacker.PackWallMaterialTexture();
 
             TileHelper.PackNoiseTexture(BufferCollection.TileNoiseTexture, NoiseMapper.MappedTiles);
             TileHelper.PackNoiseTexture(BufferCollection.WallNoiseTexture, NoiseMapper.MappedWalls);
