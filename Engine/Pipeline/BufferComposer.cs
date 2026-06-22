@@ -6,7 +6,6 @@ using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
-using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -32,6 +31,9 @@ namespace Terralume.Engine.Pipeline
 
             MaterialPacker.SetTileMaterials(MaterialMapper.MappedTiles);
             MaterialPacker.SetWallMaterials(MaterialMapper.MappedWalls);
+
+            NoisePacker.SetTileNoise(NoiseMapper.MappedTiles);
+            NoisePacker.SetWallNoise(NoiseMapper.MappedWalls);
         }
 
         public override void Unload()
@@ -61,8 +63,9 @@ namespace Terralume.Engine.Pipeline
             if (!MaterialPacker.TilesValid) MaterialPacker.PackTileMaterialTexture();
             if (!MaterialPacker.WallsValid) MaterialPacker.PackWallMaterialTexture();
 
-            TileHelper.PackNoiseTexture(BufferCollection.TileNoiseTexture, NoiseMapper.MappedTiles);
-            TileHelper.PackNoiseTexture(BufferCollection.WallNoiseTexture, NoiseMapper.MappedWalls);
+
+            if (!NoisePacker.TilesValid) NoisePacker.PackTileNoiseTexture();
+            if (!NoisePacker.WallsValid) NoisePacker.PackWallNoiseTexture();
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
             BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);

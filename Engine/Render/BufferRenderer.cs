@@ -71,8 +71,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
 
-            effect.Parameters["TileNoiseTexture"].SetValue(bufferCollection.TileNoiseTexture);
-            effect.Parameters["WallNoiseTexture"].SetValue(bufferCollection.WallNoiseTexture);
+            effect.Parameters["TileNoiseTexture"].SetValue(NoisePacker.TileNoiseTexture);
+            effect.Parameters["WallNoiseTexture"].SetValue(NoisePacker.WallNoiseTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);

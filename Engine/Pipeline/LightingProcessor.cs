@@ -74,6 +74,7 @@ namespace Terralume.Engine.Pipeline
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
+            // START DEBUG
             KeyboardState keyboardState = Main.keyState;
             if (keyboardState.IsKeyDown(Keys.LeftAlt))
             {
@@ -138,6 +139,7 @@ namespace Terralume.Engine.Pipeline
                     currentRenderTarget = outputCollection.SDFBufferFinal;
                 }
             }
+            // END DEBUG
 
             deferredSpriteBatch.Begin();
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
