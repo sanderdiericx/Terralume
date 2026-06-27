@@ -113,7 +113,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
-            effect.Parameters["OcclusionFactor"].SetValue(0.04f);
+            effect.Parameters["OcclusionFactor"].SetValue(0.1f / currentZoom);
+
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
             effect.Parameters["VolumetricNoiseContrast"].SetValue(0.6f);

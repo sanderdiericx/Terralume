@@ -251,18 +251,12 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     }
  
     
-    /* TEMP DEBUG
     color *= Occlusion(sdf);
     
     float3 emissive = albedo * material.b * 5.0;
     color += emissive;
         
     return float4(color.r, color.g, color.b, albedoOriginal.a);
-    */
-    
-    float sunOcclusion = SunOcclusion(uv);
-    
-    return float4(sunOcclusion, 0.0, 0.0, 1.0);
 }
 
 float Occlusion(float2 sdf)
