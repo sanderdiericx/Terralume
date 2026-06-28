@@ -6,6 +6,7 @@ using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Render
@@ -118,6 +119,12 @@ namespace Terralume.Engine.Render
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
             effect.Parameters["VolumetricNoiseContrast"].SetValue(0.6f);
+
+            AmbientLightProfile ambientLight = AmbientLightProvider.GetAmbientLightProfile();
+
+            effect.Parameters["AmbientColor"].SetValue(ambientLight.AmbientColor);
+            effect.Parameters["AmbientStrength"].SetValue(ambientLight.AmbientStrength);
+            effect.Parameters["AmbientDiffuseWeight"].SetValue(0.2f);
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(LightPacker.LightIndexTexture.Width, LightPacker.LightIndexTexture.Height));

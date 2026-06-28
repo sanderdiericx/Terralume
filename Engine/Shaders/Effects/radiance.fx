@@ -24,6 +24,10 @@ float VolumetricStrength;
 float VolumetricRange;
 float VolumetricNoiseContrast;
 
+float3 AmbientColor;
+float AmbientStrength;
+float AmbientDiffuseWeight;
+
 Texture2D LayerBuffer;
 
 sampler LayerSampler = sampler_state
@@ -157,6 +161,9 @@ float Occlusion(float2 sdf);
 float SunOcclusion(float2 uv);
 
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
+float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize);
+
+float3 ApproximateOpenDirection(float2 uv, float2 texelSize, out bool gradientValid);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
 float3 RadianceFunction(float3 lightColor, float intensity, float dist, float range);
@@ -167,6 +174,8 @@ float GeometrySchlickGGX(float roughness, float3 normal, float3 x);
 float GeometrySmith(float roughness, float3 normal, float3 viewDir, float3 lightDir);
 
 float3 FresnelSchlickApproximationFunction(float3 baseReflectivity, float3 viewDir, float3 halfVector);
+float3 FresnelSchlickRoughness(float3 baseReflectivity, float NdotV, float roughness);
+
 float3 EnergyConservationFunction(float3 fresnel, float metallic);
 
 float3 CalculateBRDFSpecular(float distribution, float geometry, float3 fresnel, float3 normal, float3 viewDir, float3 lightDir);
@@ -249,7 +258,9 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 
         color += volumetric * volumetricNoise;
     }
- 
+    
+    float2 texelSize = 1.0 / ScreenSize;
+    color += CalculateAmbientLight(albedo, material, normal, viewDir, uv, sdf, texelSize);
     
     color *= Occlusion(sdf);
     
@@ -315,6 +326,55 @@ float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, 
     return CalculateOutgoingLight(energyConservation, albedo, specular, radianceColor, normal, lightDir);
 }
 
+float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize)
+{
+    float metallic = material.r;
+    float roughness = material.g;
+
+    bool gradientValid;
+    float3 openDir = ApproximateOpenDirection(uv, texelSize, gradientValid);
+
+    float3 ambientSecondary = AmbientColor * float3(0.05, 0.05, 0.08);
+    float openWeight = gradientValid ? dot(normal.xy, openDir.xy) * 0.5 + 0.5 : (sdf.r >= 0.0 ? 1.0 : 0.0);
+    openWeight = pow(openWeight, 1.5);
+    
+    float3 hemisphereColor = lerp(ambientSecondary, AmbientColor, openWeight);
+    float3 ambientRadiance = hemisphereColor * AmbientStrength;
+
+    float NdotV = max(dot(normal, viewDir), 0.0);
+    float3 baseReflectivity = BaseReflectivityFunction(metallic, albedo);
+    float3 fresnel = FresnelSchlickRoughness(baseReflectivity, NdotV, roughness);
+    float3 energyConservation = EnergyConservationFunction(fresnel, metallic);
+
+    float3 diffuseAmbient = energyConservation * albedo * ambientRadiance * AmbientDiffuseWeight;
+    float3 specularAmbient = fresnel * ambientRadiance;
+
+    return (diffuseAmbient + specularAmbient);
+}
+
+float3 ApproximateOpenDirection(float2 uv, float2 texelSize, out bool gradientValid)
+{
+    float right = tex2Dlod(SDFSampler, float4(uv + float2(texelSize.x, 0), 0, 0)).r;
+    float left = tex2Dlod(SDFSampler, float4(uv - float2(texelSize.x, 0), 0, 0)).r;
+    float up = tex2Dlod(SDFSampler, float4(uv - float2(0, texelSize.y), 0, 0)).r;
+    float down = tex2Dlod(SDFSampler, float4(uv + float2(0, texelSize.y), 0, 0)).r;
+
+    float2 grad = float2(right - left, down - up);
+    gradientValid = dot(grad, grad) > 0.0001;
+
+    return gradientValid ? normalize(float3(grad, 0.0)) : float3(0, 0, 1);
+}
+
+float AmbientLightOcclusion(float2 sdf)
+{
+    float occlusion = 1.0;
+    if (sdf.r < 0.0)
+    {
+        occlusion = exp(OcclusionFactor * sdf.r * 2.0);
+    }
+    return occlusion;
+}
+
 float3 BaseReflectivityFunction(float metallic, float3 albedo)
 {
     return (1.0 - metallic) * 0.04 + metallic * albedo;
@@ -363,6 +423,14 @@ float GeometrySmith(float roughness, float3 normal, float3 viewDir, float3 light
 float3 FresnelSchlickApproximationFunction(float3 baseReflectivity, float3 viewDir, float3 halfVector)
 {
     return baseReflectivity + (1.0 - baseReflectivity) * pow(1.0 - dot(viewDir, halfVector), 5);
+}
+
+float3 FresnelSchlickRoughness(float3 baseReflectivity, float NdotV, float roughness)
+{
+    float3 smoothness = float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness);
+    float3 maxReflectivity = max(smoothness, baseReflectivity);
+
+    return baseReflectivity + (maxReflectivity - baseReflectivity) * pow(1.0 - NdotV, 5);
 }
 
 float3 EnergyConservationFunction(float3 fresnel, float metallic)

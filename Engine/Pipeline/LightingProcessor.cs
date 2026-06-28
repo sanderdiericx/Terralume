@@ -59,6 +59,8 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
+            AmbientLightProvider.GetAmbientLightProfile();
+
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();

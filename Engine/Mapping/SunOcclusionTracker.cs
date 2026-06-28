@@ -1,11 +1,10 @@
-﻿using Terraria.ModLoader;
-using Terraria;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using Terralume.Engine.Constants;
-using Terralume.Engine.Buffers.Data;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
+using Terralume.Engine.Buffers.Data;
+using Terralume.Engine.Constants;
+using Terraria;
+using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
 {
