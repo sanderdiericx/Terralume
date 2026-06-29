@@ -22,196 +22,255 @@ namespace Terralume.Engine.Utils
             Vector3 ambientColor = new Vector3(0.50f, 0.50f, 0.55f);
             float ambientStrength = 0.30f;
 
+            bool corruptSpace = player.ZoneSkyHeight && player.ZoneCorrupt;
+            bool corruptSurface = player.ZoneOverworldHeight && player.ZoneCorrupt;
+            bool corruptUnderground = player.ZoneDirtLayerHeight && player.ZoneCorrupt;
+            bool corruptCaverns = player.ZoneRockLayerHeight && player.ZoneCorrupt;
+
+            bool crimsonSpace = player.ZoneSkyHeight && player.ZoneCrimson;
+            bool crimsonSurface = player.ZoneOverworldHeight && player.ZoneCrimson;
+            bool crimsonUnderground = player.ZoneDirtLayerHeight && player.ZoneCrimson;
+            bool crimsonCaverns = player.ZoneRockLayerHeight && player.ZoneCrimson;
+
+            bool hallowSpace = player.ZoneSkyHeight && player.ZoneHallow;
+            bool hallowSurface = player.ZoneOverworldHeight && player.ZoneHallow;
+            bool hallowUnderground = player.ZoneDirtLayerHeight && player.ZoneHallow;
+            bool hallowCaverns = player.ZoneRockLayerHeight && player.ZoneHallow;
+
+            bool jungleSpace = player.ZoneSkyHeight && player.ZoneJungle;
+            bool jungleSurface = player.ZoneOverworldHeight && player.ZoneJungle;
+            bool jungleUnderground = player.ZoneDirtLayerHeight && player.ZoneJungle;
+            bool jungleCaverns = player.ZoneRockLayerHeight && player.ZoneJungle;
+
+            bool snowSpace = player.ZoneSkyHeight && player.ZoneSnow;
+            bool snowSurface = player.ZoneOverworldHeight && player.ZoneSnow;
+            bool snowUnderground = player.ZoneDirtLayerHeight && player.ZoneSnow;
+            bool snowCaverns = player.ZoneRockLayerHeight && player.ZoneSnow;
+
             if (player.ZoneTowerSolar)
             {
                 ambientColor = new Vector3(1.00f, 0.45f, 0.15f);
-                ambientStrength = 0.90f;
+                ambientStrength = 20f;
             }
             else if (player.ZoneTowerVortex)
             {
                 ambientColor = new Vector3(0.30f, 0.70f, 1.00f);
-                ambientStrength = 0.75f;
+                ambientStrength = 15f;
             }
             else if (player.ZoneTowerNebula)
             {
                 ambientColor = new Vector3(0.80f, 0.40f, 1.00f);
-                ambientStrength = 0.75f;
+                ambientStrength = 15f;
             }
             else if (player.ZoneTowerStardust)
             {
                 ambientColor = new Vector3(0.25f, 0.35f, 0.90f);
-                ambientStrength = 0.80f;
+                ambientStrength = 18f;
             }
             else if (player.ZoneUnderworldHeight)
             {
                 ambientColor = new Vector3(0.90f, 0.25f, 0.10f);
-                ambientStrength = 0.35f;
+                ambientStrength = 4f;
             }
             else if (player.ZoneDungeon)
             {
                 ambientColor = new Vector3(0.25f, 0.30f, 0.45f);
-                ambientStrength = 0.12f;
+                ambientStrength = 1.3f;
             }
             else if (player.ZoneShimmer)
             {
                 ambientColor = new Vector3(0.50f, 0.90f, 0.85f);
-                ambientStrength = 0.40f;
+                ambientStrength = 8f;
             }
             else if (player.ZoneLihzhardTemple)
             {
                 ambientColor = new Vector3(0.45f, 0.50f, 0.25f);
-                ambientStrength = 0.18f;
+                ambientStrength = 1.3f;
             }
             else if (player.ZoneHive)
             {
                 ambientColor = new Vector3(0.90f, 0.70f, 0.20f);
-                ambientStrength = 0.22f;
+                ambientStrength = 5f;
             }
             else if (player.ZoneGranite)
             {
                 ambientColor = new Vector3(0.35f, 0.40f, 0.55f);
-                ambientStrength = 0.15f;
+                ambientStrength = 2f;
             }
             else if (player.ZoneMarble)
             {
                 ambientColor = new Vector3(0.55f, 0.60f, 0.65f);
-                ambientStrength = 0.20f;
+                ambientStrength = 2.5f;
             }
             else if (player.ZoneUndergroundDesert)
             {
                 ambientColor = new Vector3(0.50f, 0.40f, 0.25f);
-                ambientStrength = 0.15f;
+                ambientStrength = 1f;
             }
             else if (player.ZoneGemCave)
             {
                 ambientColor = new Vector3(0.40f, 0.55f, 0.60f);
-                ambientStrength = 0.18f;
+                ambientStrength = 3.5f;
             }
             else if (player.ZoneGlowshroom)
             {
-                ambientColor = new Vector3(0.30f, 0.90f, 0.60f);
-                ambientStrength = 0.35f;
+                ambientColor = new Vector3(0.30f, 0.40f, 0.60f);
+                ambientStrength = 3f;
             }
-            else if (player.ZoneJungle)
+            else if (corruptCaverns)
             {
-                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.25f, 0.55f, 0.20f), 0.6f);
-                ambientStrength = 0.40f;
+                ambientColor = new Vector3(0.25f, 0.10f, 0.34f);
+                ambientStrength = 2.5f;
             }
-            else if (player.ZoneCorrupt)
+            else if (crimsonCaverns)
             {
-                ambientColor = new Vector3(0.45f, 0.25f, 0.55f);
-                ambientStrength = 0.22f;
+                ambientColor = new Vector3(0.36f, 0.06f, 0.08f);
+                ambientStrength = 2.5f;
             }
-            else if (player.ZoneCrimson)
+            else if (hallowCaverns)
             {
-                ambientColor = new Vector3(0.55f, 0.15f, 0.25f);
-                ambientStrength = 0.22f;
+                ambientColor = new Vector3(0.44f, 0.26f, 0.56f);
+                ambientStrength = 3.5f;
             }
-            else if (player.ZoneHallow)
+            else if (jungleCaverns)
             {
-                ambientColor = new Vector3(0.70f, 0.55f, 0.90f);
-                ambientStrength = 0.45f;
+                ambientColor = new Vector3(0.12f, 0.22f, 0.08f);
+                ambientStrength = 2.5f;
+            }
+            else if (snowCaverns)
+            {
+                ambientColor = new Vector3(0.26f, 0.32f, 0.44f);
+                ambientStrength = 2.5f;
+            }
+            else if (corruptUnderground)
+            {
+                ambientColor = new Vector3(0.30f, 0.14f, 0.40f);
+                ambientStrength = 3.5f;
+            }
+            else if (crimsonUnderground)
+            {
+                ambientColor = new Vector3(0.42f, 0.08f, 0.10f);
+                ambientStrength = 3.5f;
+            }
+            else if (hallowUnderground)
+            {
+                ambientColor = new Vector3(0.55f, 0.35f, 0.68f);
+                ambientStrength = 5f;
+            }
+            else if (jungleUnderground)
+            {
+                ambientColor = new Vector3(0.16f, 0.30f, 0.10f);
+                ambientStrength = 3f;
+            }
+            else if (snowUnderground)
+            {
+                ambientColor = new Vector3(0.36f, 0.44f, 0.58f);
+                ambientStrength = 3.5f;
             }
             else if (player.ZoneGraveyard)
             {
                 ambientColor = new Vector3(0.35f, 0.40f, 0.35f);
-                ambientStrength = 0.18f;
+                ambientStrength = 3.5f;
             }
             else if (player.ZoneOldOneArmy)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.50f, 0.30f, 0.25f), 0.7f);
-                ambientStrength = 0.45f;
-            }
-            else if (player.ZoneShadowCandle)
-            {
-                ambientColor = new Vector3(0.30f, 0.15f, 0.15f);
-                ambientStrength = 0.15f;
+                ambientStrength = 8f;
             }
             else if (player.ZoneMeteor)
             {
                 ambientColor = new Vector3(0.80f, 0.40f, 0.20f);
-                ambientStrength = 0.50f;
+                ambientStrength = 8f;
+            }
+            else if (corruptSurface)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.28f, 0.10f, 0.40f), 0.50f);
+                ambientStrength = 9f;
+            }
+            else if (crimsonSurface)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.55f, 0.08f, 0.12f), 0.50f);
+                ambientStrength = 9f;
+            }
+            else if (hallowSurface)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.70f, 0.50f, 0.85f), 0.40f);
+                ambientStrength = 12f;
+            }
+            else if (jungleSurface)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.18f, 0.42f, 0.12f), 0.38f);
+                ambientStrength = 8f;
+            }
+            else if (snowSurface)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.72f, 0.82f, 0.96f), 0.25f);
+                ambientStrength = 11f;
             }
             else if (player.ZoneDesert)
             {
                 ambientColor = skyLinear * new Vector3(1.15f, 0.95f, 0.75f);
-                ambientStrength = 0.80f;
-            }
-            else if (player.ZoneSnow)
-            {
-                ambientColor = skyLinear * new Vector3(0.90f, 0.95f, 1.15f);
-                ambientStrength = 0.85f;
+                ambientStrength = 12f;
             }
             else if (player.ZoneBeach)
             {
                 ambientColor = skyLinear * new Vector3(0.95f, 1.00f, 1.05f);
-                ambientStrength = 0.90f;
+                ambientStrength = 13f;
             }
             else if (player.ZoneSandstorm)
             {
                 ambientColor = skyLinear * new Vector3(0.90f, 0.75f, 0.55f);
-                ambientStrength = 0.45f;
+                ambientStrength = 6f;
             }
             else if (player.ZoneRain)
             {
                 ambientColor = skyLinear * new Vector3(0.70f, 0.75f, 0.85f);
-                ambientStrength = 0.50f;
+                ambientStrength = 7f;
             }
-            else if (player.ZoneWaterCandle)
-            {
-                ambientColor = skyLinear * new Vector3(0.85f, 0.90f, 1.00f);
-                ambientStrength = 0.75f;
-            }
-            else if (player.ZonePeaceCandle)
-            {
-                ambientColor = skyLinear * new Vector3(1.05f, 1.00f, 0.95f);
-                ambientStrength = 0.85f;
-            }
-            else if (player.ZoneSkyHeight)
-            {
-                ambientColor = skyLinear;
-                ambientStrength = 1.05f;
-            }
-            else if (player.ZoneOverworldHeight)
-            {
-                ambientColor = skyLinear;
-                ambientStrength = 0.85f;
-            }
-            else if (player.ZoneDirtLayerHeight)
-            {
-                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.40f, 0.40f, 0.42f), 0.6f);
-                ambientStrength = 0.35f;
-            }
-            else if (player.ZoneRockLayerHeight)
-            {
-                ambientColor = new Vector3(0.30f, 0.32f, 0.38f);
-                ambientStrength = 0.15f;
-            }
-
             else if (player.ZoneNormalCaverns)
             {
                 ambientColor = new Vector3(0.28f, 0.30f, 0.36f);
-                ambientStrength = 0.10f;
+                ambientStrength = 2f;
             }
             else if (player.ZoneNormalUnderground)
             {
                 ambientColor = new Vector3(0.35f, 0.33f, 0.30f);
-                ambientStrength = 0.12f;
+                ambientStrength = 2.5f;
+            }
+            else if (corruptSpace)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.28f, 0.10f, 0.40f), 0.18f);
+                ambientStrength = 15f;
+            }
+            else if (crimsonSpace)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.50f, 0.10f, 0.14f), 0.18f);
+                ambientStrength = 15f;
+            }
+            else if (hallowSpace)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.68f, 0.52f, 0.85f), 0.20f);
+                ambientStrength = 18f;
+            }
+            else if (jungleSpace)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.20f, 0.45f, 0.16f), 0.15f);
+                ambientStrength = 14f;
+            }
+            else if (snowSpace)
+            {
+                ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.74f, 0.84f, 0.98f), 0.15f);
+                ambientStrength = 16f;
             }
             else if (player.ZoneNormalSpace)
             {
                 ambientColor = skyLinear;
-                ambientStrength = 1.10f;
-            }
-            else if (player.ZonePurity)
-            {
-                ambientColor = skyLinear;
-                ambientStrength = 0.80f;
+                ambientStrength = 16f;
             }
             else if (player.ZoneForest)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.40f, 0.55f, 0.35f), 0.25f);
-                ambientStrength = 0.80f;
+                ambientStrength = 10f;
             }
 
             return new AmbientLightProfile(ambientColor, ambientStrength);
