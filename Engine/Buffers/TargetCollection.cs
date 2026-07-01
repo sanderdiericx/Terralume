@@ -6,40 +6,52 @@ namespace Terralume.Engine.Buffers
 {
     public class TargetCollection
     {
-        public RenderTarget2D BackgroundTarget;
+        public RenderTarget2D Background;
 
-        public RenderTarget2D UndergroundBackgroundTargetMaster;
-        public RenderTarget2D UndergroundBackgroundTarget;
+        public RenderTarget2D UndergroundBackgroundMaster;
+        public RenderTarget2D UndergroundBackground;
 
-        public RenderTarget2D NonSolidTileTarget;
-        public RenderTarget2D TileTarget;
-        public RenderTarget2D WallTarget;
+        public RenderTarget2D UndergroundBackgroundBlurTight;
+        public RenderTarget2D UndergroundBackgroundBlurTightCopy;
 
-        public RenderTarget2D EntityTarget;
-        public RenderTarget2D PlayerTarget;
-        public RenderTarget2D ProjectileTarget;
+        public RenderTarget2D UndergroundBackgroundBlurWide;
+        public RenderTarget2D UndergroundBackgroundBlurWideCopy;
 
-        public RenderTarget2D CopyTarget;
+        public RenderTarget2D NonSolidTile;
+        public RenderTarget2D Tile;
+        public RenderTarget2D Wall;
+
+        public RenderTarget2D Entity;
+        public RenderTarget2D Player;
+        public RenderTarget2D Projectile;
+
+        public RenderTarget2D Copy;
 
         public int Width;
         public int Height;
 
         public TargetCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
-            BackgroundTarget = new RenderTarget2D(graphicsDevice, width, height);
+            Background = new RenderTarget2D(graphicsDevice, width, height);
 
-            UndergroundBackgroundTargetMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
-            UndergroundBackgroundTarget = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
+            UndergroundBackground = new RenderTarget2D(graphicsDevice, width, height);
+            
+            UndergroundBackgroundBlurTight = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundBlurTightCopy = new RenderTarget2D(graphicsDevice, width / 2, height / 2);
 
-            NonSolidTileTarget = new RenderTarget2D(graphicsDevice, width, height);
-            TileTarget = new RenderTarget2D(graphicsDevice, width, height);
-            WallTarget = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundBlurWide = new RenderTarget2D(graphicsDevice, width, height);
+            UndergroundBackgroundBlurWideCopy = new RenderTarget2D(graphicsDevice, width / 4, height / 4);
 
-            EntityTarget = new RenderTarget2D(graphicsDevice, width, height);
-            PlayerTarget = new RenderTarget2D(graphicsDevice, width, height);
-            ProjectileTarget = new RenderTarget2D(graphicsDevice, width, height);
+            NonSolidTile = new RenderTarget2D(graphicsDevice, width, height);
+            Tile = new RenderTarget2D(graphicsDevice, width, height);
+            Wall = new RenderTarget2D(graphicsDevice, width, height);
 
-            CopyTarget = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            Entity = new RenderTarget2D(graphicsDevice, width, height);
+            Player = new RenderTarget2D(graphicsDevice, width, height);
+            Projectile = new RenderTarget2D(graphicsDevice, width, height);
+
+            Copy = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
             Width = width;
             Height = height;
@@ -52,20 +64,26 @@ namespace Terralume.Engine.Buffers
 
         public void Dispose()
         {
-            BackgroundTarget.Dispose();
+            Background.Dispose();
 
-            UndergroundBackgroundTargetMaster.Dispose();
-            UndergroundBackgroundTarget.Dispose();
+            UndergroundBackgroundMaster.Dispose();
+            UndergroundBackground.Dispose();
 
-            NonSolidTileTarget.Dispose();
-            TileTarget.Dispose();
-            WallTarget.Dispose();
+            UndergroundBackgroundBlurTight.Dispose();
+            UndergroundBackgroundBlurTightCopy.Dispose();
 
-            EntityTarget.Dispose();
-            PlayerTarget.Dispose();
-            ProjectileTarget.Dispose();
+            UndergroundBackgroundBlurWide.Dispose();
+            UndergroundBackgroundBlurWideCopy.Dispose();
 
-            CopyTarget.Dispose();
+            NonSolidTile.Dispose();
+            Tile.Dispose();
+            Wall.Dispose();
+
+            Entity.Dispose();
+            Player.Dispose();
+            Projectile.Dispose();
+
+            Copy.Dispose();
 
             GC.SuppressFinalize(this);
         }

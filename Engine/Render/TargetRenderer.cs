@@ -15,7 +15,7 @@ namespace Terralume.Engine.Render
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(targetCollection.BackgroundTarget);
+            device.SetRenderTarget(targetCollection.Background);
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
@@ -36,7 +36,7 @@ namespace Terralume.Engine.Render
             // On frames where Terraria redraws the backgroundTarget, we copy this into our master underground background buffer
             if (backgroundRedrawn)
             {
-                device.SetRenderTarget(targetCollection.UndergroundBackgroundTargetMaster);
+                device.SetRenderTarget(targetCollection.UndergroundBackgroundMaster);
                 device.Clear(Color.Transparent);
 
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
@@ -49,19 +49,75 @@ namespace Terralume.Engine.Render
             }
 
             // Every frame the master underground background buffer gets copied into the main underground background buffer
-            device.SetRenderTarget(targetCollection.UndergroundBackgroundTarget);
+            device.SetRenderTarget(targetCollection.UndergroundBackground);
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
 
             Vector2 drawPos = Main.sceneBackgroundPos - Main.screenPosition;
 
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundTargetMaster, drawPos, Color.White);
+            spriteBatch.Draw(targetCollection.UndergroundBackgroundMaster, drawPos, Color.White);
             spriteBatch.End();
 
             // Clear the background target so that the underground background texture does not appear within Main.screenTarget
             device.SetRenderTarget(Main.instance.backgroundTarget);
             device.Clear(Color.Transparent);
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Renders 2 blurred versions of the underground background backround target by downsampling and then upsampling at different resolutions
+        // Note: De-duplicate when motivated
+        public static void RenderUndergroundBackgroundBlurTargets(SpriteBatch spriteBatch, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+
+            // TIGHT BLUR
+
+            // Render the underground background target into a 1/2 resolution copy target with bilinear sampling
+            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurTightCopy);
+            device.Clear(Color.Transparent);
+
+            Vector2 tightBlurCopySize = targetCollection.UndergroundBackgroundBlurTightCopy.Size();
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+            spriteBatch.Draw(targetCollection.UndergroundBackground, new Rectangle(0, 0, (int) tightBlurCopySize.X, (int) tightBlurCopySize.Y), Color.White);
+            spriteBatch.End();
+
+            // Render the 1/2 resolution copy target into the tight blur target at native resolution with bilinear sampling
+            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurTight);
+            device.Clear(Color.Transparent);
+
+            Vector2 tightBlurSize = targetCollection.UndergroundBackgroundBlurTight.Size();
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+            spriteBatch.Draw(targetCollection.UndergroundBackgroundBlurTightCopy, new Rectangle(0, 0, (int) tightBlurSize.X, (int) tightBlurSize.Y), Color.White);
+            spriteBatch.End();
+
+
+            // WIDE BLUR
+
+            // Render the underground background target into a 1/4 resolution copy target with bilinear sampling
+            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurWideCopy);
+            device.Clear(Color.Transparent);
+
+            Vector2 wideBlurCopySize = targetCollection.UndergroundBackgroundBlurWideCopy.Size();
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+            spriteBatch.Draw(targetCollection.UndergroundBackground, new Rectangle(0, 0, (int)wideBlurCopySize.X, (int)wideBlurCopySize.Y), Color.White);
+            spriteBatch.End();
+
+            // Render the 1/4 resolution copy target into the tight blur target at native resolution with bilinear sampling
+            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurWide);
+            device.Clear(Color.Transparent);
+
+            Vector2 wideBlurSize = targetCollection.UndergroundBackgroundBlurWide.Size();
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+            spriteBatch.Draw(targetCollection.UndergroundBackgroundBlurWideCopy, new Rectangle(0, 0, (int)wideBlurSize.X, (int)wideBlurSize.Y), Color.White);
+            spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
         }
@@ -74,12 +130,12 @@ namespace Terralume.Engine.Render
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy screenTarget
-            device.SetRenderTarget(targetCollection.CopyTarget);
+            device.SetRenderTarget(targetCollection.Copy);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(targetCollection.EntityTarget);
+            device.SetRenderTarget(targetCollection.Entity);
             device.Clear(Color.Transparent);
 
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -91,7 +147,7 @@ namespace Terralume.Engine.Render
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Copy, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -103,12 +159,12 @@ namespace Terralume.Engine.Render
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy screenTarget
-            device.SetRenderTarget(targetCollection.CopyTarget);
+            device.SetRenderTarget(targetCollection.Copy);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(targetCollection.PlayerTarget);
+            device.SetRenderTarget(targetCollection.Player);
             device.Clear(Color.Transparent);
 
             orig(self);
@@ -118,7 +174,7 @@ namespace Terralume.Engine.Render
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Copy, Vector2.Zero, Color.White);
             spriteBatch.End();
         }
 
@@ -128,12 +184,12 @@ namespace Terralume.Engine.Render
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy screenTarget
-            device.SetRenderTarget(targetCollection.CopyTarget);
+            device.SetRenderTarget(targetCollection.Copy);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(targetCollection.ProjectileTarget);
+            device.SetRenderTarget(targetCollection.Projectile);
             device.Clear(Color.Transparent);
 
             orig(self);
@@ -143,7 +199,7 @@ namespace Terralume.Engine.Render
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Copy, Vector2.Zero, Color.White);
             spriteBatch.End();
         }
 
@@ -153,12 +209,12 @@ namespace Terralume.Engine.Render
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy screenTarget
-            device.SetRenderTarget(targetCollection.CopyTarget);
+            device.SetRenderTarget(targetCollection.Copy);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(targetCollection.TileTarget);
+            device.SetRenderTarget(targetCollection.Tile);
             device.Clear(Color.Transparent);
 
             orig(self);
@@ -168,7 +224,7 @@ namespace Terralume.Engine.Render
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Copy, Vector2.Zero, Color.White);
             spriteBatch.End();
         }
 
@@ -178,12 +234,12 @@ namespace Terralume.Engine.Render
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
             // Copy screenTarget
-            device.SetRenderTarget(targetCollection.CopyTarget);
+            device.SetRenderTarget(targetCollection.Copy);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            device.SetRenderTarget(targetCollection.NonSolidTileTarget);
+            device.SetRenderTarget(targetCollection.NonSolidTile);
             device.Clear(Color.Transparent);
 
             orig(self);
@@ -193,7 +249,7 @@ namespace Terralume.Engine.Render
             device.Clear(Color.Transparent);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            spriteBatch.Draw(targetCollection.CopyTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Copy, Vector2.Zero, Color.White);
             spriteBatch.End();
         }
 
@@ -202,14 +258,14 @@ namespace Terralume.Engine.Render
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(targetCollection.WallTarget);
+            device.SetRenderTarget(targetCollection.Wall);
             device.Clear(Color.Transparent);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
-
+            // Draw wall target with correct offset into our custom target
             Vector2 wallOffset = Main.sceneWallPos - Main.screenPosition;
-            spriteBatch.Draw(Main.instance.wallTarget, wallOffset, Color.White);
 
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
+            spriteBatch.Draw(Main.instance.wallTarget, wallOffset, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);

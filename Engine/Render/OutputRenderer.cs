@@ -173,7 +173,7 @@ namespace Terralume.Engine.Render
             device.SamplerStates[1] = SamplerState.PointClamp;
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            spriteBatch.Draw(targetCollection.BackgroundTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.Background, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);

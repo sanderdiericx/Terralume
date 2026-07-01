@@ -135,7 +135,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText($"Switching to projectile target view", Color.Green);
 
-                    currentRenderTarget = targetCollection.ProjectileTarget;
+                    currentRenderTarget = targetCollection.Projectile;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
@@ -143,7 +143,20 @@ namespace Terralume.Engine.Pipeline
 
                     currentRenderTarget = outputCollection.SDFBufferFinal;
                 }
+                else if (keyboardState.IsKeyDown(Keys.NumPad7))
+                {
+                    Main.NewText($"Switching to tight blur underground background target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.UndergroundBackgroundBlurTight;
+                }
+                else if (keyboardState.IsKeyDown(Keys.NumPad8))
+                {
+                    Main.NewText($"Switching to wide blur underground background target view", Color.Green);
+
+                    currentRenderTarget = targetCollection.UndergroundBackgroundBlurWide;
+                }
             }
+
             // END DEBUG
 
             deferredSpriteBatch.Begin();

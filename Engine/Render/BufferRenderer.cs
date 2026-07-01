@@ -27,12 +27,12 @@ namespace Terralume.Engine.Render
 
             layerParameter.SetUniforms(effect);
 
-            effect.Parameters["TileTarget"].SetValue(targetCollection.TileTarget);
-            effect.Parameters["NonSolidTileTarget"].SetValue(targetCollection.NonSolidTileTarget);
-            effect.Parameters["WallTarget"].SetValue(targetCollection.WallTarget);
-            effect.Parameters["EntityTarget"].SetValue(targetCollection.EntityTarget);
-            effect.Parameters["PlayerTarget"].SetValue(targetCollection.PlayerTarget);
-            effect.Parameters["ProjectileTarget"].SetValue(targetCollection.ProjectileTarget);
+            effect.Parameters["TileTarget"].SetValue(targetCollection.Tile);
+            effect.Parameters["NonSolidTileTarget"].SetValue(targetCollection.NonSolidTile);
+            effect.Parameters["WallTarget"].SetValue(targetCollection.Wall);
+            effect.Parameters["EntityTarget"].SetValue(targetCollection.Entity);
+            effect.Parameters["PlayerTarget"].SetValue(targetCollection.Player);
+            effect.Parameters["ProjectileTarget"].SetValue(targetCollection.Projectile);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
@@ -200,7 +200,7 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             // We bake the underground background into the albedo buffer because it is affected by lights (and is not present in Main.screenTarget)
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundTarget, Vector2.Zero, Color.White);
+            spriteBatch.Draw(targetCollection.UndergroundBackground, Vector2.Zero, Color.White);
 
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
 
