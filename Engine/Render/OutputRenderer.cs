@@ -13,81 +13,6 @@ namespace Terralume.Engine.Render
 {
     public static class OutputRenderer
     {
-        public static void RenderSDFBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            JFAPass(device, spriteBatch, outputCollection, bufferCollection, outputCollection.JFATileBuffer, layerParameter.Tile, false);
-            JFAPass(device, spriteBatch, outputCollection, bufferCollection, outputCollection.JFAAirBuffer, layerParameter.Tile, true);
-
-            // Combine into final signed SDF
-            Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombine);
-
-            combineEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
-            combineEffect.Parameters["SeedLayer"].SetValue(layerParameter.Tile);
-
-            combineEffect.Parameters["JFATileBuffer"].SetValue(outputCollection.JFATileBuffer);
-            combineEffect.Parameters["JFAAirBuffer"].SetValue(outputCollection.JFAAirBuffer);
-
-            device.SetRenderTarget(outputCollection.SDFBufferFinal);
-            device.Clear(Color.Transparent);
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, combineEffect);
-            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
-        }
-
-        private static void JFAPass(GraphicsDevice device, SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, RenderTarget2D outputTarget, float seedLayer, bool exclusive)
-        {
-            RenderTarget2D readTarget = outputCollection.JFABufferA;
-            RenderTarget2D writeTarget = outputCollection.JFABufferB;
-
-            device.SetRenderTarget(readTarget);
-            device.Clear(Color.Transparent);
-
-            Effect jfaInitEffect = EffectManager.GetEffect(EffectType.JFAInit);
-
-            jfaInitEffect.Parameters["SeedLayer"].SetValue(seedLayer);
-            jfaInitEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
-            jfaInitEffect.Parameters["Exclusive"].SetValue(exclusive);
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaInitEffect);
-            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
-            spriteBatch.End();
-
-            Effect jfaEffect = EffectManager.GetEffect(EffectType.JFA);
-
-            jfaEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
-
-            Vector2 size = readTarget.Size();
-            int initJumpSize = (int)Math.Max(size.X, size.Y);
-
-            for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
-            {
-                jfaEffect.Parameters["JumpSizeUV"].SetValue(new Vector2(jumpSize, jumpSize) / RenderConstants.SCREEN_SIZE);
-
-                device.SetRenderTarget(writeTarget);
-
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaEffect);
-                spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
-                spriteBatch.End();
-
-                RenderTarget2D temp = readTarget;
-                readTarget = writeTarget;
-                writeTarget = temp;
-            }
-
-            device.SetRenderTarget(outputTarget);
-            device.Clear(Color.Transparent);
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
-            spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
-        }
-
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
         public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
@@ -135,7 +60,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["NormalBuffer"].SetValue(bufferCollection.NormalBuffer);
             effect.Parameters["MaterialBuffer"].SetValue(bufferCollection.MaterialBuffer);
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
-            effect.Parameters["SDFBuffer"].SetValue(outputCollection.SDFBufferFinal);
+            effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
 
             effect.Parameters["LightPositionTexture"].SetValue(LightPacker.LightPositionTexture);
             effect.Parameters["LightColorTexture"].SetValue(LightPacker.LightColorTexture);
@@ -168,7 +93,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
-            effect.Parameters["SDFBuffer"].SetValue(outputCollection.SDFBufferFinal);
+            effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 

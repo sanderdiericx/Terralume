@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
@@ -207,6 +208,81 @@ namespace Terralume.Engine.Render
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
+        }
+
+        public static void RenderSDFBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            JFAPass(device, spriteBatch, bufferCollection, bufferCollection.JFATileBuffer, layerParameter.Tile, false);
+            JFAPass(device, spriteBatch, bufferCollection, bufferCollection.JFAAirBuffer, layerParameter.Tile, true);
+
+            // Combine into final signed SDF
+            Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombine);
+
+            combineEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            combineEffect.Parameters["SeedLayer"].SetValue(layerParameter.Tile);
+
+            combineEffect.Parameters["JFATileBuffer"].SetValue(bufferCollection.JFATileBuffer);
+            combineEffect.Parameters["JFAAirBuffer"].SetValue(bufferCollection.JFAAirBuffer);
+
+            device.SetRenderTarget(bufferCollection.SDFBufferFinal);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, combineEffect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        private static void JFAPass(GraphicsDevice device, SpriteBatch spriteBatch, BufferCollection bufferCollection, RenderTarget2D outputTarget, float seedLayer, bool exclusive)
+        {
+            RenderTarget2D readTarget = bufferCollection.JFABufferA;
+            RenderTarget2D writeTarget = bufferCollection.JFABufferB;
+
+            device.SetRenderTarget(readTarget);
+            device.Clear(Color.Transparent);
+
+            Effect jfaInitEffect = EffectManager.GetEffect(EffectType.JFAInit);
+
+            jfaInitEffect.Parameters["SeedLayer"].SetValue(seedLayer);
+            jfaInitEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            jfaInitEffect.Parameters["Exclusive"].SetValue(exclusive);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaInitEffect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            Effect jfaEffect = EffectManager.GetEffect(EffectType.JFA);
+
+            jfaEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+
+            Vector2 size = readTarget.Size();
+            int initJumpSize = (int)Math.Max(size.X, size.Y);
+
+            for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
+            {
+                jfaEffect.Parameters["JumpSizeUV"].SetValue(new Vector2(jumpSize, jumpSize) / RenderConstants.SCREEN_SIZE);
+
+                device.SetRenderTarget(writeTarget);
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaEffect);
+                spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                RenderTarget2D temp = readTarget;
+                readTarget = writeTarget;
+                writeTarget = temp;
+            }
+
+            device.SetRenderTarget(outputTarget);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
         }
     }
 }

@@ -75,7 +75,6 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            OutputRenderer.RenderSDFBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
             OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
@@ -141,7 +140,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText($"Switching to sdf buffer view", Color.Green);
 
-                    currentRenderTarget = outputCollection.SDFBufferFinal;
+                    currentRenderTarget = bufferCollection.SDFBufferFinal;
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad7))
                 {
