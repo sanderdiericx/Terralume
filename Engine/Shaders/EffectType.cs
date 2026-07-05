@@ -12,6 +12,8 @@
         Height,
         JFAInit,
         JFA,
-        SDFCombine
+        SDFCombine,
+        BackgroundBlur,
+        Gaussian
     }
 }

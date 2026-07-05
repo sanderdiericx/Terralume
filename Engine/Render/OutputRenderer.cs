@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Shaders;
-using Terralume.Engine.Utils;
+using Terralume.Hooks;
 using Terraria;
 
 namespace Terralume.Engine.Render
@@ -26,7 +25,7 @@ namespace Terralume.Engine.Render
 
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
-            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            effect.Parameters["ScreenSize"].SetValue(outputCollection.RadianceBuffer.Size());
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
             effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
 
@@ -85,7 +84,7 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Output);
 
-            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            effect.Parameters["ScreenSize"].SetValue(outputCollection.OutputBuffer.Size());
 
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);

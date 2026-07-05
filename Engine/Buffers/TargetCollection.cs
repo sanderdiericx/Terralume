@@ -11,12 +11,6 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D UndergroundBackgroundMaster;
         public RenderTarget2D UndergroundBackground;
 
-        public RenderTarget2D UndergroundBackgroundBlurTight;
-        public RenderTarget2D UndergroundBackgroundBlurTightCopy;
-
-        public RenderTarget2D UndergroundBackgroundBlurWide;
-        public RenderTarget2D UndergroundBackgroundBlurWideCopy;
-
         public RenderTarget2D NonSolidTile;
         public RenderTarget2D Tile;
         public RenderTarget2D Wall;
@@ -36,12 +30,6 @@ namespace Terralume.Engine.Buffers
 
             UndergroundBackgroundMaster = new RenderTarget2D(graphicsDevice, Main.instance.backgroundTarget.Width, Main.instance.backgroundTarget.Height);
             UndergroundBackground = new RenderTarget2D(graphicsDevice, width, height);
-            
-            UndergroundBackgroundBlurTight = new RenderTarget2D(graphicsDevice, width, height);
-            UndergroundBackgroundBlurTightCopy = new RenderTarget2D(graphicsDevice, width / 2, height / 2);
-
-            UndergroundBackgroundBlurWide = new RenderTarget2D(graphicsDevice, width, height);
-            UndergroundBackgroundBlurWideCopy = new RenderTarget2D(graphicsDevice, width / 4, height / 4);
 
             NonSolidTile = new RenderTarget2D(graphicsDevice, width, height);
             Tile = new RenderTarget2D(graphicsDevice, width, height);
@@ -68,12 +56,6 @@ namespace Terralume.Engine.Buffers
 
             UndergroundBackgroundMaster.Dispose();
             UndergroundBackground.Dispose();
-
-            UndergroundBackgroundBlurTight.Dispose();
-            UndergroundBackgroundBlurTightCopy.Dispose();
-
-            UndergroundBackgroundBlurWide.Dispose();
-            UndergroundBackgroundBlurWideCopy.Dispose();
 
             NonSolidTile.Dispose();
             Tile.Dispose();

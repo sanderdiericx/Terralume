@@ -2,11 +2,13 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Render
@@ -177,7 +179,7 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Normal);
 
-            effect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            effect.Parameters["ScreenSize"].SetValue(bufferCollection.NormalBuffer.Size());
 
             effect.Parameters["NormalStrength"].SetValue(RenderConstants.NORMAL_STRENGTH);
 
@@ -190,7 +192,7 @@ namespace Terralume.Engine.Render
 
         // Copies Main.screen target into a custom render target, the albedo map represents each pixels diffuse color
         // Note: For this to copy a true albedo buffer, vanilla lighting must be disabled
-        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
+        public static void RenderAlbedoBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -201,7 +203,7 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             // We bake the underground background into the albedo buffer because it is affected by lights (and is not present in Main.screenTarget)
-            spriteBatch.Draw(targetCollection.UndergroundBackground, Vector2.Zero, Color.White);
+            spriteBatch.Draw(bufferCollection.BlurredUndergroundBackgroundBuffer, Vector2.Zero, Color.White);
 
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
 
@@ -221,7 +223,7 @@ namespace Terralume.Engine.Render
             // Combine into final signed SDF
             Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombine);
 
-            combineEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            combineEffect.Parameters["ScreenSize"].SetValue(bufferCollection.SDFBufferFinal.Size());
             combineEffect.Parameters["SeedLayer"].SetValue(layerParameter.Tile);
 
             combineEffect.Parameters["JFATileBuffer"].SetValue(bufferCollection.JFATileBuffer);
@@ -248,7 +250,7 @@ namespace Terralume.Engine.Render
             Effect jfaInitEffect = EffectManager.GetEffect(EffectType.JFAInit);
 
             jfaInitEffect.Parameters["SeedLayer"].SetValue(seedLayer);
-            jfaInitEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            jfaInitEffect.Parameters["ScreenSize"].SetValue(readTarget.Size());
             jfaInitEffect.Parameters["Exclusive"].SetValue(exclusive);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaInitEffect);
@@ -257,14 +259,14 @@ namespace Terralume.Engine.Render
 
             Effect jfaEffect = EffectManager.GetEffect(EffectType.JFA);
 
-            jfaEffect.Parameters["ScreenSize"].SetValue(RenderConstants.SCREEN_SIZE);
+            jfaEffect.Parameters["ScreenSize"].SetValue(writeTarget.Size());
 
             Vector2 size = readTarget.Size();
             int initJumpSize = (int)Math.Max(size.X, size.Y);
 
             for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
             {
-                jfaEffect.Parameters["JumpSizeUV"].SetValue(new Vector2(jumpSize, jumpSize) / RenderConstants.SCREEN_SIZE);
+                jfaEffect.Parameters["JumpSizeUV"].SetValue(new Vector2(jumpSize, jumpSize) / writeTarget.Size());
 
                 device.SetRenderTarget(writeTarget);
 
@@ -283,6 +285,42 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
             spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+        }
+
+        // Note: SDF buffer must be before this generated for valid blur
+        public static void BlurUndergroundBackgroundBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            int width = bufferCollection.BlurredUndergroundBackgroundBuffer.Width;
+            int height = bufferCollection.BlurredUndergroundBackgroundBuffer.Height;
+
+            RenderTarget2D wideBlurTarget = RenderTargetCache.RequestTarget(width, height);
+            RenderTarget2D tightBlurTarget = RenderTargetCache.RequestTarget(width, height);
+
+            BlurHelper.DownsampledGaussianBlur(spriteBatch, targetCollection.UndergroundBackground, wideBlurTarget, width / 2, height / 2, 1f);
+            BlurHelper.DownsampledGaussianBlur(spriteBatch, targetCollection.UndergroundBackground, tightBlurTarget, width / 2, height / 2, 0.5f);
+
+            device.SetRenderTarget(bufferCollection.BlurredUndergroundBackgroundBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.BackgroundBlur);
+
+            effect.Parameters["BlurStartDistance"].SetValue(RenderConstants.BACKGROUND_BLUR_START_DISTANCE);
+            effect.Parameters["BlurEndDistance"].SetValue(RenderConstants.BACKGROUND_BLUR_END_DISTANCE);
+
+            effect.Parameters["WideBlurTarget"].SetValue(wideBlurTarget);
+            effect.Parameters["TightBlurTarget"].SetValue(tightBlurTarget);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.SDFBufferFinal, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            RenderTargetCache.ReturnTarget(wideBlurTarget);
+            RenderTargetCache.ReturnTarget(tightBlurTarget);
+
+            device.SetRenderTargets(oldTargets);
         }
     }
 }

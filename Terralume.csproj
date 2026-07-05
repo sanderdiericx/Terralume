@@ -7,6 +7,12 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
+	<ItemGroup>
+	  <AdditionalFiles Remove="Engine\Shaders\Effects\gaussian.fx" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Include="Engine\Shaders\Effects\gaussian.fx" />
+	</ItemGroup>
 	
 	<!-- References -->
 

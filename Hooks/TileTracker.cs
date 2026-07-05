@@ -1,5 +1,4 @@
-﻿using Terralume.Engine.Mapping;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 
 namespace Terralume.Hooks

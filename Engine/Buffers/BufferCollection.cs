@@ -23,6 +23,8 @@ namespace Terralume.Engine.Buffers
 
         public RenderTarget2D SDFBufferFinal;
 
+        public RenderTarget2D BlurredUndergroundBackgroundBuffer;
+
         public int Width;
         public int Height;
 
@@ -44,6 +46,8 @@ namespace Terralume.Engine.Buffers
             JFAAirBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
 
             SDFBufferFinal = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
+
+            BlurredUndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
             Width = width;
             Height = height;
@@ -72,6 +76,8 @@ namespace Terralume.Engine.Buffers
             JFAAirBuffer.Dispose();
 
             SDFBufferFinal.Dispose();
+
+            BlurredUndergroundBackgroundBuffer.Dispose();
 
             GC.SuppressFinalize(this);
         }

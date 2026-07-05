@@ -66,62 +66,6 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders 2 blurred versions of the underground background backround target by downsampling and then upsampling at different resolutions
-        // Note: De-duplicate when motivated
-        public static void RenderUndergroundBackgroundBlurTargets(SpriteBatch spriteBatch, TargetCollection targetCollection)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-
-            // TIGHT BLUR
-
-            // Render the underground background target into a 1/2 resolution copy target with bilinear sampling
-            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurTightCopy);
-            device.Clear(Color.Transparent);
-
-            Vector2 tightBlurCopySize = targetCollection.UndergroundBackgroundBlurTightCopy.Size();
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
-            spriteBatch.Draw(targetCollection.UndergroundBackground, new Rectangle(0, 0, (int) tightBlurCopySize.X, (int) tightBlurCopySize.Y), Color.White);
-            spriteBatch.End();
-
-            // Render the 1/2 resolution copy target into the tight blur target at native resolution with bilinear sampling
-            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurTight);
-            device.Clear(Color.Transparent);
-
-            Vector2 tightBlurSize = targetCollection.UndergroundBackgroundBlurTight.Size();
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundBlurTightCopy, new Rectangle(0, 0, (int) tightBlurSize.X, (int) tightBlurSize.Y), Color.White);
-            spriteBatch.End();
-
-
-            // WIDE BLUR
-
-            // Render the underground background target into a 1/4 resolution copy target with bilinear sampling
-            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurWideCopy);
-            device.Clear(Color.Transparent);
-
-            Vector2 wideBlurCopySize = targetCollection.UndergroundBackgroundBlurWideCopy.Size();
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
-            spriteBatch.Draw(targetCollection.UndergroundBackground, new Rectangle(0, 0, (int)wideBlurCopySize.X, (int)wideBlurCopySize.Y), Color.White);
-            spriteBatch.End();
-
-            // Render the 1/4 resolution copy target into the tight blur target at native resolution with bilinear sampling
-            device.SetRenderTarget(targetCollection.UndergroundBackgroundBlurWide);
-            device.Clear(Color.Transparent);
-
-            Vector2 wideBlurSize = targetCollection.UndergroundBackgroundBlurWide.Size();
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
-            spriteBatch.Draw(targetCollection.UndergroundBackgroundBlurWideCopy, new Rectangle(0, 0, (int)wideBlurSize.X, (int)wideBlurSize.Y), Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
-        }
-
         public static void CopyEntityTarget(SpriteBatch spriteBatch, TargetCollection targetCollection, On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
         {
             Main.spriteBatch.End();

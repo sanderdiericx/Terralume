@@ -9,6 +9,7 @@ using Terralume.Engine.Mapping;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
+using Terralume.Hooks;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -32,8 +33,6 @@ namespace Terralume.Engine.Pipeline
 
                 EffectManager.LoadEffect(EffectType.Radiance);
                 EffectManager.LoadEffect(EffectType.Output);
-                EffectManager.LoadEffect(EffectType.JFAInit);
-                EffectManager.LoadEffect(EffectType.JFA);
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
@@ -144,15 +143,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.NumPad7))
                 {
-                    Main.NewText($"Switching to tight blur underground background target view", Color.Green);
+                    Main.NewText($"Switching to blurred underground background buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.UndergroundBackgroundBlurTight;
-                }
-                else if (keyboardState.IsKeyDown(Keys.NumPad8))
-                {
-                    Main.NewText($"Switching to wide blur underground background target view", Color.Green);
-
-                    currentRenderTarget = targetCollection.UndergroundBackgroundBlurWide;
+                    currentRenderTarget = bufferCollection.BlurredUndergroundBackgroundBuffer;
                 }
             }
 

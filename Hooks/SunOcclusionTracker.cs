@@ -6,7 +6,7 @@ using Terralume.Engine.Constants;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.Engine.Mapping
+namespace Terralume.Hooks
 {
     public class SunOcclusionTracker : ModSystem
     {

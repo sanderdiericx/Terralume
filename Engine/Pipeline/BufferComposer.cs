@@ -27,6 +27,12 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.Height);
                 EffectManager.LoadEffect(EffectType.Normal);
                 EffectManager.LoadEffect(EffectType.Noise);
+
+                EffectManager.LoadEffect(EffectType.JFAInit);
+                EffectManager.LoadEffect(EffectType.JFA);
+                EffectManager.LoadEffect(EffectType.SDFCombine);
+
+                EffectManager.LoadEffect(EffectType.BackgroundBlur);
             });
 
             MaterialPacker.SetTileMaterials(MaterialMapper.MappedTiles);
@@ -71,12 +77,13 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
 
             BufferRenderer.RenderSDFBuffer(spriteBatch, BufferCollection, layerParameter);
+            BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, BufferCollection, targetCollection);
 
             BufferRenderer.RenderHeightBuffer(spriteBatch, BufferCollection);
             BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
             BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
             BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
-            BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection, targetCollection);
+            BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection);
         }
 
         // Make sure all buffers match screen size

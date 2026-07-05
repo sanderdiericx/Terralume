@@ -77,7 +77,6 @@ namespace Terralume.Engine.Pipeline
         {
             TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, TargetCollection);
             TargetRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, TargetCollection, ref backgroundRedrawn);
-            TargetRenderer.RenderUndergroundBackgroundBlurTargets(deferredSpriteBatch, TargetCollection);
 
             orig(self);
 

@@ -21,7 +21,9 @@ namespace Terralume.Engine.Shaders
             { EffectType.Height, "height" },
             { EffectType.JFAInit, "jfa_init" },
             { EffectType.JFA, "jfa" },
-            { EffectType.SDFCombine, "sdf_combine" }
+            { EffectType.SDFCombine, "sdf_combine" },
+            { EffectType.BackgroundBlur, "background_blur" },
+            { EffectType.Gaussian, "gaussian" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

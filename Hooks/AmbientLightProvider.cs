@@ -4,7 +4,7 @@ using Terralume.Engine.Buffers.Data;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.Engine.Utils
+namespace Terralume.Hooks
 {
     public class AmbientLightProvider : ModSystem
     {
