@@ -7,9 +7,9 @@ using Terralume.Engine.Mapping.Registry;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.Engine.Pipeline
+namespace Terralume.Engine.Hooks.Tracking
 {
-    internal class LightCapturer : ModSystem
+    internal class LightTracker : ModSystem
     {
         private static List<(Vector2, LightProfile, bool)> hookedLights = new List<(Vector2, LightProfile, bool)>();
 

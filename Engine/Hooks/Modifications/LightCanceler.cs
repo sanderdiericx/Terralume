@@ -1,6 +1,6 @@
 ﻿using Terraria.ModLoader;
 
-namespace Terralume.Hooks
+namespace Terralume.Engine.Hooks.Modifications
 {
     internal class LightCanceler : GlobalWall
     {

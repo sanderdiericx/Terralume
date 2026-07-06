@@ -4,9 +4,9 @@ using Terralume.Engine.Buffers.Data;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.Hooks
+namespace Terralume.Engine.Hooks.Tracking
 {
-    internal class AmbientLightProvider : ModSystem
+    internal class AmbientLightTracker : ModSystem
     {
         public static AmbientLightProfile GetAmbientLightProfile()
         {

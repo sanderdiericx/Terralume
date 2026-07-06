@@ -2,7 +2,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Terralume.Hooks
+namespace Terralume.Engine.Hooks.Modifications
 {
     internal class DustFilter : ModSystem
     {

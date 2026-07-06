@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Hooks.Tracking;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Shaders;
-using Terralume.Hooks;
 using Terraria;
 
 namespace Terralume.Engine.Render
@@ -44,7 +44,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
             effect.Parameters["VolumetricNoiseContrast"].SetValue(0.6f);
 
-            AmbientLightProfile ambientLight = AmbientLightProvider.GetAmbientLightProfile();
+            AmbientLightProfile ambientLight = AmbientLightTracker.GetAmbientLightProfile();
 
             effect.Parameters["AmbientColor"].SetValue(ambientLight.AmbientColor);
             effect.Parameters["AmbientStrength"].SetValue(ambientLight.AmbientStrength);

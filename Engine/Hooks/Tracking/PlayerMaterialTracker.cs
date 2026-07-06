@@ -4,7 +4,7 @@ using Terralume.Engine.Mapping.Registry;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace Terralume.Hooks
+namespace Terralume.Engine.Hooks.Tracking
 {
     internal class PlayerMaterialTracker : ModSystem
     {

@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Hooks.Tracking;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Render;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
-using Terralume.Hooks;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -58,14 +58,14 @@ namespace Terralume.Engine.Pipeline
         {
             UpdateBuffer();
 
-            AmbientLightProvider.GetAmbientLightProfile();
+            AmbientLightTracker.GetAmbientLightProfile();
 
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
             BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter);
 
-            onScreenLights = LightCapturer.GetOnScreenLights(tileCaptureParameter);
+            onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
             SunOcclusionTracker.UpdateOccluders();

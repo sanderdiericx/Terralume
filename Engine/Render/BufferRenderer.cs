@@ -6,11 +6,11 @@ using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Hooks.Tracking;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
-using Terralume.Hooks;
 using Terraria;
 using Terraria.DataStructures;
 
