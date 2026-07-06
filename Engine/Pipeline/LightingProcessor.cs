@@ -131,9 +131,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to projectile target view", Color.Green);
+                    Main.NewText($"Switching to player material target view", Color.Green);
 
-                    currentRenderTarget = targetCollection.Projectile;
+                    // currentRenderTarget = targetCollection.PlayerMaterial;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {

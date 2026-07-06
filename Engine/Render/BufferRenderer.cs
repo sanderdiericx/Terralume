@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
@@ -9,7 +10,9 @@ using Terralume.Engine.Mapping;
 using Terralume.Engine.Mapping.Registry;
 using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
+using Terralume.Hooks;
 using Terraria;
+using Terraria.DataStructures;
 
 namespace Terralume.Engine.Render
 {
@@ -146,6 +149,25 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
+
+            // Stamp player materials
+            Dictionary<Vector3, List<DrawData>> drawData = PlayerMaterialTracker._drawData;
+
+            Effect injectEffect = EffectManager.GetEffect(EffectType.MaterialInject);
+
+            foreach (var kvp in drawData)
+            {
+                injectEffect.Parameters["Material"].SetValue(kvp.Key);
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, injectEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                foreach (DrawData drawItem in kvp.Value)
+                {
+                    spriteBatch.Draw(drawItem.texture, drawItem.position, drawItem.sourceRect, Color.White, drawItem.rotation, drawItem.origin, drawItem.scale, drawItem.effect, 0f);
+                }
+
+                spriteBatch.End();
+            }
 
             device.SetRenderTargets(oldTargets);
         }

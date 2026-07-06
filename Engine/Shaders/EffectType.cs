@@ -14,6 +14,7 @@
         JFA,
         SDFCombine,
         BackgroundBlur,
-        Gaussian
+        Gaussian,
+        MaterialInject
     }
 }
