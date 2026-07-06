@@ -11,19 +11,19 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
 {
-    public class LightPacker : ModSystem
+    internal class LightPacker : ModSystem
     {
         // LightPositionTexture: (posX, posY, range, intensity)
-        public static Texture2D LightPositionTexture;
+        public static Texture2D LightPositionTexture { get; private set; }
 
         // LightColorTexture: (lightColorRed, lightColorBlue, lightColorGreen, unused)
-        public static Texture2D LightColorTexture;
+        public static Texture2D LightColorTexture { get; private set; }
 
         // LightGridTexture: (start index for tile in index list, light count for each tile)
-        public static Texture2D LightGridTexture;
+        public static Texture2D LightGridTexture { get; private set; }
 
         // LightIndexTexture (light data texture index)
-        public static Texture2D LightIndexTexture;
+        public static Texture2D LightIndexTexture { get; private set; }
 
         private static HalfVector4[] lightPositionPixels = new HalfVector4[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
         private static Color[] lightColorPixels = new Color[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];

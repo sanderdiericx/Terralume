@@ -6,7 +6,7 @@ using Terraria;
 
 namespace Terralume.Engine.Utils
 {
-    public static class BlurHelper
+    internal static class BlurHelper
     {
         public static void DownsampledGaussianBlur(SpriteBatch spriteBatch, RenderTarget2D inputTarget, RenderTarget2D outputTarget, int downsampleWidth, int downsampleHeight, float blurDeviations)
         {

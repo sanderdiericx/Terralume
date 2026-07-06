@@ -10,10 +10,10 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
 {
-    public class IDPacker : ModSystem
+    internal class IDPacker : ModSystem
     {
-        public static Texture2D TileIDTexture;
-        public static Texture2D WallIDTexture;
+        public static Texture2D TileIDTexture { get; private set; }
+        public static Texture2D WallIDTexture { get; private set; }
 
         private static ushort[] tileIDs = new ushort[8];
         private static ushort[] wallIDs = new ushort[8];

@@ -9,16 +9,16 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
 {
-    public class NoisePacker : ModSystem
+    internal class NoisePacker : ModSystem
     {
-        public static bool TilesValid = false;
+        public static bool TilesValid { get; private set; } = false;
         private static Dictionary<int, Vector2> tiles = new Dictionary<int, Vector2>();
 
-        public static bool WallsValid = false;
+        public static bool WallsValid { get; private set; } = false;
         private static Dictionary<int, Vector2> walls = new Dictionary<int, Vector2>();
 
-        public static Texture2D TileNoiseTexture;
-        public static Texture2D WallNoiseTexture;
+        public static Texture2D TileNoiseTexture { get; private set; }
+        public static Texture2D WallNoiseTexture { get; private set; }
 
         private static HalfVector2[] noisePixels = new HalfVector2[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 

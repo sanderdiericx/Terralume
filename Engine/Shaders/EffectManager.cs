@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Shaders
 {
-    public class EffectManager
+    internal static class EffectManager
     {
         private static readonly string effectPath = "Terralume/Engine/Shaders/Effects/";
 

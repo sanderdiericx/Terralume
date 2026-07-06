@@ -8,12 +8,12 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
 {
-    public class TargetCapturer : ModSystem
+    internal class TargetCapturer : ModSystem
     {
-        public static TargetCollection TargetCollection;
+        public static TargetCollection TargetCollection { get; private set; }
 
         private static SpriteBatch deferredSpriteBatch;
-        private bool backgroundRedrawn;
+        private static bool backgroundRedrawn;
 
         public override void Load()
         {

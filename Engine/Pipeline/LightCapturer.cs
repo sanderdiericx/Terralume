@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
 {
-    class LightCapturer : ModSystem
+    internal class LightCapturer : ModSystem
     {
         private static List<(Vector2, LightProfile, bool)> hookedLights = new List<(Vector2, LightProfile, bool)>();
 

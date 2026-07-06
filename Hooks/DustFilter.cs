@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Hooks
 {
-    public class DustFilter : ModSystem
+    internal class DustFilter : ModSystem
     {
         // Make sure ores dont create light casting dust
         public override void PostSetupContent()

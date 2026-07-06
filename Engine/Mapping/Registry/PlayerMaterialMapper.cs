@@ -8,9 +8,9 @@ using Terraria.ID;
 
 namespace Terralume.Engine.Mapping.Registry
 {
-    public class PlayerMaterialMapper
+    internal static class PlayerMaterialMapper
     {
-        public static Dictionary<int, Vector3> MappedMaterials = new Dictionary<int, Vector3>()
+        public static Dictionary<int, Vector3> MappedMaterials { get; private set; } = new Dictionary<int, Vector3>()
         {
             { ItemID.Goggles, new Vector3(0.0f, 0.0f, 0.0f) },
             { ItemID.CopperGreaves, new Vector3(1.0f, 0.4f, 0.0f) },

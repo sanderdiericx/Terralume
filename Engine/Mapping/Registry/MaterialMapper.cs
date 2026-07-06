@@ -4,11 +4,11 @@ using Terraria.ID;
 
 namespace Terralume.Engine.Mapping.Registry
 {
-    public static class MaterialMapper
+    internal static class MaterialMapper
     {
-        public static Vector3 DefaultMaterial = new Vector3(0.0f, 0.8f, 0.0f);
+        public static Vector3 DefaultMaterial { get; private set; } = new Vector3(0.0f, 0.8f, 0.0f);
 
-        public static Dictionary<int, Vector3> MappedTiles = new Dictionary<int, Vector3>()
+        public static Dictionary<int, Vector3> MappedTiles { get; private set; } = new Dictionary<int, Vector3>()
         {
             { TileID.Dirt, new Vector3(0.0f, 0.9f, 0.0f) },
             { TileID.Stone, new Vector3(0.0f, 0.8f, 0.0f) },

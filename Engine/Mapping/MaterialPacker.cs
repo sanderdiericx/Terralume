@@ -8,16 +8,16 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
 {
-    public class MaterialPacker : ModSystem
+    internal class MaterialPacker : ModSystem
     {
-        public static bool TilesValid = false;
+        public static bool TilesValid { get; private set; } = false;
         private static Dictionary<int, Vector3> tiles = new Dictionary<int, Vector3>();
 
-        public static bool WallsValid = false;
+        public static bool WallsValid { get; private set; } = false;
         private static Dictionary<int, Vector3> walls = new Dictionary<int, Vector3>();
 
-        public static Texture2D TileMaterialTexture;
-        public static Texture2D WallMaterialTexture;
+        public static Texture2D TileMaterialTexture { get; private set; }
+        public static Texture2D WallMaterialTexture { get; private set; }
 
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 

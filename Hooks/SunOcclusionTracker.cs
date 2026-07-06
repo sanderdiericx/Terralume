@@ -8,15 +8,13 @@ using Terraria.ModLoader;
 
 namespace Terralume.Hooks
 {
-    public class SunOcclusionTracker : ModSystem
+    internal class SunOcclusionTracker : ModSystem
     {
-        public static HashSet<int> DirtyColumns = new HashSet<int>();
-
-        public static Texture2D SunOcclusionTexture;
+        public static HashSet<int> DirtyColumns { get; private set; } = new HashSet<int>();
+        public static Texture2D SunOcclusionTexture { get; private set; }
 
         // An array with (world width) elements, each index represents a column and stores the position of the highest occluder in tile-space.
         private static int[] occluderHeights;
-
         private static float[] occlusionPixels = new float[RenderConstants.SUN_OCCLUSION_DATA_RESOLUTION];
 
         public override void Load()

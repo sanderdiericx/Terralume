@@ -4,29 +4,29 @@ using Terraria;
 
 namespace Terralume.Engine.Buffers
 {
-    public class BufferCollection : IDisposable
+    internal class BufferCollection : IDisposable
     {
-        public RenderTarget2D LayerBuffer;
-        public RenderTarget2D NoiseBuffer;
+        public RenderTarget2D LayerBuffer { get; private set; }
+        public RenderTarget2D NoiseBuffer { get; private set; }
 
-        public RenderTarget2D DepthBuffer;
-        public RenderTarget2D MaterialBuffer;
-        public RenderTarget2D HeightBuffer;
-        public RenderTarget2D NormalBuffer;
-        public RenderTarget2D AlbedoBuffer;
+        public RenderTarget2D DepthBuffer { get; private set; }
+        public RenderTarget2D MaterialBuffer { get; private set; }
+        public RenderTarget2D HeightBuffer { get; private set; }
+        public RenderTarget2D NormalBuffer { get; private set; }
+        public RenderTarget2D AlbedoBuffer { get; private set; }
 
-        public RenderTarget2D JFABufferA;
-        public RenderTarget2D JFABufferB;
+        public RenderTarget2D JFABufferA { get; private set; }
+        public RenderTarget2D JFABufferB { get; private set; }
 
-        public RenderTarget2D JFATileBuffer;
-        public RenderTarget2D JFAAirBuffer;
+        public RenderTarget2D JFATileBuffer { get; private set; }
+        public RenderTarget2D JFAAirBuffer { get; private set; }
 
-        public RenderTarget2D SDFBufferFinal;
+        public RenderTarget2D SDFBufferFinal { get; private set; }
 
-        public RenderTarget2D BlurredUndergroundBackgroundBuffer;
+        public RenderTarget2D BlurredUndergroundBackgroundBuffer { get; private set; }
 
-        public int Width;
-        public int Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public BufferCollection(GraphicsDevice graphicsDevice, int width, int height)
         {

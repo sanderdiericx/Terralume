@@ -1,6 +1,6 @@
 ﻿namespace Terralume.Engine.Shaders
 {
-    public enum EffectType
+    internal enum EffectType
     {
         Layer,
         Depth,

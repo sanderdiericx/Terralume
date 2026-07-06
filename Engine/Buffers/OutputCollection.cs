@@ -4,13 +4,13 @@ using Terraria;
 
 namespace Terralume.Engine.Buffers
 {
-    public class OutputCollection : IDisposable
+    internal class OutputCollection : IDisposable
     {
-        public RenderTarget2D RadianceBuffer;
-        public RenderTarget2D OutputBuffer;
+        public RenderTarget2D RadianceBuffer { get; private set; }
+        public RenderTarget2D OutputBuffer { get; private set; }
 
-        public int Width;
-        public int Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public OutputCollection(GraphicsDevice graphicsDevice, int width, int height)
         {

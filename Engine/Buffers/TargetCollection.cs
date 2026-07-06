@@ -4,25 +4,25 @@ using Terraria;
 
 namespace Terralume.Engine.Buffers
 {
-    public class TargetCollection
+    internal class TargetCollection : IDisposable
     {
-        public RenderTarget2D Background;
+        public RenderTarget2D Background { get; private set; }
 
-        public RenderTarget2D UndergroundBackgroundMaster;
-        public RenderTarget2D UndergroundBackground;
+        public RenderTarget2D UndergroundBackgroundMaster { get; private set; }
+        public RenderTarget2D UndergroundBackground { get; private set; }
 
-        public RenderTarget2D NonSolidTile;
-        public RenderTarget2D Tile;
-        public RenderTarget2D Wall;
+        public RenderTarget2D NonSolidTile { get; private set; }
+        public RenderTarget2D Tile { get; private set; }
+        public RenderTarget2D Wall { get; private set; }
 
-        public RenderTarget2D Entity;
-        public RenderTarget2D Player;
-        public RenderTarget2D Projectile;
+        public RenderTarget2D Entity { get; private set; }
+        public RenderTarget2D Player { get; private set; }
+        public RenderTarget2D Projectile { get; private set; }
 
-        public RenderTarget2D Copy;
+        public RenderTarget2D Copy { get; private set; }
 
-        public int Width;
-        public int Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public TargetCollection(GraphicsDevice graphicsDevice, int width, int height)
         {

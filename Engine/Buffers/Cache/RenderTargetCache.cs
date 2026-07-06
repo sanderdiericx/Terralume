@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 namespace Terralume.Engine.Buffers.Cache
 {
     // System for handing out temporary render targets, all targets use SurfaceFormat.Color by default
-    public class RenderTargetCache : ModSystem
+    internal class RenderTargetCache : ModSystem
     {
         private static List<CachedTarget> cachedRenderTargets = new List<CachedTarget>();
 

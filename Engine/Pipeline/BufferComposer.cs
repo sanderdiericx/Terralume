@@ -11,9 +11,9 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
 {
-    public class BufferComposer : ModSystem
+    internal class BufferComposer : ModSystem
     {
-        public static BufferCollection BufferCollection;
+        public static BufferCollection BufferCollection { get; private set; }
 
         public override void Load()
         {

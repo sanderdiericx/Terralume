@@ -2,12 +2,12 @@
 
 namespace Terralume.Engine.Buffers.Cache
 {
-    public class CachedTarget
+    internal class CachedTarget
     {
-        public int Width;
-        public int Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
-        public RenderTarget2D RenderTarget;
+        public RenderTarget2D RenderTarget { get; private set; }
 
         public CachedTarget(int width, int height, RenderTarget2D renderTarget)
         {

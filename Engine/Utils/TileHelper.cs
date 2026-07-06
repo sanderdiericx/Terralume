@@ -6,7 +6,7 @@ using Terraria;
 
 namespace Terralume.Engine.Utils
 {
-    public static class TileHelper
+    internal static class TileHelper
     {
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {

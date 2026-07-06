@@ -2,16 +2,16 @@
 
 namespace Terralume.Engine.Buffers.Data
 {
-    public class DepthParameter
+    internal class DepthParameter
     {
-        public float BackgroundDepth;
-        public float TileDepth;
-        public float NonSolidTileDepth;
-        public float WallDepth;
-        public float EntityDepth;
-        public float ProjectileDepth;
-        public float PlayerDepth;
-        public float OtherDepth;
+        public float BackgroundDepth { get; private set; }
+        public float TileDepth { get; private set; }
+        public float NonSolidTileDepth { get; private set; }
+        public float WallDepth { get; private set; }
+        public float EntityDepth { get; private set; }
+        public float ProjectileDepth { get; private set; }
+        public float PlayerDepth { get; private set; }
+        public float OtherDepth { get; private set; }
 
         public DepthParameter(float backgroundDepth, float tileDepth, float nonSolidTileDepth, float wallDepth, float entityDepth, float projectileDepth, float playerDepth, float otherDepth)
         {

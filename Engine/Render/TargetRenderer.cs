@@ -6,7 +6,7 @@ using Terraria;
 namespace Terralume.Engine.Render
 {
     // Note: There is a lot of double drawing, spritebatch restarting and rendertarget switching here, might need something better in the future
-    public class TargetRenderer
+    internal static class TargetRenderer
     {
         // Copies the background (surface/underworld texture) into a custom background render target
         // Note: It's stored in a seperate render target because these backgrounds should not be affected by lighting

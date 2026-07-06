@@ -4,7 +4,7 @@ using Terraria;
 
 namespace Terralume.Engine.Constants
 {
-    public static class RenderConstants
+    internal static class RenderConstants
     {
         public static readonly Vector2 SCREEN_SIZE = new Vector2(Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
 

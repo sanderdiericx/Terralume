@@ -8,7 +8,7 @@ namespace Terralume.Hooks
 {
     internal class PlayerMaterialTracker : ModSystem
     {
-        internal static Dictionary<Vector3, List<DrawData>> _drawData = new Dictionary<Vector3, List<DrawData>>();
+        public static Dictionary<Vector3, List<DrawData>> DrawData { get; private set; } = new Dictionary<Vector3, List<DrawData>>();
 
         public override void Load()
         {
@@ -34,7 +34,7 @@ namespace Terralume.Hooks
         {
             base.PreUpdatePlayers();
 
-            _drawData.Clear();
+            DrawData.Clear();
         }
 
         private void On_PlayerDrawLayers_DrawPlayer_21_Head(On_PlayerDrawLayers.orig_DrawPlayer_21_Head orig, ref PlayerDrawSet drawinfo)
@@ -127,9 +127,9 @@ namespace Terralume.Hooks
                 drawItems.Add(drawinfo.DrawDataCache[i]);
             }
 
-            if (!_drawData.TryAdd(material, drawItems))
+            if (!DrawData.TryAdd(material, drawItems))
             {
-                _drawData[material].AddRange(drawItems);
+                DrawData[material].AddRange(drawItems);
             }
         }
     }

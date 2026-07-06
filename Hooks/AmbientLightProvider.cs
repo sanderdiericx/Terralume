@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Hooks
 {
-    public class AmbientLightProvider : ModSystem
+    internal class AmbientLightProvider : ModSystem
     {
         public static AmbientLightProfile GetAmbientLightProfile()
         {

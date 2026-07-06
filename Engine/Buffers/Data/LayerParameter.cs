@@ -2,16 +2,16 @@
 
 namespace Terralume.Engine.Buffers.Data
 {
-    public class LayerParameter
+    internal class LayerParameter
     {
-        public float Background;
-        public float Tile;
-        public float NonSolidTile;
-        public float Wall;
-        public float Entity;
-        public float Projectile;
-        public float Player;
-        public float Other;
+        public float Background { get; private set; }
+        public float Tile { get; private set; }
+        public float NonSolidTile { get; private set; }
+        public float Wall { get; private set; }
+        public float Entity { get; private set; }
+        public float Projectile { get; private set; }
+        public float Player { get; private set; }
+        public float Other { get; private set; }
 
         public LayerParameter(float background, float tile, float nonSolidTile, float wall, float entity, float projectile, float player, float other)
         {

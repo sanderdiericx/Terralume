@@ -10,7 +10,7 @@ using Terraria;
 
 namespace Terralume.Engine.Render
 {
-    public static class OutputRenderer
+    internal static class OutputRenderer
     {
         // Uses the composed G-Buffer to compute lighting for the albedo buffer
         public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)

@@ -4,12 +4,12 @@ using Terraria.ID;
 
 namespace Terralume.Engine.Mapping.Registry
 {
-    public static class NoiseMapper
+    internal static class NoiseMapper
     {
-        public static Vector2 DefaultNoise = new Vector2(0.5f, 0.3f);
-        public static Vector2 BackgroundNoise = new Vector2(0.5f, 0.3f);
+        public static Vector2 DefaultNoise { get; private set; } = new Vector2(0.5f, 0.3f);
+        public static Vector2 BackgroundNoise { get; private set; } = new Vector2(0.5f, 0.3f);
 
-        public static Dictionary<int, Vector2> MappedTiles = new Dictionary<int, Vector2>()
+        public static Dictionary<int, Vector2> MappedTiles { get; private set; } = new Dictionary<int, Vector2>()
         {
             { TileID.Dirt, new Vector2(0.5f, 0.3f) },
             { TileID.Stone, new Vector2(0.5f, 0.4f) },

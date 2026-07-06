@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Hooks
 {
-    class TileTracker : GlobalTile
+    internal class TileTracker : GlobalTile
     {
         public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
         {

@@ -17,7 +17,7 @@ using Terraria.DataStructures;
 namespace Terralume.Engine.Render
 {
     // Note: All of these methods require Main.screenTarget from before drawing interface, without background textures
-    public static class BufferRenderer
+    internal static class BufferRenderer
     {
         // Renders a "layer" buffer where each pixel represents a different layer, this avoids repeated texture lookups in the depth and material mapping
         // Note: Layer colors are defined by the LayerParameter
@@ -151,7 +151,7 @@ namespace Terralume.Engine.Render
             spriteBatch.End();
 
             // Stamp player materials
-            Dictionary<Vector3, List<DrawData>> drawData = PlayerMaterialTracker._drawData;
+            Dictionary<Vector3, List<DrawData>> drawData = PlayerMaterialTracker.DrawData;
 
             Effect injectEffect = EffectManager.GetEffect(EffectType.MaterialInject);
 

@@ -15,7 +15,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline
 {
-    public class LightingProcessor : ModSystem
+    internal class LightingProcessor : ModSystem
     {
         private OutputCollection outputCollection;
         private SpriteBatch deferredSpriteBatch;
