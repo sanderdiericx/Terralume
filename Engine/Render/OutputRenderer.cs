@@ -38,7 +38,7 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
-            effect.Parameters["OcclusionFactor"].SetValue(0.04f);
+            effect.Parameters["OcclusionFactor"].SetValue(0.08f / currentZoom);
 
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
@@ -90,6 +90,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["AOStrength"].SetValue(0.001f);
 
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
+            effect.Parameters["Gamma"].SetValue(1.9f);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);

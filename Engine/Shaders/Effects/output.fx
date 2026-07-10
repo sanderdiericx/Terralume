@@ -20,6 +20,7 @@ float AORadius;
 float AOStrength;
 
 float Exposure;
+float Gamma;
 
 Texture2D RadianceBuffer;
 
@@ -131,7 +132,7 @@ float3 ToLinear(float3 sRGB)
 
 float3 ToGamma(float3 linearRGB)
 {
-    return pow(linearRGB, 1.0 / 2.2);
+    return pow(linearRGB, 1.0 / Gamma);
 }
 
 technique Output
