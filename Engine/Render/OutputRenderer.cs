@@ -50,6 +50,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["AmbientStrength"].SetValue(ambientLight.AmbientStrength);
             effect.Parameters["AmbientDiffuseWeight"].SetValue(0.2f);
 
+            effect.Parameters["Gamma"].SetValue(1.9f);
+
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(LightPacker.LightIndexTexture.Width, LightPacker.LightIndexTexture.Height));
             effect.Parameters["SunOcclusionTextureSize"].SetValue(new Vector2(SunOcclusionTracker.SunOcclusionTexture.Width, SunOcclusionTracker.SunOcclusionTexture.Height));

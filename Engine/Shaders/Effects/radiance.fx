@@ -28,6 +28,8 @@ float3 AmbientColor;
 float AmbientStrength;
 float AmbientDiffuseWeight;
 
+float Gamma;
+
 Texture2D LayerBuffer;
 
 sampler LayerSampler = sampler_state
@@ -453,7 +455,7 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
 
 float3 ToLinear(float3 sRGB)
 {
-    return pow(sRGB, 2.2);
+    return pow(sRGB, Gamma);
 }
 
 technique Radiance

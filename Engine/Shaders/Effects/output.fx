@@ -127,7 +127,7 @@ float3 RRTAndODTFit(float3 aces)
 
 float3 ToLinear(float3 sRGB)
 {
-    return pow(sRGB, 2.2);
+    return pow(sRGB, Gamma);
 }
 
 float3 ToGamma(float3 linearRGB)
