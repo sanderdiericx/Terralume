@@ -11,9 +11,10 @@ namespace Terralume.Engine.Buffers.Data
         public float Entity { get; private set; }
         public float Projectile { get; private set; }
         public float Player { get; private set; }
+        public float Liquid { get; private set; }
         public float Other { get; private set; }
 
-        public LayerParameter(float background, float tile, float nonSolidTile, float wall, float entity, float projectile, float player, float other)
+        public LayerParameter(float background, float tile, float nonSolidTile, float wall, float entity, float projectile, float player, float liquid, float other)
         {
             Background = background;
             Tile = tile;
@@ -22,6 +23,7 @@ namespace Terralume.Engine.Buffers.Data
             Entity = entity;
             Projectile = projectile;
             Player = player;
+            Liquid = liquid;
             Other = other;
         }
 
@@ -34,6 +36,7 @@ namespace Terralume.Engine.Buffers.Data
             effect.Parameters["EntityLayer"].SetValue(Entity);
             effect.Parameters["ProjectileLayer"].SetValue(Projectile);
             effect.Parameters["PlayerLayer"].SetValue(Player);
+            effect.Parameters["LiquidLayer"].SetValue(Liquid);
             effect.Parameters["OtherLayer"].SetValue(Other);
         }
     }

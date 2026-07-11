@@ -39,6 +39,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["EntityTarget"].SetValue(targetCollection.Entity);
             effect.Parameters["PlayerTarget"].SetValue(targetCollection.Player);
             effect.Parameters["ProjectileTarget"].SetValue(targetCollection.Projectile);
+            effect.Parameters["LiquidTarget"].SetValue(targetCollection.Liquid);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);

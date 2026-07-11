@@ -9,6 +9,7 @@ float WallLayer;
 float EntityLayer;
 float ProjectileLayer;
 float PlayerLayer;
+float LiquidLayer;
 float OtherLayer;
 
 Texture2D TileTarget;
@@ -83,6 +84,18 @@ sampler ProjectileSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D LiquidTarget;
+
+sampler LiquidSampler = sampler_state
+{
+    Texture = (LiquidTarget);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float4 layer = float4(OtherLayer, 0.0, 0.0, 1.0);
@@ -105,6 +118,10 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
     {
         layer = float4(TileLayer, 0.0, 0.0, 1.0);
+    }
+    else if (tex2D(LiquidSampler, uv).a > epsilon) // Liquids
+    {
+        layer = float4(LiquidLayer, 0.0, 0.0, 1.0);
     }
     else if (tex2D(NonSolidTileSampler, uv).a > epsilon) // Non Solid Tiles
     {

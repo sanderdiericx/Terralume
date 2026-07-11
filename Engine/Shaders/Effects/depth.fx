@@ -7,6 +7,7 @@ float WallDepth;
 float EntityDepth;
 float ProjectileDepth;
 float PlayerDepth;
+float LiquidDepth;
 float OtherDepth;
 
 float BackgroundLayer;
@@ -16,6 +17,7 @@ float WallLayer;
 float EntityLayer;
 float ProjectileLayer;
 float PlayerLayer;
+float LiquidLayer;
 float OtherLayer;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
@@ -52,6 +54,10 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     else if (abs(layer - PlayerLayer) < epsilon) // Player
     {
         depth = float4(PlayerDepth, 0.0, 0.0, 1.0);
+    }
+    else if (abs(layer - LiquidLayer) < epsilon) // Liquid
+    {
+        depth = float4(LiquidDepth, 0.0, 0.0, 1.0);
     }
     
     return depth;

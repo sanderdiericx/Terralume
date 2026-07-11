@@ -21,6 +21,7 @@ float WallLayer;
 float EntityLayer;
 float ProjectileLayer;
 float PlayerLayer;
+float LiquidLayer;
 float OtherLayer;
 
 Texture2D NoiseBuffer;
