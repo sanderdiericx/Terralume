@@ -111,7 +111,7 @@ namespace Terralume.Engine.Render
                 prev = target;
             }
 
-            // Upsample + additive combine
+            // Upsample and additive combine
             RenderTarget2D composite = downsampled[levels - 1];
             for (int i = levels - 2; i >= 0; i--)
             {
