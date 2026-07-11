@@ -9,6 +9,8 @@ float2 ViewSize;
 float3 DefaultMaterial;
 float MaterialVariationFactor;
 
+float3 DefaultProjectileMaterial;
+
 float2 MaterialTextureSize;
 float2 TileIDTextureSize;
 
@@ -97,7 +99,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     {
         material = float4(0.0, 1.0, 0.0, 1.0);
     }
-    else if (abs(layer - PlayerLayer) < epsilon || abs(layer - EntityLayer) < epsilon || abs(layer - ProjectileLayer) < epsilon) // Player, Entity, Projectile
+    else if (abs(layer - ProjectileLayer) < epsilon)
+    {
+        material = float4(DefaultProjectileMaterial.r, DefaultProjectileMaterial.g, DefaultProjectileMaterial.b, 1.0);
+    }
+    else if (abs(layer - PlayerLayer) < epsilon || abs(layer - EntityLayer) < epsilon) // Player, Entity, Projectile
     {
         material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
     }

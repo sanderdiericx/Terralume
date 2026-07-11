@@ -12,6 +12,8 @@ float LightDepth;
 float BackgroundLayer;
 float TileLayer;
 float WallLayer;
+float PlayerLayer;
+float ProjectileLayer;
 
 float AlbedoVariationFactor;
 float OcclusionFactor;
@@ -159,8 +161,18 @@ sampler SunOcclusionSampler = sampler_state
     AddressV = Clamp;
 };
 
+
+struct Output
+{
+    float4 Radiance : COLOR0;
+    float4 Bloom : COLOR1;
+};
+
+
 float Occlusion(float2 sdf);
 float SunOcclusion(float2 uv);
+
+float3 BloomThreshold(float3 color, float threshold, float knee);
 
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
 float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize);
@@ -185,7 +197,7 @@ float3 CalculateOutgoingLight(float3 energyConservation, float3 albedo, float3 s
 
 float3 ToLinear(float3 sRGB);
 
-float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
+Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {   
     float noise = tex2Dlod(NoiseSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
     float2 sdf = tex2Dlod(SDFSampler, float4(uv.x, uv.y, 0, 0));
@@ -268,8 +280,15 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     float3 emissive = albedo * material.b * 5.0;
     color += emissive;
-        
-    return float4(color.r, color.g, color.b, albedoOriginal.a);
+    
+    Output output;
+    
+    output.Radiance = float4(color.r, color.g, color.b, albedoOriginal.a);
+    
+    float3 bloomColor = BloomThreshold(emissive, 0.1, 0.2) + BloomThreshold(color, 1.2, 0.4);
+    output.Bloom = float4(bloomColor, albedoOriginal.a);
+
+    return output;
 }
 
 float Occlusion(float2 sdf)
@@ -308,6 +327,19 @@ float SunOcclusion(float2 uv)
     }
     
     return occlusion;
+}
+
+float3 BloomThreshold(float3 color, float threshold, float knee)
+{
+    float brightness = max(color.r, max(color.g, color.b));
+    
+    float soft = brightness - threshold + knee;
+    soft = clamp(soft, 0, 2 * knee);
+    soft = soft * soft / (4 * knee + 0.00001);
+    
+    float contribution = max(soft, brightness - threshold);
+    
+    return color * (contribution / max(brightness, 0.00001));
 }
 
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range)

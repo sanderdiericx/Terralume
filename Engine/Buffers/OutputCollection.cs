@@ -8,6 +8,7 @@ namespace Terralume.Engine.Buffers
     {
         public RenderTarget2D RadianceBuffer { get; private set; }
         public RenderTarget2D OutputBuffer { get; private set; }
+        public RenderTarget2D BloomBuffer { get; private set; }
 
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -16,6 +17,7 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             OutputBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            BloomBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
 
             Width = width;
             Height = height;
@@ -30,6 +32,7 @@ namespace Terralume.Engine.Buffers
         {
             RadianceBuffer.Dispose();
             OutputBuffer.Dispose();
+            BloomBuffer.Dispose();
 
             GC.SuppressFinalize(this);
         }

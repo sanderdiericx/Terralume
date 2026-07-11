@@ -31,7 +31,7 @@ namespace Terralume.Engine.Hooks.Tracking
             On_PlayerDrawLayers.DrawPlayer_17_Torso -= On_PlayerDrawLayers_DrawPlayer_17_Torso;
             On_PlayerDrawLayers.DrawPlayer_13_Leggings -= On_PlayerDrawLayers_DrawPlayer_13_Leggings;
             On_PlayerDrawLayers.DrawPlayer_28_ArmOverItem -= On_PlayerDrawLayers_DrawPlayer_28_ArmOverItem;
-            On_PlayerDrawLayers.DrawPlayer_12_SkinComposite_BackArmShirt += On_PlayerDrawLayers_DrawPlayer_12_SkinComposite_BackArmShirt;
+            On_PlayerDrawLayers.DrawPlayer_12_SkinComposite_BackArmShirt -= On_PlayerDrawLayers_DrawPlayer_12_SkinComposite_BackArmShirt;
         }
 
         public override void PreUpdatePlayers()

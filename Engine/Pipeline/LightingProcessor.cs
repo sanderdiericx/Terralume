@@ -74,7 +74,8 @@ namespace Terralume.Engine.Pipeline
             TargetCollection targetCollection = TargetCapturer.TargetCollection;
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
-            OutputRenderer.RenderRadianceBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
+            OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
+            OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 5);
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             // START DEBUG
@@ -131,21 +132,15 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to player material target view", Color.Green);
+                    Main.NewText($"Switching to bloom buffer view", Color.Green);
 
-                    // currentRenderTarget = targetCollection.PlayerMaterial;
+                    currentRenderTarget = outputCollection.BloomBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
                     Main.NewText($"Switching to sdf buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.SDFBufferFinal;
-                }
-                else if (keyboardState.IsKeyDown(Keys.NumPad7))
-                {
-                    Main.NewText($"Switching to blurred underground background buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.BlurredUndergroundBackgroundBuffer;
                 }
             }
 

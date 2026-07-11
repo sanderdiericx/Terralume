@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace Terralume.Engine.Buffers.Cache
 {
-    // System for handing out temporary render targets, all targets use SurfaceFormat.Color by default
+    // System for handing out temporary render targets, all targets use SurfaceFormat.Vector4 by default
     internal class RenderTargetCache : ModSystem
     {
         private static List<CachedTarget> cachedRenderTargets = new List<CachedTarget>();
@@ -40,7 +40,7 @@ namespace Terralume.Engine.Buffers.Cache
             Main.NewText($"NEW TARGET; ({width} : {height})");
 
             // No suitable target was found, create a new one
-            return new RenderTarget2D(Main.graphics.GraphicsDevice, width, height); ;
+            return new RenderTarget2D(Main.graphics.GraphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
         }
 
 

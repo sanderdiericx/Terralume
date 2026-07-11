@@ -58,10 +58,48 @@ namespace Terralume.Engine.Utils
             spriteBatch.Draw(copyTargetA, new Rectangle(0, 0, inputTarget.Width, inputTarget.Height), Color.White);
             spriteBatch.End();
 
+            device.SetRenderTargets(oldTargets);
+
             RenderTargetCache.ReturnTarget(copyTargetA);
             RenderTargetCache.ReturnTarget(copyTargetB);
+        }
+
+        public static void GaussianBlur(SpriteBatch spriteBatch, RenderTarget2D inputTarget, float blurDeviations)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            RenderTarget2D copyTarget = RenderTargetCache.RequestTarget(inputTarget.Width, inputTarget.Height);
+
+            // Run horizontal and vertical blur passes
+            Effect effect = EffectManager.GetEffect(EffectType.Gaussian);
+            effect.Parameters["U_Sigma"].SetValue(blurDeviations);
+
+            // Horizontal
+            device.SetRenderTarget(copyTarget);
+            device.Clear(Color.Transparent);
+
+            effect.Parameters["ScreenSize"].SetValue(copyTarget.Size());
+            effect.Parameters["Direction"].SetValue(new Vector2(1.0f, 0.0f));
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(inputTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            // Vertical
+            device.SetRenderTarget(inputTarget);
+            device.Clear(Color.Transparent);
+
+            effect.Parameters["ScreenSize"].SetValue(inputTarget.Size());
+            effect.Parameters["Direction"].SetValue(new Vector2(0.0f, 1.0f));
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(copyTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(copyTarget);
         }
     }
 }

@@ -19,6 +19,8 @@ float2 ScreenSize;
 float AORadius;
 float AOStrength;
 
+float BloomIntensity;
+
 float Exposure;
 float Gamma;
 
@@ -46,6 +48,18 @@ sampler SDFSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D BloomBuffer;
+
+sampler BloomSampler = sampler_state
+{
+    Texture = (BloomBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 float SDFAO(float2 uv, float2 texelSize);
 
 float3 ToneMappingACES(float3 color);
@@ -60,9 +74,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float3 albedo = ToLinear(albedoOriginal.rgb);
     
     float ao = SDFAO(uv, 1.0 / ScreenSize);
-    float4 direct = tex2D(RadianceSampler, uv);
+    float4 radiance = tex2D(RadianceSampler, uv);
     
-    float3 color = direct.rgb * ao;
+    float3 color = radiance.rgb + (tex2D(BloomSampler, uv).rgb * BloomIntensity);
+  
+    color *= ao;
     
     color *= Exposure;
     color = ToneMappingACES(color);

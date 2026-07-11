@@ -7,6 +7,7 @@ namespace Terralume.Engine.Mapping.Registry
     internal static class MaterialMapper
     {
         public static Vector3 DefaultMaterial { get; private set; } = new Vector3(0.0f, 0.8f, 0.0f);
+        public static Vector3 DefaultProjectileMaterial { get; private set; } = new Vector3(0.0f, 0.9f, 0.25f);
 
         public static Dictionary<int, Vector3> MappedTiles { get; private set; } = new Dictionary<int, Vector3>()
         {

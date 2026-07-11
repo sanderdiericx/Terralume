@@ -128,6 +128,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
             effect.Parameters["MaterialVariationFactor"].SetValue(RenderConstants.MATERIAL_VARIATION_FACTOR);
 
+            effect.Parameters["DefaultProjectileMaterial"].SetValue(MaterialMapper.DefaultProjectileMaterial);
+
             effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
             effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
 
@@ -339,10 +341,10 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(bufferCollection.SDFBufferFinal, Vector2.Zero, Color.White);
             spriteBatch.End();
 
+            device.SetRenderTargets(oldTargets);
+
             RenderTargetCache.ReturnTarget(wideBlurTarget);
             RenderTargetCache.ReturnTarget(tightBlurTarget);
-
-            device.SetRenderTargets(oldTargets);
         }
     }
 }

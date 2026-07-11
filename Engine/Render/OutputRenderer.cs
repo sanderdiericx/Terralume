@@ -1,24 +1,28 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Humanizer.Localisation.DateToOrdinalWords;
+using log4net.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
+using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Hooks.Tracking;
 using Terralume.Engine.Mapping;
 using Terralume.Engine.Shaders;
+using Terralume.Engine.Utils;
 using Terraria;
 
 namespace Terralume.Engine.Render
 {
     internal static class OutputRenderer
     {
-        // Uses the composed G-Buffer to compute lighting for the albedo buffer
-        public static void RenderRadianceBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
+        // Uses the composed G-Buffer to compute radiance and bloom mask
+        public static void RenderRadianceAndBloomBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(outputCollection.RadianceBuffer);
+            device.SetRenderTargets(outputCollection.RadianceBuffer, outputCollection.BloomBuffer);
             device.Clear(Color.Transparent);
 
             Effect effect = EffectManager.GetEffect(EffectType.Radiance);
@@ -35,6 +39,8 @@ namespace Terralume.Engine.Render
             effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
             effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+            effect.Parameters["PlayerLayer"].SetValue(layerParameter.Player);
+            effect.Parameters["ProjectileLayer"].SetValue(layerParameter.Projectile);
 
             effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
 
@@ -76,6 +82,63 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
+        public static void RenderBlurredBloomBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, int levels)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            RenderTarget2D bloomBuffer = outputCollection.BloomBuffer;
+
+            RenderTarget2D[] downsampled = new RenderTarget2D[levels];
+            int w = bloomBuffer.Width, h = bloomBuffer.Height;
+            RenderTarget2D prev = bloomBuffer;
+
+            // Downsample chain
+            for (int i = 0; i < levels; i++)
+            {
+                w /= 2; h /= 2;
+                RenderTarget2D target = RenderTargetCache.RequestTarget(w, h);
+
+                device.SetRenderTarget(target);
+                device.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+                spriteBatch.Draw(prev, new Rectangle(0, 0, w, h), Color.White);
+                spriteBatch.End();
+
+                BlurHelper.GaussianBlur(spriteBatch, target, 0.5f);
+
+                downsampled[i] = target;
+                prev = target;
+            }
+
+            // Upsample + additive combine
+            RenderTarget2D composite = downsampled[levels - 1];
+            for (int i = levels - 2; i >= 0; i--)
+            {
+                RenderTarget2D target = downsampled[i];
+                int tw = target.Width, th = target.Height;
+
+                device.SetRenderTarget(target);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, null);
+                spriteBatch.Draw(composite, new Rectangle(0, 0, tw, th), Color.White * 0.7f);
+                spriteBatch.End();
+
+                composite = target;
+            }
+
+            device.SetRenderTarget(bloomBuffer);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, null);
+            spriteBatch.Draw(composite, new Rectangle(0, 0, bloomBuffer.Width, bloomBuffer.Height), Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+
+            foreach (var t in downsampled) 
+            {
+                RenderTargetCache.ReturnTarget(t);
+            }
+        }
+
         public static void RenderOutputBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -91,11 +154,14 @@ namespace Terralume.Engine.Render
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);
 
+            effect.Parameters["BloomIntensity"].SetValue(0.25f);
+
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
             effect.Parameters["Gamma"].SetValue(1.9f);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
+            effect.Parameters["BloomBuffer"].SetValue(outputCollection.BloomBuffer);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 
