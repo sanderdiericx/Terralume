@@ -105,7 +105,7 @@ namespace Terralume.Engine.Render
                 spriteBatch.Draw(prev, new Rectangle(0, 0, w, h), Color.White);
                 spriteBatch.End();
 
-                BlurHelper.GaussianBlur(spriteBatch, target, 0.5f);
+                BlurHelper.GaussianBlur(spriteBatch, target, 1.0f + i * 0.0001f);
 
                 downsampled[i] = target;
                 prev = target;
@@ -154,7 +154,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);
 
-            effect.Parameters["BloomIntensity"].SetValue(0.25f);
+            effect.Parameters["BloomIntensity"].SetValue(0.05f);
 
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
             effect.Parameters["Gamma"].SetValue(1.9f);

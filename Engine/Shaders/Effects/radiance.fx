@@ -285,7 +285,7 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     output.Radiance = float4(color.r, color.g, color.b, albedoOriginal.a);
     
-    float3 bloomColor = BloomThreshold(emissive, 0.1, 0.2) + BloomThreshold(color, 1.2, 0.4);
+    float3 bloomColor = BloomThreshold(emissive, 0.1, 0.5) + BloomThreshold(color, 1.2, 0.8);
     output.Bloom = float4(bloomColor, albedoOriginal.a);
 
     return output;
@@ -331,7 +331,7 @@ float SunOcclusion(float2 uv)
 
 float3 BloomThreshold(float3 color, float threshold, float knee)
 {
-    float brightness = max(color.r, max(color.g, color.b));
+    float brightness = dot(color, float3(0.2126, 0.7152, 0.0722));
     
     float soft = brightness - threshold + knee;
     soft = clamp(soft, 0, 2 * knee);
