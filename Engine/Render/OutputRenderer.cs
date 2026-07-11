@@ -158,7 +158,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);
 
-            effect.Parameters["BloomIntensity"].SetValue(1.2f);
+            effect.Parameters["BloomIntensity"].SetValue(1.1f);
 
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
             effect.Parameters["Gamma"].SetValue(1.9f);

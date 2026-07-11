@@ -4,6 +4,7 @@ using Terralume.Engine.Buffers;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Render;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace Terralume.Engine.Pipeline

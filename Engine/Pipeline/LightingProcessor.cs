@@ -138,9 +138,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to sdf buffer view", Color.Green);
+                    Main.NewText($"Switching to liquid buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.SDFBufferFinal;
+                    currentRenderTarget = Main.waterTarget;
                 }
             }
 
