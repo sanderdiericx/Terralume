@@ -18,6 +18,7 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D Entity { get; private set; }
         public RenderTarget2D Player { get; private set; }
         public RenderTarget2D Projectile { get; private set; }
+        public RenderTarget2D Liquid { get; private set; }
 
         public RenderTarget2D Copy { get; private set; }
 
@@ -38,6 +39,8 @@ namespace Terralume.Engine.Buffers
             Entity = new RenderTarget2D(graphicsDevice, width, height);
             Player = new RenderTarget2D(graphicsDevice, width, height);
             Projectile = new RenderTarget2D(graphicsDevice, width, height);
+
+            Liquid = new RenderTarget2D(graphicsDevice, width, height);
 
             Copy = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
@@ -64,6 +67,8 @@ namespace Terralume.Engine.Buffers
             Entity.Dispose();
             Player.Dispose();
             Projectile.Dispose();
+
+            Liquid.Dispose();
 
             Copy.Dispose();
 

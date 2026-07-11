@@ -11,7 +11,7 @@ namespace Terralume.Engine.Pipeline
 {
     internal class TargetCapturer : ModSystem
     {
-        public static TargetCollection TargetCollection { get; private set; }
+        private static TargetCollection targetCollection;
 
         private static SpriteBatch deferredSpriteBatch;
         private static bool backgroundRedrawn;
@@ -20,7 +20,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
             });
 
@@ -45,7 +45,7 @@ namespace Terralume.Engine.Pipeline
 
             Main.QueueMainThreadAction(() =>
             {
-                TargetCollection.Dispose();
+                targetCollection.Dispose();
             });
 
             On_Main.DoDraw -= On_Main_DoDraw;
@@ -76,12 +76,12 @@ namespace Terralume.Engine.Pipeline
 
         private void On_Main_DoDraw_WallsAndBlacks(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self)
         {
-            TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, TargetCollection);
-            TargetRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, TargetCollection, ref backgroundRedrawn);
+            TargetRenderer.CopyBackgroundBuffer(deferredSpriteBatch, targetCollection);
+            TargetRenderer.CopyUndergroundBackgroundBuffer(deferredSpriteBatch, targetCollection, ref backgroundRedrawn);
 
             orig(self);
 
-            TargetRenderer.CopyWallTarget(deferredSpriteBatch, TargetCollection);
+            TargetRenderer.CopyWallTarget(deferredSpriteBatch, targetCollection);
 
             // Main.screenTarget cannot have background targets for g-buffer composition
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
@@ -91,45 +91,51 @@ namespace Terralume.Engine.Pipeline
         {
             orig(self);
 
-            TargetRenderer.CopyTileTarget(deferredSpriteBatch, TargetCollection, orig, self);
+            TargetRenderer.CopyTileTarget(deferredSpriteBatch, targetCollection, orig, self);
         }
 
         private void On_Main_DoDraw_Tiles_NonSolid(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
         {
             orig(self);
 
-            TargetRenderer.CopyNonSolidTileTarget(deferredSpriteBatch, TargetCollection, orig, self);
+            TargetRenderer.CopyNonSolidTileTarget(deferredSpriteBatch, targetCollection, orig, self);
         }
-
 
         private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
         {
             orig(self, behindTiles);
 
-            TargetRenderer.CopyEntityTarget(deferredSpriteBatch, TargetCollection, orig, self, behindTiles);
+            TargetRenderer.CopyEntityTarget(deferredSpriteBatch, targetCollection, orig, self, behindTiles);
         }
 
         private void On_Main_DrawPlayers_AfterProjectiles(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
         {
             orig(self);
 
-            TargetRenderer.CopyPlayerTarget(deferredSpriteBatch, TargetCollection, orig, self);
+            TargetRenderer.CopyPlayerTarget(deferredSpriteBatch, targetCollection, orig, self);
         }
 
         private void On_Main_DrawProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
         {
             orig(self);
 
-            TargetRenderer.CopyProjectileTarget(deferredSpriteBatch, TargetCollection, orig, self);
+            TargetRenderer.CopyProjectileTarget(deferredSpriteBatch, targetCollection, orig, self);
+        }
+
+        public static TargetCollection GetTargetCollection()
+        {
+            TargetRenderer.CopyLiquidTarget(deferredSpriteBatch, targetCollection);
+
+            return targetCollection;
         }
 
         // Make sure all buffers match screen size
         private void UpdateBuffer()
         {
-            if (!TargetCollection.IsValid())
+            if (!targetCollection.IsValid())
             {
-                TargetCollection.Dispose();
-                TargetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                targetCollection.Dispose();
+                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
             }
         }
     }

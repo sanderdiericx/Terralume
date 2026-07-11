@@ -16,8 +16,12 @@ namespace Terralume.Engine.Mapping
         public static bool WallsValid { get; private set; } = false;
         private static Dictionary<int, Vector3> walls = new Dictionary<int, Vector3>();
 
+        public static bool LiquidsValid { get; private set; } = false;
+        private static Dictionary<int, Vector3> liquids = new Dictionary<int, Vector3>(); 
+
         public static Texture2D TileMaterialTexture { get; private set; }
         public static Texture2D WallMaterialTexture { get; private set; }
+        public static Texture2D LiquidMaterialTexture { get; private set; }
 
         private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
@@ -31,6 +35,7 @@ namespace Terralume.Engine.Mapping
             {
                 TileMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
                 WallMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                LiquidMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             });
         }
 
@@ -42,6 +47,7 @@ namespace Terralume.Engine.Mapping
             {
                 TileMaterialTexture.Dispose();
                 WallMaterialTexture.Dispose();
+                LiquidMaterialTexture.Dispose();
             });
         }
 
@@ -59,6 +65,13 @@ namespace Terralume.Engine.Mapping
             WallsValid = true;
         }
 
+        public static void PackLiquidMaterialTexture()
+        {
+            PackMaterialTexture(LiquidMaterialTexture, liquids);
+
+            LiquidsValid = true;
+        }
+
         public static void SetTileMaterials(Dictionary<int, Vector3> mappedTiles)
         {
             tiles = new Dictionary<int, Vector3>(mappedTiles);
@@ -71,6 +84,13 @@ namespace Terralume.Engine.Mapping
             walls = new Dictionary<int, Vector3>(mappedWalls);
 
             WallsValid = false;
+        }
+
+        public static void SetLiquidMaterials(Dictionary<int, Vector3> mappedLiquids)
+        {
+            liquids = new Dictionary<int, Vector3>(mappedLiquids);
+
+            LiquidsValid = false;
         }
 
         // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID

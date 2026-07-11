@@ -63,16 +63,15 @@ namespace Terralume.Engine.Pipeline
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            BufferComposer.ComposeGBuffer(deferredSpriteBatch, tileCaptureParameter);
+            
+            TargetCollection targetCollection = TargetCapturer.GetTargetCollection();
+            BufferCollection bufferCollection = BufferComposer.GetBufferCollection(deferredSpriteBatch, tileCaptureParameter);
 
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
             SunOcclusionTracker.UpdateOccluders();
             SunOcclusionTracker.PackSunOcclusionTexture(tileCaptureParameter);
-
-            TargetCollection targetCollection = TargetCapturer.TargetCollection;
-            BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
@@ -138,9 +137,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to liquid buffer view", Color.Green);
+                    Main.NewText($"Switching to liquid target view", Color.Green);
 
-                    currentRenderTarget = Main.waterTarget;
+                    currentRenderTarget = targetCollection.Liquid;
                 }
             }
 

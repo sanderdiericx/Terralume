@@ -712,5 +712,13 @@ namespace Terralume.Engine.Mapping.Registry
             { WallID.VioletMossBlockWall, new Vector3(0.0f, 0.8f, 0.1f) },
             { WallID.RainbowMossBlockWall, new Vector3(0.0f, 0.8f, 0.1f) }
         };
+
+        public static Dictionary<int, Vector3> MappedLiquids { get; private set; } = new Dictionary<int, Vector3>()
+        {
+            { LiquidID.Water, new Vector3(0.0f, 0.8f, 0.0f) },
+            { LiquidID.Lava, new Vector3(0.0f, 0.8f, 0.15f) },
+            { LiquidID.Honey, new Vector3(0.0f, 0.8f, 0.0f) },
+            { LiquidID.Shimmer, new Vector3(0.0f, 0.8f, 0.2f) }
+        };
     }
 }

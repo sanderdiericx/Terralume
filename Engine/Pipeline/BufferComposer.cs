@@ -13,13 +13,13 @@ namespace Terralume.Engine.Pipeline
 {
     internal class BufferComposer : ModSystem
     {
-        public static BufferCollection BufferCollection { get; private set; }
+        private static BufferCollection bufferCollection;
 
         public override void Load()
         {
             Main.QueueMainThreadAction(() =>
             {
-                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
 
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
@@ -37,6 +37,7 @@ namespace Terralume.Engine.Pipeline
 
             MaterialPacker.SetTileMaterials(MaterialMapper.MappedTiles);
             MaterialPacker.SetWallMaterials(MaterialMapper.MappedWalls);
+            MaterialPacker.SetLiquidMaterials(MaterialMapper.MappedLiquids);
 
             NoisePacker.SetTileNoise(NoiseMapper.MappedTiles);
             NoisePacker.SetWallNoise(NoiseMapper.MappedWalls);
@@ -48,16 +49,16 @@ namespace Terralume.Engine.Pipeline
 
             Main.QueueMainThreadAction(() =>
             {
-                BufferCollection.Dispose();
+                bufferCollection.Dispose();
             });
         }
 
         // Must be called at On_Main.DrawInterface to not break
-        public static void ComposeGBuffer(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter)
+        public static BufferCollection GetBufferCollection(SpriteBatch spriteBatch, TileCaptureParameter tileCaptureParameter)
         {
             UpdateBuffer();
 
-            TargetCollection targetCollection = TargetCapturer.TargetCollection;
+            TargetCollection targetCollection = TargetCapturer.GetTargetCollection();
 
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
             DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
@@ -65,34 +66,37 @@ namespace Terralume.Engine.Pipeline
             IDPacker.UpdateStoredIDs(tileCaptureParameter);
             IDPacker.PackTileIDTexture();
             IDPacker.PackWallIDTexture();
+            IDPacker.PackLiquidIDTexture();
 
             if (!MaterialPacker.TilesValid) MaterialPacker.PackTileMaterialTexture();
             if (!MaterialPacker.WallsValid) MaterialPacker.PackWallMaterialTexture();
-
+            if (!MaterialPacker.LiquidsValid) MaterialPacker.PackLiquidMaterialTexture();
 
             if (!NoisePacker.TilesValid) NoisePacker.PackTileNoiseTexture();
             if (!NoisePacker.WallsValid) NoisePacker.PackWallNoiseTexture();
 
-            BufferRenderer.RenderLayerBuffer(spriteBatch, BufferCollection, targetCollection, layerParameter);
-            BufferRenderer.RenderNoiseBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
+            BufferRenderer.RenderLayerBuffer(spriteBatch, bufferCollection, targetCollection, layerParameter);
+            BufferRenderer.RenderNoiseBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
 
-            BufferRenderer.RenderSDFBuffer(spriteBatch, BufferCollection, layerParameter);
-            BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, BufferCollection, targetCollection);
+            BufferRenderer.RenderSDFBuffer(spriteBatch, bufferCollection, layerParameter);
+            BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, bufferCollection, targetCollection);
 
-            BufferRenderer.RenderHeightBuffer(spriteBatch, BufferCollection);
-            BufferRenderer.RenderDepthBuffer(spriteBatch, BufferCollection, layerParameter, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(spriteBatch, BufferCollection, layerParameter, tileCaptureParameter);
-            BufferRenderer.RenderNormalBuffer(spriteBatch, BufferCollection);
-            BufferRenderer.RenderAlbedoBuffer(spriteBatch, BufferCollection);
+            BufferRenderer.RenderHeightBuffer(spriteBatch, bufferCollection);
+            BufferRenderer.RenderDepthBuffer(spriteBatch, bufferCollection, layerParameter, depthParameter);
+            BufferRenderer.RenderMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
+            BufferRenderer.RenderNormalBuffer(spriteBatch, bufferCollection);
+            BufferRenderer.RenderAlbedoBuffer(spriteBatch, bufferCollection);
+
+            return bufferCollection;
         }
 
         // Make sure all buffers match screen size
         private static void UpdateBuffer()
         {
-            if (!BufferCollection.IsValid())
+            if (!bufferCollection.IsValid())
             {
-                BufferCollection.Dispose();
-                BufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                bufferCollection.Dispose();
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
             }
         }
     }

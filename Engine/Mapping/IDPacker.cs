@@ -14,9 +14,11 @@ namespace Terralume.Engine.Mapping
     {
         public static Texture2D TileIDTexture { get; private set; }
         public static Texture2D WallIDTexture { get; private set; }
+        public static Texture2D LiquidIDTexture { get; private set; }
 
         private static ushort[] tileIDs = new ushort[8];
         private static ushort[] wallIDs = new ushort[8];
+        private static ushort[] liquidIDs = new ushort[8];
 
         private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
@@ -30,6 +32,7 @@ namespace Terralume.Engine.Mapping
             {
                 TileIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
                 WallIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                LiquidIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             });
         }
 
@@ -41,12 +44,13 @@ namespace Terralume.Engine.Mapping
             {
                 TileIDTexture.Dispose();
                 WallIDTexture.Dispose();
+                LiquidIDTexture.Dispose();
             });
         }
 
         public static void UpdateStoredIDs(TileCaptureParameter tileCaptureParameter)
         {
-            GetVisibleIDs(tileCaptureParameter, out tileIDs, out wallIDs);
+            GetVisibleIDs(tileCaptureParameter, out tileIDs, out wallIDs, out liquidIDs);
         }
 
         public static void PackTileIDTexture()
@@ -57,6 +61,11 @@ namespace Terralume.Engine.Mapping
         public static void PackWallIDTexture()
         {
             PackShortsIntoTexture(WallIDTexture, wallIDs);
+        }
+
+        public static void PackLiquidIDTexture()
+        {
+            PackShortsIntoTexture(LiquidIDTexture, liquidIDs);
         }
 
         // Encodes an array of shorts into a 2D texture
@@ -88,7 +97,7 @@ namespace Terralume.Engine.Mapping
         // Builds a flat array with tile ids of all visible tiles, and a second flat array with ids of all visible wall tiles
         //
         // Note: Indices without tiles will recieve tile ID 65535 by default, this method supports max 65534 different tiles/walls
-        private static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs)
+        private static void GetVisibleIDs(TileCaptureParameter tileCaptureParameter, out ushort[] tileIDs, out ushort[] wallIDs, out ushort[] liquidIDs)
         {
             Vector2 stride = tileCaptureParameter.TileStride;
             Vector2 minTile = tileCaptureParameter.MinTile;
@@ -96,6 +105,7 @@ namespace Terralume.Engine.Mapping
 
             tileIDs = new ushort[(int)stride.X * (int)stride.Y];
             wallIDs = new ushort[(int)stride.X * (int)stride.Y];
+            liquidIDs = new ushort[(int)stride.X * (int)stride.Y];
 
             int count = 0;
 
@@ -107,11 +117,13 @@ namespace Terralume.Engine.Mapping
                     {
                         tileIDs[count] = 65535;
                         wallIDs[count] = 65535;
+                        liquidIDs[count] = 65535;
                     }
                     else
                     {
                         tileIDs[count] = (Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : (ushort)65535);
                         wallIDs[count] = (Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : (ushort)65535);
+                        liquidIDs[count] = (Main.tile[j, i].LiquidAmount > 0 ? (ushort)Main.tile[j, i].LiquidType : (ushort)65535);
                     }
 
                     count++;

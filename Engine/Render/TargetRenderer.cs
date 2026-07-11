@@ -214,5 +214,23 @@ namespace Terralume.Engine.Render
 
             device.SetRenderTargets(oldTargets);
         }
+
+        public static void CopyLiquidTarget(SpriteBatch spriteBatch, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(targetCollection.Liquid);
+            device.Clear(Color.Transparent);
+
+            // Draw water target with correct offset into our custom target
+            Vector2 waterOffset = Main.sceneWaterPos - Main.screenPosition;
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, null, Main.GameViewMatrix.TransformationMatrix);
+            spriteBatch.Draw(Main.waterTarget, waterOffset, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
     }
 }
