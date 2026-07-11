@@ -24,7 +24,8 @@ namespace Terralume.Engine.Shaders
             { EffectType.SDFCombine, "sdf_combine" },
             { EffectType.BackgroundBlur, "background_blur" },
             { EffectType.Gaussian, "gaussian" },
-            { EffectType.MaterialInject, "material_inject" }
+            { EffectType.MaterialInject, "material_inject" },
+            { EffectType.Downsample, "downsample" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

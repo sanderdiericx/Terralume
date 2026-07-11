@@ -75,7 +75,7 @@ namespace Terralume.Engine.Pipeline
             BufferCollection bufferCollection = BufferComposer.BufferCollection;
 
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
-            OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 5);
+            OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             // START DEBUG

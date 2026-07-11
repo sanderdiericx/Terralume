@@ -93,19 +93,23 @@ namespace Terralume.Engine.Render
             int w = bloomBuffer.Width, h = bloomBuffer.Height;
             RenderTarget2D prev = bloomBuffer;
 
+            Effect effect = EffectManager.GetEffect(EffectType.Downsample);
+
             // Downsample chain
             for (int i = 0; i < levels; i++)
             {
                 w /= 2; h /= 2;
                 RenderTarget2D target = RenderTargetCache.RequestTarget(w, h);
 
+                effect.Parameters["ScreenSize"].SetValue(target.Size());
+
                 device.SetRenderTarget(target);
                 device.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
                 spriteBatch.Draw(prev, new Rectangle(0, 0, w, h), Color.White);
                 spriteBatch.End();
 
-                BlurHelper.GaussianBlur(spriteBatch, target, 1.0f + i * 0.0001f);
+                BlurHelper.GaussianBlur(spriteBatch, target, 0.2f);
 
                 downsampled[i] = target;
                 prev = target;
@@ -120,7 +124,7 @@ namespace Terralume.Engine.Render
 
                 device.SetRenderTarget(target);
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, null, null);
-                spriteBatch.Draw(composite, new Rectangle(0, 0, tw, th), Color.White * 0.7f);
+                spriteBatch.Draw(composite, new Rectangle(0, 0, tw, th), Color.White * 0.8f);
                 spriteBatch.End();
 
                 composite = target;
@@ -154,7 +158,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["AORadius"].SetValue(40f);
             effect.Parameters["AOStrength"].SetValue(0.001f);
 
-            effect.Parameters["BloomIntensity"].SetValue(0.05f);
+            effect.Parameters["BloomIntensity"].SetValue(1.2f);
 
             effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
             effect.Parameters["Gamma"].SetValue(1.9f);

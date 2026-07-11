@@ -15,6 +15,7 @@
         SDFCombine,
         BackgroundBlur,
         Gaussian,
-        MaterialInject
+        MaterialInject,
+        Downsample
     }
 }
