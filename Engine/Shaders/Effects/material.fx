@@ -108,45 +108,56 @@ sampler LiquidMaterialSampler = sampler_state
     AddressV = Clamp;
 };
 
+struct Output
+{
+    float4 Material : COLOR0;
+    float4 LiquidID : COLOR1;
+};
+
 float GetID(sampler IDSampler, float2 uv);
 float4 GetMaterial(float ID, sampler materialSampler, float2 uv);
 
-float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
+Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float layer = tex2D(LayerSampler, uv).r;
     float epsilon = 0.0001;
     
-    float4 material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
+    Output output;
+    
+    output.LiquidID = float4(0.0, 0.0, 0.0, 0.0);
+    output.Material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
     
     if (abs(layer - BackgroundLayer) < epsilon) // Background 
     {
-        material = float4(0.0, 1.0, 0.0, 1.0);
+        output.Material = float4(0.0, 1.0, 0.0, 1.0);
     }
-    else if (abs(layer - ProjectileLayer) < epsilon)
+    else if (abs(layer - ProjectileLayer) < epsilon) // Projectile
     {
-        material = float4(DefaultProjectileMaterial.r, DefaultProjectileMaterial.g, DefaultProjectileMaterial.b, 1.0);
+        output.Material = float4(DefaultProjectileMaterial.r, DefaultProjectileMaterial.g, DefaultProjectileMaterial.b, 1.0);
     }
     else if (abs(layer - PlayerLayer) < epsilon || abs(layer - EntityLayer) < epsilon) // Player, Entity, Projectile
     {
-        material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
+        output.Material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
     }
-    else if (abs(layer - LiquidLayer) < epsilon)
+    else if (abs(layer - LiquidLayer) < epsilon) // Liquid
     {
         float ID = GetID(LiquidIDSampler, uv);
-        material = GetMaterial(ID, LiquidMaterialSampler, uv);
+        output.Material = GetMaterial(ID, LiquidMaterialSampler, uv);
+        
+        output.LiquidID = float4(ID, 0.0, 0.0, 1.0);
     }
     else if (abs(layer - NonSolidTileLayer) < epsilon || abs(layer - TileLayer) < epsilon) // Non Solid Tiles, Tiles
     {
         float ID = GetID(TileIDSampler, uv);
-        material = GetMaterial(ID, TileMaterialSampler, uv);
+        output.Material = GetMaterial(ID, TileMaterialSampler, uv);
     }
     else if (abs(layer - WallLayer) < epsilon) // Walls
     {
         float ID = GetID(WallIDSampler, uv);
-        material = GetMaterial(ID, WallMaterialSampler, uv);
+        output.Material = GetMaterial(ID, WallMaterialSampler, uv);
     }
     
-    return material;
+    return output;
 }
 
 float GetID(sampler IDSampler, float2 uv)

@@ -137,9 +137,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to liquid target view", Color.Green);
+                    Main.NewText($"Switching to liquid ID buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.Liquid;
+                    currentRenderTarget = bufferCollection.LiquidIDBuffer;
                 }
             }
 

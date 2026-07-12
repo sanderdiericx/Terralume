@@ -109,13 +109,13 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders a material buffer
-        public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
+        // Renders a material buffer, alongside a liquid ID buffer
+        public static void RenderMaterialAndLiquidIDBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            device.SetRenderTarget(bufferCollection.MaterialBuffer);
+            device.SetRenderTargets(bufferCollection.MaterialBuffer, bufferCollection.LiquidIDBuffer);
             device.Clear(Color.Transparent);
 
             Effect effect = EffectManager.GetEffect(EffectType.Material);

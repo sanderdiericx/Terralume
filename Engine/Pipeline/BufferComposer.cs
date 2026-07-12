@@ -83,7 +83,7 @@ namespace Terralume.Engine.Pipeline
 
             BufferRenderer.RenderHeightBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderDepthBuffer(spriteBatch, bufferCollection, layerParameter, depthParameter);
-            BufferRenderer.RenderMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
+            BufferRenderer.RenderMaterialAndLiquidIDBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
             BufferRenderer.RenderNormalBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, bufferCollection);
 
