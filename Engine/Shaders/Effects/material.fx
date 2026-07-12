@@ -60,6 +60,17 @@ sampler WallIDSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D LiquidIDTexture;
+
+sampler LiquidIDSampler = sampler_state
+{
+    Texture = (LiquidIDTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 Texture2D TileMaterialTexture;
 
@@ -85,10 +96,21 @@ sampler WallMaterialSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D LiquidMaterialTexture;
+
+sampler LiquidMaterialSampler = sampler_state
+{
+    Texture = (LiquidMaterialTexture);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 float GetID(sampler IDSampler, float2 uv);
 float4 GetMaterial(float ID, sampler materialSampler, float2 uv);
 
-// TO DO: Add player, entity, wall materials. 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float layer = tex2D(LayerSampler, uv).r;
@@ -107,6 +129,11 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     else if (abs(layer - PlayerLayer) < epsilon || abs(layer - EntityLayer) < epsilon) // Player, Entity, Projectile
     {
         material = float4(DefaultMaterial.r, DefaultMaterial.g, DefaultMaterial.b, 1.0);
+    }
+    else if (abs(layer - LiquidLayer) < epsilon)
+    {
+        float ID = GetID(LiquidIDSampler, uv);
+        material = GetMaterial(ID, LiquidMaterialSampler, uv);
     }
     else if (abs(layer - NonSolidTileLayer) < epsilon || abs(layer - TileLayer) < epsilon) // Non Solid Tiles, Tiles
     {

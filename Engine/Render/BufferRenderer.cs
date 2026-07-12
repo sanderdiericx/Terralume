@@ -140,14 +140,11 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
+            effect.Parameters["LiquidIDTexture"].SetValue(IDPacker.LiquidIDTexture);
 
             effect.Parameters["TileMaterialTexture"].SetValue(MaterialPacker.TileMaterialTexture);
             effect.Parameters["WallMaterialTexture"].SetValue(MaterialPacker.WallMaterialTexture);
-
-            device.SamplerStates[2] = SamplerState.PointClamp;
-            device.SamplerStates[3] = SamplerState.PointClamp;
-            device.SamplerStates[4] = SamplerState.PointClamp;
-            device.SamplerStates[5] = SamplerState.PointClamp;
+            effect.Parameters["LiquidMaterialTexture"].SetValue(MaterialPacker.LiquidMaterialTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);

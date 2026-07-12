@@ -123,7 +123,35 @@ namespace Terralume.Engine.Mapping
                     {
                         tileIDs[count] = (Main.tile[j, i].HasTile ? Main.tile[j, i].TileType : (ushort)65535);
                         wallIDs[count] = (Main.tile[j, i].WallType != WallID.None ? Main.tile[j, i].WallType : (ushort)65535);
-                        liquidIDs[count] = (Main.tile[j, i].LiquidAmount > 0 ? (ushort)Main.tile[j, i].LiquidType : (ushort)65535);
+
+                        liquidIDs[count] = 65535;
+
+                        if (Main.tile[j, i].LiquidAmount > 0)
+                        {
+                            liquidIDs[count] = (ushort)Main.tile[j, i].LiquidType;
+                        }
+                        else
+                        {
+                            for (int dy = -1; dy <= 1 && liquidIDs[count] == 65535; dy++)
+                            {
+                                for (int dx = -1; dx <= 1; dx++)
+                                {
+                                    if (dx == 0 && dy == 0) continue;
+
+                                    int neighborX = j + dx;
+                                    int neighborY = i + dy;
+
+                                    if (neighborX < 0 || neighborX >= Main.maxTilesX || neighborY < 0 || neighborY >= Main.maxTilesY)
+                                        continue;
+
+                                    if (Main.tile[neighborX, neighborY].LiquidAmount > 0)
+                                    {
+                                        liquidIDs[count] = (ushort)Main.tile[neighborX, neighborY].LiquidType;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     count++;
