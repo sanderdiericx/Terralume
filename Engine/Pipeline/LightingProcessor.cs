@@ -139,7 +139,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText($"Switching to liquid ID buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.LiquidIDBuffer;
+                    currentRenderTarget = bufferCollection.ReflectiveMaterialBuffer;
                 }
             }
 

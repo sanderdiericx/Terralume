@@ -15,7 +15,7 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D NormalBuffer { get; private set; }
         public RenderTarget2D AlbedoBuffer { get; private set; }
 
-        public RenderTarget2D LiquidIDBuffer { get; private set; }
+        public RenderTarget2D ReflectiveMaterialBuffer { get; private set; }
 
         public RenderTarget2D JFABufferA { get; private set; }
         public RenderTarget2D JFABufferB { get; private set; }
@@ -41,7 +41,7 @@ namespace Terralume.Engine.Buffers
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
-            LiquidIDBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
+            ReflectiveMaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             JFABufferA = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
             JFABufferB = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
@@ -73,7 +73,7 @@ namespace Terralume.Engine.Buffers
             NormalBuffer.Dispose();
             AlbedoBuffer.Dispose();
 
-            LiquidIDBuffer.Dispose();
+            ReflectiveMaterialBuffer.Dispose();
 
             JFABufferA.Dispose();
             JFABufferB.Dispose();
