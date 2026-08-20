@@ -25,7 +25,8 @@ namespace Terralume.Engine.Shaders
             { EffectType.BackgroundBlur, "background_blur" },
             { EffectType.Gaussian, "gaussian" },
             { EffectType.MaterialInject, "material_inject" },
-            { EffectType.Downsample, "downsample" }
+            { EffectType.Downsample, "downsample" },
+            { EffectType.ReflectiveMaterial, "reflective_material"}
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();

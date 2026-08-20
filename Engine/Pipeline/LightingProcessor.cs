@@ -63,7 +63,7 @@ namespace Terralume.Engine.Pipeline
             LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
-            
+
             TargetCollection targetCollection = TargetCapturer.GetTargetCollection();
             BufferCollection bufferCollection = BufferComposer.GetBufferCollection(deferredSpriteBatch, tileCaptureParameter);
 
@@ -137,7 +137,7 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to liquid ID buffer view", Color.Green);
+                    Main.NewText($"Switching to reflective material buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.ReflectiveMaterialBuffer;
                 }

@@ -16,6 +16,7 @@
         BackgroundBlur,
         Gaussian,
         MaterialInject,
-        Downsample
+        Downsample,
+        ReflectiveMaterial
     }
 }

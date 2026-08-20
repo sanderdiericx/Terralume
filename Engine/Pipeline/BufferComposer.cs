@@ -33,11 +33,17 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.SDFCombine);
 
                 EffectManager.LoadEffect(EffectType.BackgroundBlur);
+
+                EffectManager.LoadEffect(EffectType.ReflectiveMaterial);
             });
 
             MaterialPacker.SetTileMaterials(MaterialMapper.MappedTiles);
             MaterialPacker.SetWallMaterials(MaterialMapper.MappedWalls);
             MaterialPacker.SetLiquidMaterials(MaterialMapper.MappedLiquids);
+
+            ReflectionPacker.SetTileReflections(ReflectionMapper.MappedTiles);
+            ReflectionPacker.SetWallReflections(ReflectionMapper.MappedWalls);
+            ReflectionPacker.SetLiquidReflections(ReflectionMapper.MappedLiquids);
 
             NoisePacker.SetTileNoise(NoiseMapper.MappedTiles);
             NoisePacker.SetWallNoise(NoiseMapper.MappedWalls);
@@ -72,6 +78,10 @@ namespace Terralume.Engine.Pipeline
             if (!MaterialPacker.WallsValid) MaterialPacker.PackWallMaterialTexture();
             if (!MaterialPacker.LiquidsValid) MaterialPacker.PackLiquidMaterialTexture();
 
+            if (!ReflectionPacker.TilesValid) ReflectionPacker.PackTileReflectionTexture();
+            if (!ReflectionPacker.WallsValid) ReflectionPacker.PackWallReflectionTexture();
+            if (!ReflectionPacker.LiquidsValid) ReflectionPacker.PackLiquidReflectionTexture();
+
             if (!NoisePacker.TilesValid) NoisePacker.PackTileNoiseTexture();
             if (!NoisePacker.WallsValid) NoisePacker.PackWallNoiseTexture();
 
@@ -83,7 +93,10 @@ namespace Terralume.Engine.Pipeline
 
             BufferRenderer.RenderHeightBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderDepthBuffer(spriteBatch, bufferCollection, layerParameter, depthParameter);
+
             BufferRenderer.RenderMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
+            BufferRenderer.RenderReflectiveMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
+            
             BufferRenderer.RenderNormalBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, bufferCollection);
 

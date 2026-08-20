@@ -8,14 +8,14 @@ namespace Terralume.Engine.Buffers
     {
         public RenderTarget2D LayerBuffer { get; private set; }
         public RenderTarget2D NoiseBuffer { get; private set; }
-
         public RenderTarget2D DepthBuffer { get; private set; }
+
         public RenderTarget2D MaterialBuffer { get; private set; }
+        public RenderTarget2D ReflectiveMaterialBuffer { get; private set; }
+
         public RenderTarget2D HeightBuffer { get; private set; }
         public RenderTarget2D NormalBuffer { get; private set; }
         public RenderTarget2D AlbedoBuffer { get; private set; }
-
-        public RenderTarget2D ReflectiveMaterialBuffer { get; private set; }
 
         public RenderTarget2D JFABufferA { get; private set; }
         public RenderTarget2D JFABufferB { get; private set; }
@@ -34,14 +34,14 @@ namespace Terralume.Engine.Buffers
         {
             LayerBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
             NoiseBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
-
             DepthBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
+
             MaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            ReflectiveMaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
+
             HeightBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-
-            ReflectiveMaterialBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             JFABufferA = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
             JFABufferB = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
@@ -66,14 +66,14 @@ namespace Terralume.Engine.Buffers
         {
             LayerBuffer.Dispose();
             NoiseBuffer.Dispose();
-
             DepthBuffer.Dispose();
+
             MaterialBuffer.Dispose();
+            ReflectiveMaterialBuffer.Dispose();
+
             HeightBuffer.Dispose();
             NormalBuffer.Dispose();
             AlbedoBuffer.Dispose();
-
-            ReflectiveMaterialBuffer.Dispose();
 
             JFABufferA.Dispose();
             JFABufferB.Dispose();

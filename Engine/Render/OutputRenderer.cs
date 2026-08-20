@@ -1,6 +1,4 @@
-﻿using Humanizer.Localisation.DateToOrdinalWords;
-using log4net.Core;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
@@ -137,7 +135,7 @@ namespace Terralume.Engine.Render
 
             device.SetRenderTargets(oldTargets);
 
-            foreach (var t in downsampled) 
+            foreach (var t in downsampled)
             {
                 RenderTargetCache.ReturnTarget(t);
             }

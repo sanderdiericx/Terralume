@@ -17,7 +17,7 @@ namespace Terralume.Engine.Mapping
         private static Dictionary<int, Vector3> walls = new Dictionary<int, Vector3>();
 
         public static bool LiquidsValid { get; private set; } = false;
-        private static Dictionary<int, Vector3> liquids = new Dictionary<int, Vector3>(); 
+        private static Dictionary<int, Vector3> liquids = new Dictionary<int, Vector3>();
 
         public static Texture2D TileMaterialTexture { get; private set; }
         public static Texture2D WallMaterialTexture { get; private set; }

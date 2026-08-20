@@ -109,7 +109,8 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
-        // Renders a material buffer, alongside a reflective material buffer
+        // Renders a material buffer
+        // Format: r = metallic, g = roughness, b = emissive, a = unused (default 1.0)
         public static void RenderMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -168,6 +169,48 @@ namespace Terralume.Engine.Render
 
                 spriteBatch.End();
             }
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Renders a reflective material buffer, used for screen space reflectionss
+        // Format: r = reflection strength, g = unused, b = unused, a = liquid id (if liquid; else -1)
+        public static void RenderReflectiveMaterialBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.ReflectiveMaterialBuffer);
+
+            Effect effect = EffectManager.GetEffect(EffectType.ReflectiveMaterial);
+
+            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
+            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
+
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+
+            effect.Parameters["DefaultReflection"].SetValue(ReflectionMapper.DefaultReflection);
+
+            effect.Parameters["ReflectionTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+
+            effect.Parameters["NonSolidTileLayer"].SetValue(layerParameter.NonSolidTile);
+            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
+            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
+            effect.Parameters["LiquidLayer"].SetValue(layerParameter.Liquid);
+
+            effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
+            effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
+            effect.Parameters["LiquidIDTexture"].SetValue(IDPacker.LiquidIDTexture);
+
+            effect.Parameters["TileReflectionTexture"].SetValue(ReflectionPacker.TileReflectionTexture);
+            effect.Parameters["WallReflectionTexture"].SetValue(ReflectionPacker.WallReflectionTexture);
+            effect.Parameters["LiquidReflectionTexture"].SetValue(ReflectionPacker.LiquidReflectionTexture);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
         }
