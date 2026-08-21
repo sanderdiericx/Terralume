@@ -13,8 +13,8 @@ namespace Terralume.Engine.Utils
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            RenderTarget2D copyTargetA = RenderTargetCache.RequestTarget(downsampleWidth, downsampleHeight);
-            RenderTarget2D copyTargetB = RenderTargetCache.RequestTarget(downsampleWidth, downsampleHeight);
+            RenderTarget2D copyTargetA = RenderTargetCache.RequestTarget(downsampleWidth, downsampleHeight, SurfaceFormat.Vector4);
+            RenderTarget2D copyTargetB = RenderTargetCache.RequestTarget(downsampleWidth, downsampleHeight, SurfaceFormat.Vector4);
 
             // Draw input target onto copy target A
             device.SetRenderTarget(copyTargetA);
@@ -69,7 +69,7 @@ namespace Terralume.Engine.Utils
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            RenderTarget2D copyTarget = RenderTargetCache.RequestTarget(inputTarget.Width, inputTarget.Height);
+            RenderTarget2D copyTarget = RenderTargetCache.RequestTarget(inputTarget.Width, inputTarget.Height, SurfaceFormat.Vector4);
 
             // Run horizontal and vertical blur passes
             Effect effect = EffectManager.GetEffect(EffectType.Gaussian);

@@ -282,8 +282,8 @@ namespace Terralume.Engine.Render
 
         public static void RenderSDFBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter)
         {
-            RenderTarget2D JFATileBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height);
-            RenderTarget2D JFAAirBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height);
+            RenderTarget2D JFATileBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height, SurfaceFormat.Vector2);
+            RenderTarget2D JFAAirBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height, SurfaceFormat.Vector2);
 
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
@@ -315,8 +315,8 @@ namespace Terralume.Engine.Render
 
         private static void JFAPass(GraphicsDevice device, SpriteBatch spriteBatch, BufferCollection bufferCollection, RenderTarget2D outputTarget, float seedLayer, bool exclusive)
         {
-            RenderTarget2D readTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height);
-            RenderTarget2D writeTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height);
+            RenderTarget2D readTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height, SurfaceFormat.Vector2);
+            RenderTarget2D writeTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height, SurfaceFormat.Vector2);
 
             device.SetRenderTarget(readTarget);
             device.Clear(Color.Transparent);
@@ -375,8 +375,8 @@ namespace Terralume.Engine.Render
             int width = bufferCollection.BlurredUndergroundBackgroundBuffer.Width;
             int height = bufferCollection.BlurredUndergroundBackgroundBuffer.Height;
 
-            RenderTarget2D wideBlurTarget = RenderTargetCache.RequestTarget(width, height);
-            RenderTarget2D tightBlurTarget = RenderTargetCache.RequestTarget(width, height);
+            RenderTarget2D wideBlurTarget = RenderTargetCache.RequestTarget(width, height, SurfaceFormat.Color);
+            RenderTarget2D tightBlurTarget = RenderTargetCache.RequestTarget(width, height, SurfaceFormat.Color);
 
             BlurHelper.DownsampledGaussianBlur(spriteBatch, targetCollection.UndergroundBackground, wideBlurTarget, width / 2, height / 2, 1f);
             BlurHelper.DownsampledGaussianBlur(spriteBatch, targetCollection.UndergroundBackground, tightBlurTarget, width / 2, height / 2, 0.5f);

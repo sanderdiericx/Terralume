@@ -23,14 +23,14 @@ namespace Terralume.Engine.Buffers.Cache
         }
 
         // Must be called from the Main thread
-        public static RenderTarget2D RequestTarget(int width, int height)
+        public static RenderTarget2D RequestTarget(int width, int height, SurfaceFormat surfaceFormat)
         {
             // Search for a cached target at the desired resolution
             for (int i = cachedRenderTargets.Count - 1; i >= 0; i--)
             {
                 CachedTarget cachedTarget = cachedRenderTargets[i];
 
-                if (cachedTarget.Width == width && cachedTarget.Height == height)
+                if (cachedTarget.Width == width && cachedTarget.Height == height && cachedTarget.SurfaceFormat == surfaceFormat)
                 {
                     cachedRenderTargets.RemoveAt(i);
                     return cachedTarget.RenderTarget;
@@ -40,13 +40,13 @@ namespace Terralume.Engine.Buffers.Cache
             Main.NewText($"NEW TARGET; ({width} : {height})");
 
             // No suitable target was found, create a new one
-            return new RenderTarget2D(Main.graphics.GraphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
+            return new RenderTarget2D(Main.graphics.GraphicsDevice, width, height, false, surfaceFormat, DepthFormat.None);
         }
 
 
         public static void ReturnTarget(RenderTarget2D renderTarget)
         {
-            cachedRenderTargets.Add(new CachedTarget(renderTarget.Width, renderTarget.Height, renderTarget));
+            cachedRenderTargets.Add(new CachedTarget(renderTarget.Width, renderTarget.Height, renderTarget.Format, renderTarget));
         }
 
         // Disposes all available rendertargets and clears the cached targets list

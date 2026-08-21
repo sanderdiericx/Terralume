@@ -97,7 +97,7 @@ namespace Terralume.Engine.Render
             for (int i = 0; i < levels; i++)
             {
                 w /= 2; h /= 2;
-                RenderTarget2D target = RenderTargetCache.RequestTarget(w, h);
+                RenderTarget2D target = RenderTargetCache.RequestTarget(w, h, SurfaceFormat.Vector4);
 
                 effect.Parameters["ScreenSize"].SetValue(target.Size());
 
