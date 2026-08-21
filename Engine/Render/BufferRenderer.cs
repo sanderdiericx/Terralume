@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
@@ -13,6 +14,8 @@ using Terralume.Engine.Shaders;
 using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.DataStructures;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Terralume.Engine.Render
 {
@@ -328,6 +331,8 @@ namespace Terralume.Engine.Render
 
             Vector2 size = readTarget.Size();
             int initJumpSize = (int)Math.Max(size.X, size.Y);
+
+            initJumpSize = (int)BitOperations.RoundUpToPowerOf2((uint)initJumpSize);
 
             for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
             {
