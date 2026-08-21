@@ -282,20 +282,23 @@ namespace Terralume.Engine.Render
 
         public static void RenderSDFBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter)
         {
+            RenderTarget2D JFATileBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height);
+            RenderTarget2D JFAAirBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height);
+
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
 
-            JFAPass(device, spriteBatch, bufferCollection, bufferCollection.JFATileBuffer, layerParameter.Tile, false);
-            JFAPass(device, spriteBatch, bufferCollection, bufferCollection.JFAAirBuffer, layerParameter.Tile, true);
+            JFAPass(device, spriteBatch, bufferCollection, JFATileBuffer, layerParameter.Tile, false);
+            JFAPass(device, spriteBatch, bufferCollection, JFAAirBuffer, layerParameter.Tile, true);
 
-            // Combine into final signed SDF
+            // Combine into final signed distance field
             Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombine);
 
             combineEffect.Parameters["ScreenSize"].SetValue(bufferCollection.SDFBufferFinal.Size());
             combineEffect.Parameters["SeedLayer"].SetValue(layerParameter.Tile);
 
-            combineEffect.Parameters["JFATileBuffer"].SetValue(bufferCollection.JFATileBuffer);
-            combineEffect.Parameters["JFAAirBuffer"].SetValue(bufferCollection.JFAAirBuffer);
+            combineEffect.Parameters["JFATileBuffer"].SetValue(JFATileBuffer);
+            combineEffect.Parameters["JFAAirBuffer"].SetValue(JFAAirBuffer);
 
             device.SetRenderTarget(bufferCollection.SDFBufferFinal);
             device.Clear(Color.Transparent);
@@ -305,12 +308,15 @@ namespace Terralume.Engine.Render
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(JFATileBuffer);
+            RenderTargetCache.ReturnTarget(JFAAirBuffer);
         }
 
         private static void JFAPass(GraphicsDevice device, SpriteBatch spriteBatch, BufferCollection bufferCollection, RenderTarget2D outputTarget, float seedLayer, bool exclusive)
         {
-            RenderTarget2D readTarget = bufferCollection.JFABufferA;
-            RenderTarget2D writeTarget = bufferCollection.JFABufferB;
+            RenderTarget2D readTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height);
+            RenderTarget2D writeTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height);
 
             device.SetRenderTarget(readTarget);
             device.Clear(Color.Transparent);
@@ -355,6 +361,9 @@ namespace Terralume.Engine.Render
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
             spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+
+            RenderTargetCache.ReturnTarget(readTarget);
+            RenderTargetCache.ReturnTarget(writeTarget);
         }
 
         // Note: SDF buffer must be before this generated for valid blur

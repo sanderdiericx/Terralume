@@ -17,12 +17,6 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D NormalBuffer { get; private set; }
         public RenderTarget2D AlbedoBuffer { get; private set; }
 
-        public RenderTarget2D JFABufferA { get; private set; }
-        public RenderTarget2D JFABufferB { get; private set; }
-
-        public RenderTarget2D JFATileBuffer { get; private set; }
-        public RenderTarget2D JFAAirBuffer { get; private set; }
-
         public RenderTarget2D SDFBufferFinal { get; private set; }
 
         public RenderTarget2D BlurredUndergroundBackgroundBuffer { get; private set; }
@@ -42,12 +36,6 @@ namespace Terralume.Engine.Buffers
             HeightBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
             NormalBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             AlbedoBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
-
-            JFABufferA = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
-            JFABufferB = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
-
-            JFATileBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
-            JFAAirBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
 
             SDFBufferFinal = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
 
@@ -74,12 +62,6 @@ namespace Terralume.Engine.Buffers
             HeightBuffer.Dispose();
             NormalBuffer.Dispose();
             AlbedoBuffer.Dispose();
-
-            JFABufferA.Dispose();
-            JFABufferB.Dispose();
-
-            JFATileBuffer.Dispose();
-            JFAAirBuffer.Dispose();
 
             SDFBufferFinal.Dispose();
 
