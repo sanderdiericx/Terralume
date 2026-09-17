@@ -28,7 +28,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
         float distToSurface = (reflectionSeed.x >= 0.0) ? length(pixelPos - reflectionSeed) : 1e9;
     
-        output = float4(distToSurface / ScreenSize.y, 0.0, 0.0, 1.0);
+        output = float4(distToSurface, 0.0, 0.0, 1.0);
     }
     
     return output;

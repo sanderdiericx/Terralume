@@ -20,6 +20,7 @@
         ReflectiveMaterial,
         JFAReflectionInit,
         JFAReflection,
-        SDFCombineReflection
+        SDFCombineReflection,
+        Reflection
     }
 }

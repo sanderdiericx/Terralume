@@ -60,6 +60,18 @@ sampler BloomSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D ReflectionBuffer;
+
+sampler ReflectionSampler = sampler_state
+{
+    Texture = (ReflectionBuffer);
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 float SDFAO(float2 uv, float2 texelSize);
 
 float3 ToneMappingACES(float3 color);
@@ -75,8 +87,9 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     float ao = SDFAO(uv, 1.0 / ScreenSize);
     float4 radiance = tex2D(RadianceSampler, uv);
+    float4 reflection = tex2D(ReflectionSampler, uv);
     
-    float3 color = radiance.rgb + (tex2D(BloomSampler, uv).rgb * BloomIntensity);
+    float3 color = radiance.rgb + reflection.rgb + (tex2D(BloomSampler, uv).rgb * BloomIntensity);
   
     color *= ao;
     

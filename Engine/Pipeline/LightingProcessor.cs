@@ -75,6 +75,8 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
+            OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             // START DEBUG
@@ -125,9 +127,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D8))
                 {
-                    Main.NewText($"Switching to noise buffer view", Color.Green);
+                    Main.NewText($"Switching to reflection buffer view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.NoiseBuffer;
+                    currentRenderTarget = outputCollection.ReflectionBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {

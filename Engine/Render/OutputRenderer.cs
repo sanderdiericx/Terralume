@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using log4net.Filter;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
@@ -141,6 +143,29 @@ namespace Terralume.Engine.Render
             }
         }
 
+        // Note: Radiance buffer must be produced before this method is called
+        public static void RenderReflectionBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(outputCollection.ReflectionBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.Reflection);
+
+            effect.Parameters["ScreenSize"].SetValue(outputCollection.ReflectionBuffer.Size());
+
+            effect.Parameters["SDFReflectionBuffer"].SetValue(bufferCollection.SDFBufferReflection);
+            effect.Parameters["ReflectiveMaterialBuffer"].SetValue(bufferCollection.ReflectiveMaterialBuffer);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(outputCollection.RadianceBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
         public static void RenderOutputBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -164,6 +189,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
             effect.Parameters["BloomBuffer"].SetValue(outputCollection.BloomBuffer);
+            effect.Parameters["ReflectionBuffer"].SetValue(outputCollection.ReflectionBuffer);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 
