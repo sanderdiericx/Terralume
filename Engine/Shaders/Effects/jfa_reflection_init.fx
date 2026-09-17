@@ -4,11 +4,11 @@ float2 ScreenSize;
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
-    float4 material = tex2Dlod(ReflectiveMaterialSampler, float4(uv.x, uv.y, 0.0, 0.0));
+    float4 reflectiveMaterial = tex2Dlod(ReflectiveMaterialSampler, float4(uv.x, uv.y, 0.0, 0.0));
     
     float4 seed = float4(-1.0, -1.0, 0.0, 0.0);
     
-    if (material.r > 0.0)
+    if (reflectiveMaterial.r > 0.0)
     {
         float2 jumpSize = float2(1.0, 1.0) / ScreenSize;
 

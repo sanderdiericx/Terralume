@@ -13,7 +13,6 @@ float2 TileIDTextureSize;
 
 float NonSolidTileLayer;
 float TileLayer;
-float WallLayer;
 float LiquidLayer;
 
 Texture2D TileIDTexture;
@@ -21,18 +20,6 @@ Texture2D TileIDTexture;
 sampler TileIDSampler = sampler_state
 {
     Texture = (TileIDTexture);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D WallIDTexture;
-
-sampler WallIDSampler = sampler_state
-{
-    Texture = (WallIDTexture);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -57,18 +44,6 @@ Texture2D TileReflectionTexture;
 sampler TileReflectionSampler = sampler_state
 {
     Texture = (TileReflectionTexture);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-Texture2D WallReflectionTexture;
-
-sampler WallReflectionSampler = sampler_state
-{
-    Texture = (WallReflectionTexture);
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
@@ -110,13 +85,6 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         float ID = GetID(TileIDSampler, uv);
         float3 reflection = GetReflection(ID, TileReflectionSampler, uv);
     
-        output = float4(reflection.r, reflection.g, reflection.b, -1.0);
-    }
-    else if (abs(layer - WallLayer) < epsilon) // Walls
-    {
-        float ID = GetID(WallIDSampler, uv);
-        float3 reflection = GetReflection(ID, WallReflectionSampler, uv);
-        
         output = float4(reflection.r, reflection.g, reflection.b, -1.0);
     }
     

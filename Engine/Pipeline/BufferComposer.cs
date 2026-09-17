@@ -32,6 +32,10 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.JFA);
                 EffectManager.LoadEffect(EffectType.SDFCombine);
 
+                EffectManager.LoadEffect(EffectType.JFAReflectionInit);
+                EffectManager.LoadEffect(EffectType.JFAReflection);
+                EffectManager.LoadEffect(EffectType.SDFCombineReflection);
+
                 EffectManager.LoadEffect(EffectType.BackgroundBlur);
 
                 EffectManager.LoadEffect(EffectType.ReflectiveMaterial);
@@ -42,7 +46,6 @@ namespace Terralume.Engine.Pipeline
             MaterialPacker.SetLiquidMaterials(MaterialMapper.MappedLiquids);
 
             ReflectionPacker.SetTileReflections(ReflectionMapper.MappedTiles);
-            ReflectionPacker.SetWallReflections(ReflectionMapper.MappedWalls);
             ReflectionPacker.SetLiquidReflections(ReflectionMapper.MappedLiquids);
 
             NoisePacker.SetTileNoise(NoiseMapper.MappedTiles);
@@ -79,7 +82,6 @@ namespace Terralume.Engine.Pipeline
             if (!MaterialPacker.LiquidsValid) MaterialPacker.PackLiquidMaterialTexture();
 
             if (!ReflectionPacker.TilesValid) ReflectionPacker.PackTileReflectionTexture();
-            if (!ReflectionPacker.WallsValid) ReflectionPacker.PackWallReflectionTexture();
             if (!ReflectionPacker.LiquidsValid) ReflectionPacker.PackLiquidReflectionTexture();
 
             if (!NoisePacker.TilesValid) NoisePacker.PackTileNoiseTexture();
@@ -89,6 +91,8 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderNoiseBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
 
             BufferRenderer.RenderSDFBuffer(spriteBatch, bufferCollection, layerParameter);
+            BufferRenderer.RenderSDFBufferReflection(spriteBatch, bufferCollection);
+
             BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, bufferCollection, targetCollection);
 
             BufferRenderer.RenderHeightBuffer(spriteBatch, bufferCollection);

@@ -13,14 +13,10 @@ namespace Terralume.Engine.Mapping
         public static bool TilesValid { get; private set; } = false;
         private static Dictionary<int, Vector3> tiles = new Dictionary<int, Vector3>();
 
-        public static bool WallsValid { get; private set; } = false;
-        private static Dictionary<int, Vector3> walls = new Dictionary<int, Vector3>();
-
         public static bool LiquidsValid { get; private set; } = false;
         private static Dictionary<int, Vector3> liquids = new Dictionary<int, Vector3>();
 
         public static Texture2D TileReflectionTexture { get; private set; }
-        public static Texture2D WallReflectionTexture { get; private set; }
         public static Texture2D LiquidReflectionTexture { get; private set; }
 
         private static Color[] reflectionPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
@@ -34,7 +30,6 @@ namespace Terralume.Engine.Mapping
             Main.QueueMainThreadAction(() =>
             {
                 TileReflectionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                WallReflectionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
                 LiquidReflectionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             });
         }
@@ -46,7 +41,6 @@ namespace Terralume.Engine.Mapping
             Main.QueueMainThreadAction(() =>
             {
                 TileReflectionTexture.Dispose();
-                WallReflectionTexture.Dispose();
                 LiquidReflectionTexture.Dispose();
             });
         }
@@ -56,13 +50,6 @@ namespace Terralume.Engine.Mapping
             PackReflectionTexture(TileReflectionTexture, tiles);
 
             TilesValid = true;
-        }
-
-        public static void PackWallReflectionTexture()
-        {
-            PackReflectionTexture(WallReflectionTexture, walls);
-
-            WallsValid = true;
         }
 
         public static void PackLiquidReflectionTexture()
@@ -77,13 +64,6 @@ namespace Terralume.Engine.Mapping
             tiles = new Dictionary<int, Vector3>(mappedTiles);
 
             TilesValid = false;
-        }
-
-        public static void SetWallReflections(Dictionary<int, Vector3> mappedWalls)
-        {
-            walls = new Dictionary<int, Vector3>(mappedWalls);
-
-            WallsValid = false;
         }
 
         public static void SetLiquidReflections(Dictionary<int, Vector3> mappedLiquids)

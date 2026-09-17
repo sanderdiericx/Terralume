@@ -131,15 +131,15 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to bloom buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.BloomBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D0))
-                {
                     Main.NewText($"Switching to reflective material buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.ReflectiveMaterialBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D0))
+                {
+                    Main.NewText($"Switching to reflective sdf buffer view", Color.Green);
+
+                    currentRenderTarget = bufferCollection.SDFBufferReflection;
                 }
             }
 

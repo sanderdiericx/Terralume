@@ -17,6 +17,9 @@
         Gaussian,
         MaterialInject,
         Downsample,
-        ReflectiveMaterial
+        ReflectiveMaterial,
+        JFAReflectionInit,
+        JFAReflection,
+        SDFCombineReflection
     }
 }

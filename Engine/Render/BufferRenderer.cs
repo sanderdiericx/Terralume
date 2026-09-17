@@ -200,15 +200,12 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["NonSolidTileLayer"].SetValue(layerParameter.NonSolidTile);
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
-            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
             effect.Parameters["LiquidLayer"].SetValue(layerParameter.Liquid);
 
             effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
-            effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
             effect.Parameters["LiquidIDTexture"].SetValue(IDPacker.LiquidIDTexture);
 
             effect.Parameters["TileReflectionTexture"].SetValue(ReflectionPacker.TileReflectionTexture);
-            effect.Parameters["WallReflectionTexture"].SetValue(ReflectionPacker.WallReflectionTexture);
             effect.Parameters["LiquidReflectionTexture"].SetValue(ReflectionPacker.LiquidReflectionTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
@@ -337,6 +334,85 @@ namespace Terralume.Engine.Render
 
             Vector2 size = readTarget.Size();
             int initJumpSize = (int)Math.Max(size.X, size.Y);
+
+            initJumpSize = (int)BitOperations.RoundUpToPowerOf2((uint)initJumpSize);
+
+            for (int jumpSize = initJumpSize; jumpSize >= 1; jumpSize /= 2)
+            {
+                jfaEffect.Parameters["JumpSizeUV"].SetValue(new Vector2(jumpSize, jumpSize) / writeTarget.Size());
+
+                device.SetRenderTarget(writeTarget);
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaEffect);
+                spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
+                spriteBatch.End();
+
+                RenderTarget2D temp = readTarget;
+                readTarget = writeTarget;
+                writeTarget = temp;
+            }
+
+            device.SetRenderTarget(outputTarget);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(readTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            RenderTargetCache.ReturnTarget(readTarget);
+            RenderTargetCache.ReturnTarget(writeTarget);
+        }
+
+        public static void RenderSDFBufferReflection(SpriteBatch spriteBatch, BufferCollection bufferCollection)
+        {
+            RenderTarget2D JFAReflectionBuffer = RenderTargetCache.RequestTarget(bufferCollection.SDFBufferFinal.Width, bufferCollection.SDFBufferFinal.Height, SurfaceFormat.Vector2);
+
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            JFAPassReflection(device, spriteBatch, bufferCollection, JFAReflectionBuffer);
+
+            // Combine into final buffer with distance to nearest reflective surface
+            Effect combineEffect = EffectManager.GetEffect(EffectType.SDFCombineReflection);
+
+            combineEffect.Parameters["ScreenSize"].SetValue(bufferCollection.SDFBufferReflection.Size());
+
+            combineEffect.Parameters["JFAReflectionBuffer"].SetValue(JFAReflectionBuffer);
+
+            device.SetRenderTarget(bufferCollection.SDFBufferReflection);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, combineEffect);
+            spriteBatch.Draw(bufferCollection.ReflectiveMaterialBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(JFAReflectionBuffer);
+        }
+
+        private static void JFAPassReflection(GraphicsDevice device, SpriteBatch spriteBatch, BufferCollection bufferCollection, RenderTarget2D outputTarget)
+        {
+            RenderTarget2D readTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height, SurfaceFormat.Vector2);
+            RenderTarget2D writeTarget = RenderTargetCache.RequestTarget(outputTarget.Width, outputTarget.Height, SurfaceFormat.Vector2);
+
+            device.SetRenderTarget(readTarget);
+            device.Clear(Color.Transparent);
+
+            Effect jfaInitEffect = EffectManager.GetEffect(EffectType.JFAReflectionInit);
+
+            jfaInitEffect.Parameters["ScreenSize"].SetValue(readTarget.Size());
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, jfaInitEffect);
+            spriteBatch.Draw(bufferCollection.ReflectiveMaterialBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            Effect jfaEffect = EffectManager.GetEffect(EffectType.JFAReflection);
+
+            jfaEffect.Parameters["ScreenSize"].SetValue(writeTarget.Size());
+
+            Vector2 size = readTarget.Size();
+            int initJumpSize = (int) size.Y;
 
             initJumpSize = (int)BitOperations.RoundUpToPowerOf2((uint)initJumpSize);
 
