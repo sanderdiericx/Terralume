@@ -40,7 +40,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         
         float4 albedo = tex2Dlod(RadianceSampler, float4(uv.x, uv.y - distanceUV * 2.0, 0.0, 0.0));
         
-        float blendStrength = 1.0 - smoothstep(0.0, 1.0, distanceUV);
+        float blendStrength = (1.0 - smoothstep(0.0, 0.1, distanceUV)) * reflectionStrength;
         
         reflection = albedo * blendStrength;
     }

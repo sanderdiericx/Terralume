@@ -91,7 +91,6 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderNoiseBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
 
             BufferRenderer.RenderSDFBuffer(spriteBatch, bufferCollection, layerParameter);
-            BufferRenderer.RenderSDFBufferReflection(spriteBatch, bufferCollection);
 
             BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, bufferCollection, targetCollection);
 
@@ -99,8 +98,10 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderDepthBuffer(spriteBatch, bufferCollection, layerParameter, depthParameter);
 
             BufferRenderer.RenderMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
+
             BufferRenderer.RenderReflectiveMaterialBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
-            
+            BufferRenderer.RenderSDFBufferReflection(spriteBatch, bufferCollection);
+
             BufferRenderer.RenderNormalBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, bufferCollection);
 
