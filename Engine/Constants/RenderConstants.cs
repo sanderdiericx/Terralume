@@ -28,7 +28,8 @@ namespace Terralume.Engine.Constants
         public static readonly float BACKGROUND_BLUR_START_DISTANCE = 40f;
         public static readonly float BACKGROUND_BLUR_END_DISTANCE = 150f;
 
-        public static readonly float NORMAL_STRENGTH = 0.8f;
+        public static readonly float NORMAL_STRENGTH = 0.6f;
+        public static readonly float NORMAL_BLUR_DEVIATIONS = 0.5f;
 
         public static readonly float TONE_MAPPING_EXPOSURE = 0.8f;
 

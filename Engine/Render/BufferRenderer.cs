@@ -252,6 +252,8 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
+            BlurHelper.GaussianBlur(spriteBatch, bufferCollection.NormalBuffer, RenderConstants.NORMAL_BLUR_DEVIATIONS);
+
             device.SetRenderTargets(oldTargets);
         }
 
