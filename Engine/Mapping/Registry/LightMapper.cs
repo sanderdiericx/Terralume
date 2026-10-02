@@ -15,6 +15,34 @@ namespace Terralume.Engine.Mapping.Registry
         public static Dictionary<short, LightProfile> HeldItemProfiles { get; private set; } = new Dictionary<short, LightProfile>
         {
             { ItemID.Torch, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },
+            { ItemID.TikiTorch, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },
+            { ItemID.BlueTorch, new LightProfile(new Vector4(0.20f, 0.40f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.RedTorch, new LightProfile(new Vector4(1.00f, 0.20f, 0.20f, 1f), 3.5f, 300f) },
+            { ItemID.GreenTorch, new LightProfile(new Vector4(0.20f, 1.00f, 0.20f, 1f), 3.5f, 300f) },
+            { ItemID.PurpleTorch, new LightProfile(new Vector4(0.70f, 0.20f, 0.90f, 1f), 3.5f, 300f) },
+            { ItemID.WhiteTorch, new LightProfile(new Vector4(1.00f, 1.00f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.YellowTorch, new LightProfile(new Vector4(1.00f, 1.00f, 0.20f, 1f), 3.5f, 300f) },
+            { ItemID.DemonTorch, new LightProfile(new Vector4(0.60f, 0.20f, 0.80f, 1f), 3.5f, 300f) },
+            { ItemID.CursedTorch, new LightProfile(new Vector4(0.40f, 1.00f, 0.20f, 1f), 3.5f, 300f) },
+            { ItemID.IceTorch, new LightProfile(new Vector4(0.20f, 0.80f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.OrangeTorch, new LightProfile(new Vector4(1.00f, 0.60f, 0.10f, 1f), 3.5f, 300f) },
+            { ItemID.IchorTorch, new LightProfile(new Vector4(1.00f, 0.90f, 0.20f, 1f), 3.5f, 300f) },
+            { ItemID.UltrabrightTorch, new LightProfile(new Vector4(0.80f, 1.00f, 1.00f, 1f), 4.5f, 400f) },
+            { ItemID.BoneTorch, new LightProfile(new Vector4(0.80f, 0.70f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.RainbowTorch, new LightProfile(new Vector4(1.00f, 1.00f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.PinkTorch, new LightProfile(new Vector4(1.00f, 0.40f, 0.80f, 1f), 3.5f, 300f) },
+            { ItemID.DesertTorch, new LightProfile(new Vector4(1.00f, 0.85f, 0.60f, 1f), 3.5f, 300f) },
+            { ItemID.CoralTorch, new LightProfile(new Vector4(1.00f, 0.50f, 0.50f, 1f), 3.5f, 300f) },
+            { ItemID.CorruptTorch, new LightProfile(new Vector4(0.60f, 0.20f, 0.90f, 1f), 3.5f, 300f) },
+            { ItemID.CrimsonTorch, new LightProfile(new Vector4(0.95f, 0.20f, 0.28f, 1f), 3.5f, 300f) },
+            { ItemID.HallowedTorch, new LightProfile(new Vector4(0.60f, 0.90f, 0.90f, 1f), 3.5f, 300f) },
+            { ItemID.JungleTorch, new LightProfile(new Vector4(0.30f, 0.80f, 0.30f, 1f), 3.5f, 300f) },
+            { ItemID.MushroomTorch, new LightProfile(new Vector4(0.20f, 0.40f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.ShimmerTorch, new LightProfile(new Vector4(0.80f, 0.70f, 1.00f, 1f), 3.5f, 300f) },
+            { ItemID.Glowstick, new LightProfile(new Vector4(0.40f, 1.00f, 0.40f, 1f), 3.0f, 250f) },
+            { ItemID.BouncyGlowstick, new LightProfile(new Vector4(1.00f, 0.40f, 0.80f, 1f), 3.0f, 250f) },
+            { ItemID.SpelunkerGlowstick, new LightProfile(new Vector4(1.00f, 1.00f, 0.20f, 1f), 3.0f, 250f) },
+            { ItemID.StickyGlowstick, new LightProfile(new Vector4(0.40f, 1.00f, 0.40f, 1f), 3.0f, 250f) }
         };
 
         // Light profiles linked to light emitting tiles via CaptureVisibleTileLights
