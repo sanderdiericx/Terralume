@@ -1,6 +1,8 @@
 ﻿using log4net.Filter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SteelSeries.GameSense.DeviceZone;
+using System;
 using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
@@ -43,6 +45,22 @@ namespace Terralume.Engine.Render
             effect.Parameters["ProjectileLayer"].SetValue(layerParameter.Projectile);
 
             effect.Parameters["OcclusionFactor"].SetValue(0.08f / currentZoom);
+
+            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
+
+            float angle = (float)(Math.PI - (timePercent * Math.PI));
+            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
+
+            float maxIntensity = 4f;
+            float minIntensity = 2f;
+            float avgIntensity = 3f;
+
+            float t = MathF.Sin((float)timePercent * MathF.PI);
+            float sunIntensity = Main.dayTime ? float.Lerp(avgIntensity, maxIntensity, t) : float.Lerp(avgIntensity, minIntensity, t);
+            Vector3 sunLightColor = Main.ColorOfTheSkies.ToVector3() * sunIntensity;
+
+            effect.Parameters["SunDirection"].SetValue(sunDirection);
+            effect.Parameters["SunLightColor"].SetValue(sunLightColor);
 
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);

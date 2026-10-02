@@ -21,6 +21,9 @@ float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
 float2 SunOcclusionTextureSize;
 
+float2 SunDirection;
+float3 SunLightColor;
+
 float VolumetricStrength;
 float VolumetricRange;
 float VolumetricNoiseContrast;
@@ -174,6 +177,7 @@ float SunOcclusion(float2 uv);
 float3 BloomThreshold(float3 color, float threshold, float knee);
 
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
+float3 CalculateDirectionalLight(float2 lightDir, float lightZ, float pixelZ, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir);
 float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize);
 
 float3 ApproximateOpenDirection(float2 uv, float2 texelSize, out bool gradientValid);
@@ -263,6 +267,8 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         color += volumetric * volumetricNoise;
     }
     
+    color += CalculateDirectionalLight(SunDirection, lightPositionZ, pixelZ, SunLightColor, albedo, material, normal, viewDir) * SunOcclusion(uv);
+    
     float2 texelSize = 1.0 / ScreenSize;
     color += CalculateAmbientLight(albedo, material, normal, viewDir, uv, sdf, texelSize);
     
@@ -349,6 +355,26 @@ float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, 
     
     return CalculateOutgoingLight(energyConservation, albedo, specular, radianceColor, normal, lightDir);
 }
+
+float3 CalculateDirectionalLight(float2 lightDir, float lightZ, float pixelZ, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir)
+{
+    float3 lightDirZ = normalize(float3(0.0, 0.0, lightZ) - float3(0.0, 0.0, pixelZ));
+    
+    float3 l = float3(lightDir.x, lightDir.y, lightDirZ.z);
+    float3 halfVector = normalize(viewDir + l);
+    
+    float3 baseReflectivity = BaseReflectivityFunction(material.r, albedo);
+    
+    float distribution = NormalDistributionFunction(material.g, normal, halfVector);
+    float geometry = GeometrySmith(material.g, normal, viewDir, l);
+    
+    float3 fresnel = FresnelSchlickApproximationFunction(baseReflectivity, viewDir, halfVector);
+    float3 energyConservation = EnergyConservationFunction(fresnel, material.r);
+    float3 specular = CalculateBRDFSpecular(distribution, geometry, fresnel, normal, viewDir, l);
+    
+    return CalculateOutgoingLight(energyConservation, albedo, specular, lightColor, normal, l);
+}
+
 
 float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize)
 {

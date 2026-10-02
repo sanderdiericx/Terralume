@@ -89,11 +89,18 @@ namespace Terralume.Engine.Hooks.Tracking
 
         private static int ResolveColumn(int column)
         {
+            int rowCount = 0;
+
             for (int row = 0; row < Main.tile.Height; row++)
             {
                 Tile tile = Main.tile[column, row];
 
                 if (tile.HasTile && Main.tileSolid[tile.TileType])
+                {
+                    rowCount++;
+                }
+
+                if (rowCount > 30)
                 {
                     return row;
                 }
