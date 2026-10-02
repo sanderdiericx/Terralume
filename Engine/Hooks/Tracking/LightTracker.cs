@@ -11,9 +11,15 @@ namespace Terralume.Engine.Hooks.Tracking
 {
     internal class LightTracker : ModSystem
     {
+        // Hooked lights tracks lights added by the vanilla lighting engine, as well as held lights and tile lights
+        // Note: Each hooked light stores a world position, light profile, and if the light can skip merging with others nearby
         private static List<(Vector2, LightProfile, bool)> hookedLights = new List<(Vector2, LightProfile, bool)>();
 
+        // Merged lights represents the lights from hooked lights, with lights close enough to each other being merged into one to improve performance
         private static List<(Vector2, LightProfile)> mergedLights = new List<(Vector2, LightProfile)>();
+
+        // On screen lights is all the hooked and merged lights, with the world position being converted into screen position
+        // Note: Any light not within the screen position +- padding is removed to improve performance
         private static List<(Vector2, LightProfile)> onScreenLights = new List<(Vector2, LightProfile)>();
 
         public override void Load()
@@ -52,7 +58,6 @@ namespace Terralume.Engine.Hooks.Tracking
             Vector4 color = new Vector4(r, g, b, 1f);
 
             LightProfile lightProfile = new LightProfile(color, LightMapper.DefaultLightIntensity, LightMapper.DefaultLightRange);
-            LightMapper.DefaultLightExceptions.TryGetValue(color, out lightProfile);
 
             hookedLights.Add((position, lightProfile, false));
         }
@@ -84,6 +89,19 @@ namespace Terralume.Engine.Hooks.Tracking
                         }
                     }
                 }
+            }
+        }
+
+        // Captures held item light profiles by checking wheter the current held item type has a defined light profile
+        private static void CaptureHeldItemLights()
+        {
+            Player player = Main.player[Main.myPlayer];
+
+            if (LightMapper.HeldItemProfiles.TryGetValue((short)player.HeldItem.type, out LightProfile lightProfile))
+            {
+                Vector2 worldPos = player.itemLocation;
+
+                hookedLights.Add((worldPos, lightProfile, true));
             }
         }
 
@@ -138,6 +156,9 @@ namespace Terralume.Engine.Hooks.Tracking
 
             // Capture tile lights into hookedLights
             CaptureVisibleTileLights(tileCaptureParameter);
+
+            // Capture item lights into hookedLights
+            CaptureHeldItemLights();
 
             // Merge hookedLights into mergedLights
             MergeHookedLights();

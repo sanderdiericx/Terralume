@@ -223,91 +223,91 @@ namespace Terralume.Engine.Hooks.Tracking
             else if (corruptSurface)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.28f, 0.10f, 0.40f), 0.50f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (crimsonSurface)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.55f, 0.08f, 0.12f), 0.50f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (hallowSurface)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.70f, 0.50f, 0.85f), 0.40f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (jungleSurface)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.18f, 0.42f, 0.12f), 0.38f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (snowSurface)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.72f, 0.82f, 0.96f), 0.25f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (player.ZoneDesert)
             {
                 ambientColor = skyLinear * new Vector3(1.15f, 0.95f, 0.75f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (player.ZoneBeach)
             {
                 ambientColor = skyLinear * new Vector3(0.95f, 1.00f, 1.05f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (player.ZoneForest)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.40f, 0.55f, 0.35f), 0.25f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
 
             // SURFACE MISC
             else if (player.ZoneSandstorm)
             {
                 ambientColor = skyLinear * new Vector3(0.90f, 0.75f, 0.55f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
             else if (player.ZoneRain)
             {
                 ambientColor = skyLinear * new Vector3(0.70f, 0.75f, 0.85f);
-                ambientStrength = 0f;
+                ambientStrength = 1.5f;
             }
             else if (player.ZoneMeteor)
             {
                 ambientColor = new Vector3(0.80f, 0.40f, 0.20f);
-                ambientStrength = 0f;
+                ambientStrength = 3f;
             }
 
             // SPACE
             else if (corruptSpace)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.28f, 0.10f, 0.40f), 0.18f);
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
             else if (crimsonSpace)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.50f, 0.10f, 0.14f), 0.18f);
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
             else if (hallowSpace)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.68f, 0.52f, 0.85f), 0.20f);
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
             else if (jungleSpace)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.20f, 0.45f, 0.16f), 0.15f);
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
             else if (snowSpace)
             {
                 ambientColor = Vector3.Lerp(skyLinear, new Vector3(0.74f, 0.84f, 0.98f), 0.15f);
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
             else if (player.ZoneNormalSpace)
             {
                 ambientColor = skyLinear;
-                ambientStrength = 0f;
+                ambientStrength = 1f;
             }
 
             return new AmbientLightProfile(ambientColor, ambientStrength);

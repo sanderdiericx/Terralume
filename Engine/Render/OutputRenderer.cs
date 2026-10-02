@@ -160,10 +160,25 @@ namespace Terralume.Engine.Render
         }
 
         // Note: Radiance buffer must be produced before this method is called
-        public static void RenderReflectionBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection)
+        public static void RenderReflectionBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
             RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            RenderTarget2D radianceAndBackgroundBuffer = RenderTargetCache.RequestTarget(outputCollection.RadianceBuffer.Width, outputCollection.RadianceBuffer.Height, SurfaceFormat.Vector4);
+
+            // Composite the aboveground background onto the buffer used for reflections so that backgrounds appear in surface reflections
+            device.SetRenderTarget(radianceAndBackgroundBuffer);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(targetCollection.Background, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(outputCollection.RadianceBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
 
             device.SetRenderTarget(outputCollection.ReflectionBuffer);
             device.Clear(Color.Transparent);
@@ -176,10 +191,12 @@ namespace Terralume.Engine.Render
             effect.Parameters["ReflectiveMaterialBuffer"].SetValue(bufferCollection.ReflectiveMaterialBuffer);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
-            spriteBatch.Draw(outputCollection.RadianceBuffer, Vector2.Zero, Color.White);
+            spriteBatch.Draw(radianceAndBackgroundBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
             device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(radianceAndBackgroundBuffer);
         }
 
         public static void RenderOutputBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TargetCollection targetCollection)

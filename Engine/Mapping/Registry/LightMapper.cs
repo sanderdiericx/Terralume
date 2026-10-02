@@ -11,15 +11,13 @@ namespace Terralume.Engine.Mapping.Registry
         public static float DefaultLightIntensity { get; private set; } = 2.0f;
         public static float DefaultLightRange { get; private set; } = 115f;
 
-        // Some light sources captured by AddLight methods (such as held torches) need custom light profiles
-        //
-        // Note: Custom lights are currently identified by color (Need a better ID system in the future)
-        public static Dictionary<Vector4, LightProfile> DefaultLightExceptions { get; private set; } = new Dictionary<Vector4, LightProfile>()
+        // Light profiles linked to (held!) items via CaptureHeldItemLights
+        public static Dictionary<short, LightProfile> HeldItemProfiles { get; private set; } = new Dictionary<short, LightProfile>
         {
-            { new Vector4(1.00f, 0.95f, 0.80f, 1f), new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) } // Held torches
+            { ItemID.Torch, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },
         };
 
-        // Light profiles linked to light emitting tiles via GetVisibleTileLights
+        // Light profiles linked to light emitting tiles via CaptureVisibleTileLights
         public static Dictionary<ushort, LightProfile> TileProfiles { get; private set; } = new Dictionary<ushort, LightProfile>
         {
             { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },

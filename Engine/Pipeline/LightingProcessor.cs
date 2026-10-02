@@ -75,7 +75,7 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
-            OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection);
+            OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
@@ -133,15 +133,15 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {
-                    Main.NewText($"Switching to reflective material buffer view", Color.Green);
+                    Main.NewText($"Switching to background target view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.ReflectiveMaterialBuffer;
+                    currentRenderTarget = targetCollection.Background;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to reflective sdf buffer view", Color.Green);
+                    Main.NewText($"Switching to underground background target view", Color.Green);
 
-                    currentRenderTarget = bufferCollection.SDFBufferReflection;
+                    currentRenderTarget = targetCollection.UndergroundBackgroundMaster;
                 }
             }
 
