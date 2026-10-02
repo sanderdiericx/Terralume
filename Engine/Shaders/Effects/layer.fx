@@ -108,6 +108,10 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     {
         layer = float4(LiquidLayer, 0.0, 0.0, 1.0);
     }
+    else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
+    {
+        layer = float4(TileLayer, 0.0, 0.0, 1.0);
+    }
     else if (tex2D(PlayerSampler, uv).a > epsilon) // Player
     {
         layer = float4(PlayerLayer, 0.0, 0.0, 1.0);
@@ -119,10 +123,6 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     else if (tex2D(EntitySampler, uv).a > epsilon) // Entity
     {
         layer = float4(EntityLayer, 0.0, 0.0, 1.0);
-    }
-    else if (tex2D(TileSampler, uv).a > epsilon) // Tiles
-    {
-        layer = float4(TileLayer, 0.0, 0.0, 1.0);
     }
     else if (tex2D(NonSolidTileSampler, uv).a > epsilon) // Non Solid Tiles
     {
