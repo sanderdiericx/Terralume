@@ -47,9 +47,6 @@ namespace Terralume.Engine.Pipeline
 
             ReflectionPacker.SetTileReflections(ReflectionMapper.MappedTiles);
             ReflectionPacker.SetLiquidReflections(ReflectionMapper.MappedLiquids);
-
-            NoisePacker.SetTileNoise(NoiseMapper.MappedTiles);
-            NoisePacker.SetWallNoise(NoiseMapper.MappedWalls);
         }
 
         public override void Unload()
@@ -83,9 +80,6 @@ namespace Terralume.Engine.Pipeline
 
             if (!ReflectionPacker.TilesValid) ReflectionPacker.PackTileReflectionTexture();
             if (!ReflectionPacker.LiquidsValid) ReflectionPacker.PackLiquidReflectionTexture();
-
-            if (!NoisePacker.TilesValid) NoisePacker.PackTileNoiseTexture();
-            if (!NoisePacker.WallsValid) NoisePacker.PackWallNoiseTexture();
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, bufferCollection, targetCollection, layerParameter);
             BufferRenderer.RenderNoiseBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);

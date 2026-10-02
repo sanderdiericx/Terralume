@@ -7,7 +7,6 @@ float2 ScreenPosition;
 float2 ViewSize;
 
 float3 DefaultMaterial;
-float MaterialVariationFactor;
 
 float3 DefaultProjectileMaterial;
 
@@ -23,18 +22,6 @@ float ProjectileLayer;
 float PlayerLayer;
 float LiquidLayer;
 float OtherLayer;
-
-Texture2D NoiseBuffer;
-
-sampler NoiseSampler = sampler_state
-{
-    Texture = (NoiseBuffer);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
 
 Texture2D TileIDTexture;
 
@@ -195,12 +182,9 @@ float GetID(sampler IDSampler, float2 uv)
 
 float4 GetMaterial(float ID, sampler materialSampler, float2 uv)
 {
-    float roughnessVariation = (tex2D(NoiseSampler, uv).r - 0.5) * MaterialVariationFactor;
-    float4 variation = float4(0.0, roughnessVariation, 0.0, 0.0);
-    
     if (ID == 65535)
     {
-        return float4(DefaultMaterial.x, DefaultMaterial.y, DefaultMaterial.z, 1.0) + variation;
+        return float4(DefaultMaterial.x, DefaultMaterial.y, DefaultMaterial.z, 1.0);
     }
     
     float materialPixelX = fmod((float) ID, MaterialTextureSize.x);
@@ -213,10 +197,10 @@ float4 GetMaterial(float ID, sampler materialSampler, float2 uv)
     // ID was never given a material vector
     if (sampledMaterial.a < 0.01)
     {
-        return float4(DefaultMaterial.x, DefaultMaterial.y, DefaultMaterial.z, 1.0) + variation;
+        return float4(DefaultMaterial.x, DefaultMaterial.y, DefaultMaterial.z, 1.0);
     }
     
-    return sampledMaterial + variation;
+    return sampledMaterial;
 }
 
 technique Material

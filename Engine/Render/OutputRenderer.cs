@@ -42,8 +42,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["PlayerLayer"].SetValue(layerParameter.Player);
             effect.Parameters["ProjectileLayer"].SetValue(layerParameter.Projectile);
 
-            effect.Parameters["AlbedoVariationFactor"].SetValue(RenderConstants.ALBEDO_VARIATION_FACTOR);
-
             effect.Parameters["OcclusionFactor"].SetValue(0.08f / currentZoom);
 
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);

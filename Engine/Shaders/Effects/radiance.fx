@@ -15,7 +15,6 @@ float WallLayer;
 float PlayerLayer;
 float ProjectileLayer;
 
-float AlbedoVariationFactor;
 float OcclusionFactor;
 
 float2 LightDataTextureSize;
@@ -208,15 +207,6 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     if (abs(layer - BackgroundLayer) < 0.01 && albedoOriginal.a < 0.01)
     {
         discard;
-    }
-
-    // Albedo noise variation
-    if (abs(layer - TileLayer) < 0.01 || abs(layer - WallLayer) < 0.01)
-    {
-        float variation = (noise - 0.5) * AlbedoVariationFactor;
-        float3 albedoVariation = float3(-variation, -variation, -variation);
-        
-        albedoOriginal.rgb = clamp(albedoOriginal.rgb + albedoVariation, 0.0, 1.0);
     }
     
     float3 albedo = ToLinear(albedoOriginal.rgb);

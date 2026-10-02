@@ -62,27 +62,10 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.Noise);
 
-            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
-            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
-
             effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
-            effect.Parameters["DefaultNoise"].SetValue(NoiseMapper.DefaultNoise);
-            effect.Parameters["BackgroundNoise"].SetValue(NoiseMapper.BackgroundNoise);
-
-            effect.Parameters["NoiseTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["IDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-
-            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
-            effect.Parameters["WallLayer"].SetValue(layerParameter.Wall);
-            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
-
-            effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
-            effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
-
-            effect.Parameters["TileNoiseTexture"].SetValue(NoisePacker.TileNoiseTexture);
-            effect.Parameters["WallNoiseTexture"].SetValue(NoisePacker.WallNoiseTexture);
+            effect.Parameters["DefaultNoise"].SetValue(RenderConstants.DEFAULT_NOISE);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
@@ -131,7 +114,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
             effect.Parameters["DefaultMaterial"].SetValue(MaterialMapper.DefaultMaterial);
-            effect.Parameters["MaterialVariationFactor"].SetValue(RenderConstants.MATERIAL_VARIATION_FACTOR);
 
             effect.Parameters["DefaultProjectileMaterial"].SetValue(MaterialMapper.DefaultProjectileMaterial);
 
@@ -139,8 +121,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
 
             layerParameter.SetUniforms(effect);
-
-            effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
 
             effect.Parameters["TileIDTexture"].SetValue(IDPacker.TileIDTexture);
             effect.Parameters["WallIDTexture"].SetValue(IDPacker.WallIDTexture);
