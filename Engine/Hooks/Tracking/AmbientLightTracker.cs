@@ -8,9 +8,31 @@ namespace Terralume.Engine.Hooks.Tracking
 {
     internal class AmbientLightTracker : ModSystem
     {
+        private static AmbientLightProfile lastAmbientLightProfile = new AmbientLightProfile(Vector3.Zero, 0f);
+        private static float t = 0f;
+
         public static AmbientLightProfile GetAmbientLightProfile()
         {
-            return GetBiomeAmbient();
+            // Find the ambient light profile for the current biome
+            AmbientLightProfile biomeAmbient = GetBiomeAmbient();
+
+            // If the current and previous biome ambient do not closely match, we interpolate between the last and current profiles
+            float distance = Vector3.Distance(biomeAmbient.AmbientColor, lastAmbientLightProfile.AmbientColor);
+
+            if (distance > 0.001f)
+            {
+                t += 0.01f;
+
+                lastAmbientLightProfile.AmbientColor = Vector3.Lerp(lastAmbientLightProfile.AmbientColor, biomeAmbient.AmbientColor, t);
+                lastAmbientLightProfile.AmbientStrength = float.Lerp(lastAmbientLightProfile.AmbientStrength, biomeAmbient.AmbientStrength, t);
+
+                return lastAmbientLightProfile;
+            }
+
+            // Reset interpolation progress
+            t = 0f;
+
+            return biomeAmbient;
         }
 
         private static AmbientLightProfile GetBiomeAmbient()
