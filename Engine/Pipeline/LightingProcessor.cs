@@ -70,8 +70,8 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
-            SunOcclusionTracker.UpdateOccluders();
-            SunOcclusionTracker.PackSunOcclusionTexture(tileCaptureParameter);
+            SunOcclusionTracker.UpdateSunOcclusionValues(tileCaptureParameter);
+            SunOcclusionTracker.PackSunOcclusionTexture();
 
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
@@ -141,7 +141,7 @@ namespace Terralume.Engine.Pipeline
                 {
                     Main.NewText($"Switching to underground background target view", Color.Green);
 
-                    currentRenderTarget = targetCollection.UndergroundBackgroundMaster;
+                    currentRenderTarget = targetCollection.UndergroundBackground;
                 }
             }
 

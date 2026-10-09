@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terraria;
@@ -10,12 +10,11 @@ namespace Terralume.Engine.Hooks.Tracking
 {
     internal class SunOcclusionTracker : ModSystem
     {
-        public static HashSet<int> DirtyColumns { get; private set; } = new HashSet<int>();
-        public static Texture2D SunOcclusionTexture { get; private set; }
+        private static readonly int MAX_RAY_STEPS = 100;
+        private static readonly Vector2 TILEMAP_PADDING = new Vector2(100, 100);
 
-        // An array with (world width) elements, each index represents a column and stores the position of the highest occluder in tile-space.
-        private static int[] occluderHeights;
-        private static float[] occlusionPixels = new float[RenderConstants.SUN_OCCLUSION_DATA_RESOLUTION];
+        public static Texture2D SunOcclusionTexture { get; private set; }
+        private static Vector4[] occlusionPixels = new Vector4[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public override void Load()
         {
@@ -25,7 +24,7 @@ namespace Terralume.Engine.Hooks.Tracking
 
             Main.QueueMainThreadAction(() =>
             {
-                SunOcclusionTexture = new Texture2D(device, RenderConstants.SUN_OCCLUSION_DATA_RESOLUTION, 1, false, SurfaceFormat.Single);
+                SunOcclusionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
             });
         }
 
@@ -39,74 +38,104 @@ namespace Terralume.Engine.Hooks.Tracking
             });
         }
 
-        public override void PostWorldLoad()
+        public static void UpdateSunOcclusionValues(TileCaptureParameter tileCaptureParameter)
         {
-            base.PostWorldLoad();
+            // buffer sized to the max visible tile area, reused every frame
+            Array.Clear(occlusionPixels, 0, occlusionPixels.Length);
 
-            occluderHeights = new int[Main.tile.Width];
+            // Extract min and max tile positions
+            int minX = (int)tileCaptureParameter.MinTile.X, minY = (int)tileCaptureParameter.MinTile.Y;
+            int maxX = (int)tileCaptureParameter.MaxTile.X, maxY = (int)tileCaptureParameter.MaxTile.Y;
 
-            for (int column = 0; column < Main.tile.Width; column++)
-            {
-                occluderHeights[column] = ResolveColumn(column);
-            }
-        }
+            // Calculate sun direction
+            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
+            float angle = (float)(Math.PI - (timePercent * Math.PI));
+            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
 
-        public static void PackSunOcclusionTexture(TileCaptureParameter tileCaptureParameter)
-        {
-            int maxPixels = RenderConstants.SUN_OCCLUSION_DATA_RESOLUTION;
+            // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
+            Vector2 startPos = new Vector2(minX - (int)TILEMAP_PADDING.X, minY - (int)TILEMAP_PADDING.Y);
+            Vector2 endPos = new Vector2(maxX - (int)TILEMAP_PADDING.X, maxY - (int)TILEMAP_PADDING.Y);
 
-            Array.Clear(occlusionPixels, 0, maxPixels);
+            Tile[,] tiles = CopyTileMap(startPos, endPos);
 
             int count = 0;
 
-            for (int i = (int)tileCaptureParameter.MinTile.X; i <= tileCaptureParameter.MaxTile.X; i++)
+            // For each tile currently on screen, cast a ray in the negative direction of the sun
+            for (int x = minX; x < maxX; x++)
             {
-                if (i < 0 || i >= Main.maxTilesX) // Out of bounds
+                for (int y = minY; y < maxY; y++)
                 {
-                    occlusionPixels[count] = -1f;
-                }
-                else
-                {
-                    int height = occluderHeights[i];
-                    occlusionPixels[count] = height;
-                }
+                    int tileMapX = x + (int)TILEMAP_PADDING.X;
+                    int tileMapY = x + (int)TILEMAP_PADDING.Y;
 
-                count++;
+                    // Ray returns the level of occlusion this tile has
+                    // Note: packing the occlusion float into a ARGB texture is kind of wasteful compared to IDPacker
+                    occlusionPixels[count] = new Vector4(CastSunRay(tiles, tileMapX, tileMapY, sunDirection));
+
+                    count++;
+                }
             }
+        }
 
+        public static void PackSunOcclusionTexture()
+        {
             SunOcclusionTexture.SetData(occlusionPixels);
         }
 
-        public static void UpdateOccluders()
+        // Casts a ray from that steps along the tile grid from a tile space position until it hits a solid tile or reaches a max iteration count
+        private static float CastSunRay(Tile[,] tiles, int x, int y, Vector2 sunDir)
         {
-            foreach (int column in DirtyColumns)
+            Vector2 origin = new Vector2(x, y);
+
+            // Step through the tile grid in the opposite direction of the sun
+            for (int i = 1; i <= MAX_RAY_STEPS; i++)
             {
-                occluderHeights[column] = ResolveColumn(column);
+                Vector2 currentPos = origin + (-sunDir * i);
+
+                int sampleX = (int)MathF.Floor(currentPos.X);
+                int sampleY = (int)MathF.Floor(currentPos.Y);
+
+                // Ray is out of bounds, assume unobstructed path to the sky
+                if (sampleX < 0 || sampleX > tiles.GetLength(0) || sampleY < 0 || sampleY > tiles.GetLength(1))
+                {
+                    return 1f;
+                }
+
+                Tile sampled = tiles[sampleX, sampleY];
+
+                // Ray has hit tile, no sunlight shall reach this tile
+                if (sampled.HasTile)
+                {
+                    return 0f;
+                }
             }
 
-            DirtyColumns.Clear();
+            // This tile has an unobstructed path to the sky
+            return 1f;
         }
 
-        private static int ResolveColumn(int column)
+        // Copies the Main.tile tilemap into a 2D array, only copies values within a specified bounding box
+        private static Tile[,] CopyTileMap(Vector2 startPos, Vector2 endPos)
         {
-            int rowCount = 0;
+            // Ensure start and end positions are within bounds
+            int startX = (int)Math.Clamp(startPos.X, 0, Main.tile.Width);
+            int startY = (int)Math.Clamp(startPos.Y, 0, Main.tile.Height);
 
-            for (int row = 0; row < Main.tile.Height; row++)
+            int endX = (int)Math.Clamp(endPos.X, 0, Main.tile.Width);
+            int endY = (int)Math.Clamp(endPos.Y, 0, Main.tile.Height);
+
+            Tile[,] tiles = new Tile[endX - startX + 1, endY - startY + 1];
+
+            // Copy Main.tile values into tiles
+            for (int x = startX; x < endX; x++)
             {
-                Tile tile = Main.tile[column, row];
-
-                if (tile.HasTile && Main.tileSolid[tile.TileType])
+                for (int y = startY; y < endY; y++)
                 {
-                    rowCount++;
-                }
-
-                if (rowCount > 30)
-                {
-                    return row;
+                    tiles[x - startX, y - startX] = Main.tile[x, y]; 
                 }
             }
 
-            return Main.tile.Height;
+            return tiles;
         }
     }
 }
