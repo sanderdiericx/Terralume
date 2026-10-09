@@ -74,6 +74,9 @@ namespace Terralume.Engine.Pipeline
             IDPacker.PackWallIDTexture();
             IDPacker.PackLiquidIDTexture();
 
+            SunOcclusionPacker.UpdateSunOcclusionValues(tileCaptureParameter);
+            SunOcclusionPacker.PackSunOcclusionTexture();
+
             if (!MaterialPacker.TilesValid) MaterialPacker.PackTileMaterialTexture();
             if (!MaterialPacker.WallsValid) MaterialPacker.PackWallMaterialTexture();
             if (!MaterialPacker.LiquidsValid) MaterialPacker.PackLiquidMaterialTexture();
@@ -98,6 +101,8 @@ namespace Terralume.Engine.Pipeline
 
             BufferRenderer.RenderNormalBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderAlbedoBuffer(spriteBatch, bufferCollection);
+
+            BufferRenderer.RenderSunOcclusionBuffer(spriteBatch, bufferCollection, tileCaptureParameter);
 
             return bufferCollection;
         }

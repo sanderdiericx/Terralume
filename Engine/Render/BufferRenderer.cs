@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using log4net.Filter;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
@@ -458,6 +460,34 @@ namespace Terralume.Engine.Render
 
             RenderTargetCache.ReturnTarget(wideBlurTarget);
             RenderTargetCache.ReturnTarget(tightBlurTarget);
+        }
+
+        // Note SunOcclusionTexture must be packed for this method to work properly
+        public static void RenderSunOcclusionBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TileCaptureParameter tileCaptureParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(bufferCollection.SunOcclusionBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.SunOcclusion);
+
+            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
+            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
+
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+
+            effect.Parameters["SunOcclusionTextureSize"].SetValue(SunOcclusionPacker.SunOcclusionTexture.Size());
+
+            effect.Parameters["SunOcclusionTexture"].SetValue(SunOcclusionPacker.SunOcclusionTexture);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
         }
     }
 }

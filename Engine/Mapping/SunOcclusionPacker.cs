@@ -6,15 +6,15 @@ using Terralume.Engine.Constants;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Terralume.Engine.Hooks.Tracking
+namespace Terralume.Engine.Mapping
 {
-    internal class SunOcclusionTracker : ModSystem
+    internal class SunOcclusionPacker : ModSystem
     {
         private static readonly int MAX_RAY_STEPS = 100;
         private static readonly Vector2 TILEMAP_PADDING = new Vector2(100, 100);
 
         public static Texture2D SunOcclusionTexture { get; private set; }
-        private static Vector4[] occlusionPixels = new Vector4[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static float[] occlusionPixels = new float[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
         public override void Load()
         {
@@ -24,7 +24,7 @@ namespace Terralume.Engine.Hooks.Tracking
 
             Main.QueueMainThreadAction(() =>
             {
-                SunOcclusionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                SunOcclusionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION, false, SurfaceFormat.Single);
             });
         }
 
@@ -46,6 +46,7 @@ namespace Terralume.Engine.Hooks.Tracking
             // Extract min and max tile positions
             int minX = (int)tileCaptureParameter.MinTile.X, minY = (int)tileCaptureParameter.MinTile.Y;
             int maxX = (int)tileCaptureParameter.MaxTile.X, maxY = (int)tileCaptureParameter.MaxTile.Y;
+            int stride = (int)tileCaptureParameter.TileStride.X;
 
             // Calculate sun direction
             double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
@@ -53,26 +54,21 @@ namespace Terralume.Engine.Hooks.Tracking
             Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
 
             // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
-            Vector2 startPos = new Vector2(minX - (int)TILEMAP_PADDING.X, minY - (int)TILEMAP_PADDING.Y);
-            Vector2 endPos = new Vector2(maxX - (int)TILEMAP_PADDING.X, maxY - (int)TILEMAP_PADDING.Y);
+            // Note: startPos is clamped here so the copy and the indexing below share the same origin
+            Vector2 startPos = new Vector2(Math.Clamp(minX - (int)TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)TILEMAP_PADDING.Y, 0, Main.tile.Height));
+            Vector2 endPos = new Vector2(maxX + (int)TILEMAP_PADDING.X, maxY + (int)TILEMAP_PADDING.Y);
 
             Tile[,] tiles = CopyTileMap(startPos, endPos);
 
-            int count = 0;
-
-            // For each tile currently on screen, cast a ray in the negative direction of the sun
-            for (int x = minX; x < maxX; x++)
+            // For each tile currently on screen, cast a ray toward the sun
+            for (int y = minY; y < maxY; y++)
             {
-                for (int y = minY; y < maxY; y++)
+                for (int x = minX; x < maxX; x++)
                 {
-                    int tileMapX = x + (int)TILEMAP_PADDING.X;
-                    int tileMapY = x + (int)TILEMAP_PADDING.Y;
+                    int index = (y - minY) * stride + (x - minX);
+                    if (index < 0 || index >= occlusionPixels.Length) continue;
 
-                    // Ray returns the level of occlusion this tile has
-                    // Note: packing the occlusion float into a ARGB texture is kind of wasteful compared to IDPacker
-                    occlusionPixels[count] = new Vector4(CastSunRay(tiles, tileMapX, tileMapY, sunDirection));
-
-                    count++;
+                    occlusionPixels[index] = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, sunDirection);
                 }
             }
         }
@@ -87,24 +83,27 @@ namespace Terralume.Engine.Hooks.Tracking
         {
             Vector2 origin = new Vector2(x, y);
 
-            // Step through the tile grid in the opposite direction of the sun
+            // Tile space is y-down, so flip y to march toward the sun
+            Vector2 toSun = new Vector2(sunDir.X, -sunDir.Y);
+
+            // Step through the tile grid in the direction of the sun
             for (int i = 1; i <= MAX_RAY_STEPS; i++)
             {
-                Vector2 currentPos = origin + (-sunDir * i);
+                Vector2 currentPos = origin + (toSun * i);
 
                 int sampleX = (int)MathF.Floor(currentPos.X);
                 int sampleY = (int)MathF.Floor(currentPos.Y);
 
                 // Ray is out of bounds, assume unobstructed path to the sky
-                if (sampleX < 0 || sampleX > tiles.GetLength(0) || sampleY < 0 || sampleY > tiles.GetLength(1))
+                if (sampleX < 0 || sampleX >= tiles.GetLength(0) || sampleY < 0 || sampleY >= tiles.GetLength(1))
                 {
                     return 1f;
                 }
 
                 Tile sampled = tiles[sampleX, sampleY];
 
-                // Ray has hit tile, no sunlight shall reach this tile
-                if (sampled.HasTile)
+                // Ray has hit a solid, non-actuated tile, no sunlight shall reach this tile
+                if (sampled.HasTile && Main.tileSolid[sampled.TileType] && !sampled.IsActuated)
                 {
                     return 0f;
                 }
@@ -124,14 +123,14 @@ namespace Terralume.Engine.Hooks.Tracking
             int endX = (int)Math.Clamp(endPos.X, 0, Main.tile.Width);
             int endY = (int)Math.Clamp(endPos.Y, 0, Main.tile.Height);
 
-            Tile[,] tiles = new Tile[endX - startX + 1, endY - startY + 1];
+            Tile[,] tiles = new Tile[endX - startX, endY - startY];
 
             // Copy Main.tile values into tiles
             for (int x = startX; x < endX; x++)
             {
                 for (int y = startY; y < endY; y++)
                 {
-                    tiles[x - startX, y - startX] = Main.tile[x, y]; 
+                    tiles[x - startX, y - startY] = Main.tile[x, y];
                 }
             }
 

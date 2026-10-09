@@ -70,9 +70,6 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
-            SunOcclusionTracker.UpdateSunOcclusionValues(tileCaptureParameter);
-            SunOcclusionTracker.PackSunOcclusionTexture();
-
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
             OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
@@ -127,9 +124,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D8))
                 {
-                    Main.NewText($"Switching to reflection buffer view", Color.Green);
+                    Main.NewText($"Switching to sun occlusion buffer view", Color.Green);
 
-                    currentRenderTarget = outputCollection.ReflectionBuffer;
+                    currentRenderTarget = bufferCollection.SunOcclusionBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D9))
                 {

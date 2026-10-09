@@ -32,8 +32,6 @@ namespace Terralume.Engine.Render
             float currentZoom = Main.GameViewMatrix.Zoom.X;
 
             effect.Parameters["ScreenSize"].SetValue(outputCollection.RadianceBuffer.Size());
-            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
-            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
 
             effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
             effect.Parameters["LightDepth"].SetValue(RenderConstants.LIGHT_DEPTH);
@@ -76,7 +74,6 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(LightPacker.LightIndexTexture.Width, LightPacker.LightIndexTexture.Height));
-            effect.Parameters["SunOcclusionTextureSize"].SetValue(new Vector2(SunOcclusionTracker.SunOcclusionTexture.Width, SunOcclusionTracker.SunOcclusionTexture.Height));
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
             effect.Parameters["DepthBuffer"].SetValue(bufferCollection.DepthBuffer);
@@ -89,7 +86,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["LightColorTexture"].SetValue(LightPacker.LightColorTexture);
             effect.Parameters["LightGridTexture"].SetValue(LightPacker.LightGridTexture);
             effect.Parameters["LightIndexTexture"].SetValue(LightPacker.LightIndexTexture);
-            effect.Parameters["SunOcclusionTexture"].SetValue(SunOcclusionTracker.SunOcclusionTexture);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.AlbedoBuffer, Vector2.Zero, Color.White);

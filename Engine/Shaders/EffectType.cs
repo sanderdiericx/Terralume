@@ -21,6 +21,7 @@
         JFAReflectionInit,
         JFAReflection,
         SDFCombineReflection,
-        Reflection
+        Reflection,
+        SunOcclusion
     }
 }

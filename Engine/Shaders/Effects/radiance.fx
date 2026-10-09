@@ -3,8 +3,6 @@
 static const float PI = 3.14159265359f;
 
 float2 ScreenSize;
-float2 ViewSize;
-float2 ScreenPosition;
 
 float DepthScale;
 float LightDepth;
@@ -19,7 +17,6 @@ float OcclusionFactor;
 
 float2 LightDataTextureSize;
 float2 LightIndexTextureSize;
-float2 SunOcclusionTextureSize;
 
 float2 SunDirection;
 float3 SunLightColor;
@@ -152,17 +149,6 @@ sampler LightIndexSampler = sampler_state
     AddressV = Clamp;
 };
 
-Texture2D SunOcclusionTexture;
-sampler SunOcclusionSampler = sampler_state
-{
-    Texture = (SunOcclusionTexture);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
 
 struct Output
 {
@@ -172,7 +158,6 @@ struct Output
 
 
 float Occlusion(float2 sdf);
-float SunOcclusion(float2 uv);
 
 float3 BloomThreshold(float3 color, float threshold, float knee);
 
@@ -267,7 +252,7 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
         color += volumetric * volumetricNoise;
     }
     
-    color += CalculateDirectionalLight(SunDirection, lightPositionZ, pixelZ, SunLightColor, albedo, material, normal, viewDir) * SunOcclusion(uv);
+    color += CalculateDirectionalLight(SunDirection, lightPositionZ, pixelZ, SunLightColor, albedo, material, normal, viewDir) * 1.0;
     
     float2 texelSize = 1.0 / ScreenSize;
     color += CalculateAmbientLight(albedo, material, normal, viewDir, uv, sdf, texelSize);
@@ -296,32 +281,6 @@ float Occlusion(float2 sdf)
         occlusion = exp(OcclusionFactor * sdf.r);
     }
 
-    return occlusion;
-}
-
-float SunOcclusion(float2 uv)
-{
-    float worldPosX = ScreenPosition.x + (uv.x * ViewSize.x);
-    float worldPosY = ScreenPosition.y + (uv.y * ViewSize.y);
-    
-    float worldTileX = floor(worldPosX / 16.0);
-    float worldTileY = floor(worldPosY / 16.0);
-    
-    float minTileX = floor(ScreenPosition.x / 16.0);
-    
-    float textureIndexX = worldTileX - minTileX;
-    
-    float sampleX = (textureIndexX + 0.5) / SunOcclusionTextureSize.x;
-    
-    float occluderTileHeight = tex2Dlod(SunOcclusionSampler, float4(sampleX, 0.0, 0.0, 0.0)).r;
-    
-    float occlusion = 1.0;
-    
-    if (worldTileY > occluderTileHeight - 1.0)
-    {
-        occlusion = 0.0;
-    }
-    
     return occlusion;
 }
 

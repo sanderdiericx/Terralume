@@ -26,11 +26,12 @@ namespace Terralume.Engine.Shaders
             { EffectType.Gaussian, "gaussian" },
             { EffectType.MaterialInject, "material_inject" },
             { EffectType.Downsample, "downsample" },
-            { EffectType.ReflectiveMaterial, "reflective_material"},
-            { EffectType.JFAReflectionInit, "jfa_reflection_init"},
-            { EffectType.JFAReflection, "jfa_reflection"},
-            { EffectType.SDFCombineReflection, "sdf_combine_reflection"},
-            { EffectType.Reflection, "reflection"}
+            { EffectType.ReflectiveMaterial, "reflective_material" },
+            { EffectType.JFAReflectionInit, "jfa_reflection_init" },
+            { EffectType.JFAReflection, "jfa_reflection" },
+            { EffectType.SDFCombineReflection, "sdf_combine_reflection" },
+            { EffectType.Reflection, "reflection" },
+            { EffectType.SunOcclusion, "sun_occlusion" }
         };
 
         private static Dictionary<EffectType, Asset<Effect>> loadedEffects = new Dictionary<EffectType, Asset<Effect>>();
