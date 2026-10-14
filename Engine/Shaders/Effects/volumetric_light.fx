@@ -17,49 +17,49 @@ Texture2D SunOcclusionBuffer;
 sampler SunOcclusionSampler = sampler_state
 {
     Texture = (SunOcclusionBuffer);
-MinFilter = Point;
-MagFilter = Point;
-MipFilter = Point;
-AddressU = Clamp;
-AddressV = Clamp;
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
+    AddressU = Clamp;
+    AddressV = Clamp;
 };
 
 
 float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float3 volumetric = float3(0.0, 0.0, 0.0);
-
-int accumulationCount = 1;
-
-if (tex2Dlod(SunOcclusionSampler, float4(uv.x, uv.y, 0.0, 0.0)).r > 0.01)
-{
-    for (int i = 0; i < MaxStepCount; i++)
+    
+    if (tex2Dlod(SunOcclusionSampler, float4(uv.x, uv.y, 0.0, 0.0)).r > 0.01)
     {
-        float2 sampleUV = uv + SunDirection * StepSize * i;
-
-        if (any(sampleUV) > 1.0 || any(sampleUV) < 0.0)
+        float illuminationDecay = 1.0;
+        
+        for (int i = 0; i < MaxStepCount; i++)
         {
-            break;
-        }
+            float2 sampleUV = uv + float2(SunDirection.x, -SunDirection.y) * StepSize * i;
 
-        float sampledLayer = tex2Dlod(LayerSampler, float4(sampleUV.x, sampleUV.y, 0.0, 0.0));
+            if (any(sampleUV > 1.0) || any(sampleUV < 0.0))
+            {
+                break;
+            }
 
-        if (abs(sampledLayer - BackgroundLayer) < 0.1)
-        {
-            float distance = abs(sampleUV - uv);
+            float sampledLayer = tex2Dlod(LayerSampler, float4(sampleUV.x, sampleUV.y, 0.0, 0.0));
+
+            if (abs(sampledLayer - BackgroundLayer) > 0.01)
+            {
+                break;   
+            }
+            
+            float distance = length(sampleUV - uv);
 
             float attenuation = 1 / (1 + (VolumetricAttenuationStrength * distance) + (VolumetricAttenuationStrength * (distance * distance)));
 
             volumetric += SunColor * VolumetricIntensity * attenuation;
-
-            accumulationCount++;
         }
+
+        volumetric /= MaxStepCount;
     }
-}
 
-volumetric /= accumulationCount;
-
-return float4(volumetric.r, volumetric.g, volumetric.b, 1.0);
+    return float4(volumetric.r, volumetric.g, volumetric.b, 1.0);
 }
 
 technique VolumetricLight
