@@ -31,23 +31,11 @@ namespace Terralume.Engine.Render
             Effect effect = EffectManager.GetEffect(EffectType.VolumetricLight);
 
             float stepSize = 1f / 128;
-
-            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
-            float angle = (float)(Math.PI - (timePercent * Math.PI));
-            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
-
-            float maxIntensity = 4f;
-            float minIntensity = 2f;
-            float avgIntensity = 3f;
-
-            float t = MathF.Sin((float)timePercent * MathF.PI);
-            float sunIntensity = Main.dayTime ? float.Lerp(avgIntensity, maxIntensity, t) : float.Lerp(avgIntensity, minIntensity, t);
-            Vector3 sunLightColor = Main.ColorOfTheSkies.ToVector3() * sunIntensity;
-
+            
             effect.Parameters["MaxStepCount"].SetValue(128);
             effect.Parameters["StepSize"].SetValue(new Vector2(stepSize, stepSize));
-            effect.Parameters["SunDirection"].SetValue(sunDirection);
-            effect.Parameters["SunColor"].SetValue(sunLightColor);
+            effect.Parameters["SunDirection"].SetValue(SunLightTracker.GetSunDirection());
+            effect.Parameters["SunColor"].SetValue(SunLightTracker.GetSunColor());
             effect.Parameters["VolumetricIntensity"].SetValue(1f);
             effect.Parameters["VolumetricAttenuationStrength"].SetValue(0.5f);
 
@@ -88,21 +76,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["OcclusionFactor"].SetValue(0.08f / currentZoom);
 
-            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
-
-            float angle = (float)(Math.PI - (timePercent * Math.PI));
-            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
-
-            float maxIntensity = 4f;
-            float minIntensity = 2f;
-            float avgIntensity = 3f;
-
-            float t = MathF.Sin((float)timePercent * MathF.PI);
-            float sunIntensity = Main.dayTime ? float.Lerp(avgIntensity, maxIntensity, t) : float.Lerp(avgIntensity, minIntensity, t);
-            Vector3 sunLightColor = Main.ColorOfTheSkies.ToVector3() * sunIntensity;
-
-            effect.Parameters["SunDirection"].SetValue(sunDirection);
-            effect.Parameters["SunLightColor"].SetValue(sunLightColor);
+            effect.Parameters["SunDirection"].SetValue(SunLightTracker.GetSunDirection());
+            effect.Parameters["SunLightColor"].SetValue(SunLightTracker.GetSunColor());
 
             effect.Parameters["VolumetricStrength"].SetValue(0.04f);
             effect.Parameters["VolumetricRange"].SetValue(0.1f);
