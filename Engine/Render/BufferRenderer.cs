@@ -1,10 +1,8 @@
-﻿using log4net.Filter;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Cache;
 using Terralume.Engine.Buffers.Data;
@@ -396,7 +394,7 @@ namespace Terralume.Engine.Render
             jfaEffect.Parameters["ScreenSize"].SetValue(writeTarget.Size());
 
             Vector2 size = readTarget.Size();
-            int initJumpSize = (int) size.Y;
+            int initJumpSize = (int)size.Y;
 
             initJumpSize = (int)BitOperations.RoundUpToPowerOf2((uint)initJumpSize);
 

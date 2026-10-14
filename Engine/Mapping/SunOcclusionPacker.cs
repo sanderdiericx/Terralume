@@ -61,7 +61,7 @@ namespace Terralume.Engine.Mapping
             int minX = (int)tileCaptureParameter.MinTile.X, minY = (int)tileCaptureParameter.MinTile.Y;
             int maxX = (int)tileCaptureParameter.MaxTile.X, maxY = (int)tileCaptureParameter.MaxTile.Y;
             int stride = (int)tileCaptureParameter.TileStride.X;
-            
+
             Vector2 sunDirection = new Vector2(0.2f, 1f);
 
             Main.NewText(sunDirection);

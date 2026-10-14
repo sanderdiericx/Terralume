@@ -43,7 +43,7 @@ namespace Terralume.Engine.Buffers
             SDFBufferFinal = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector2, DepthFormat.None);
             SDFBufferReflection = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
-            SunOcclusionBuffer = new RenderTarget2D (graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            SunOcclusionBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
             BlurredUndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Terralume.Engine.Buffers.Data;
-using Terralume.Engine.Hooks.Tracking;
 using Terraria;
 
 namespace Terralume.Engine.Constants
