@@ -18,7 +18,51 @@ namespace Terralume.Engine.Render
 {
     internal static class OutputRenderer
     {
-        // Uses the composed G-Buffer to compute radiance and bloom mask
+        // Computes a volumetric lighting lighting buffer for the surface directional light
+        // Note: Must be produced before the radiance and bloom buffer
+        public static void RenderVolumetricLightBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(outputCollection.VolumetricLightBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.VolumetricLight);
+
+            float stepSize = 1f / 128;
+
+            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
+            float angle = (float)(Math.PI - (timePercent * Math.PI));
+            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
+
+            float maxIntensity = 4f;
+            float minIntensity = 2f;
+            float avgIntensity = 3f;
+
+            float t = MathF.Sin((float)timePercent * MathF.PI);
+            float sunIntensity = Main.dayTime ? float.Lerp(avgIntensity, maxIntensity, t) : float.Lerp(avgIntensity, minIntensity, t);
+            Vector3 sunLightColor = Main.ColorOfTheSkies.ToVector3() * sunIntensity;
+
+            effect.Parameters["MaxStepCount"].SetValue(128);
+            effect.Parameters["StepSize"].SetValue(new Vector2(stepSize, stepSize));
+            effect.Parameters["SunDirection"].SetValue(sunDirection);
+            effect.Parameters["SunColor"].SetValue(sunLightColor);
+            effect.Parameters["VolumetricIntensity"].SetValue(1f);
+            effect.Parameters["VolumetricAttenuationStrength"].SetValue(0.5f);
+
+            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
+
+            effect.Parameters["SunOcclusionBuffer"].SetValue(bufferCollection.SunOcclusionBuffer);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
+        // Uses the composed G-Buffer to compute radiance buffer and bloom mask
         public static void RenderRadianceAndBloomBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;

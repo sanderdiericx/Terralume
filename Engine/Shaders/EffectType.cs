@@ -22,6 +22,7 @@
         JFAReflection,
         SDFCombineReflection,
         Reflection,
-        SunOcclusion
+        SunOcclusion,
+        VolumetricLight
     }
 }
