@@ -102,6 +102,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float epsilon = 0.01;
     
     float4 projectile = tex2D(ProjectileSampler, uv);
+    float4 player = tex2D(PlayerSampler, uv);
     
     // Note: sample order is fragile and modifying it can result in artifacts
     if (tex2D(LiquidSampler, uv).a > epsilon) // Liquids
@@ -112,7 +113,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     {
         layer = float4(TileLayer, 0.0, 0.0, 1.0);
     }
-    else if (tex2D(PlayerSampler, uv).a > epsilon) // Player
+    else if (player.a > epsilon || dot(player.rgb, LUMINANCE) > 0.01) // Player
     {
         layer = float4(PlayerLayer, 0.0, 0.0, 1.0);
     }

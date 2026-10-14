@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Terralume.Engine.Mapping
@@ -11,7 +13,19 @@ namespace Terralume.Engine.Mapping
     internal class SunOcclusionPacker : ModSystem
     {
         private static readonly int MAX_RAY_STEPS = 100;
+        private static readonly int MAX_TILE_PASSES = 20;
         private static readonly Vector2 TILEMAP_PADDING = new Vector2(100, 100);
+
+        // Tile IDs that the sun occlusion ray skips when determining if it hit a solid tile
+        private static readonly HashSet<int> SKIPPED_TILES = new HashSet<int>
+        {
+            TileID.LeafBlock,
+            TileID.LivingWood,
+            TileID.Cloud,
+            TileID.RainCloud,
+            TileID.SnowCloud,
+            TileID.Glass
+        };
 
         public static Texture2D SunOcclusionTexture { get; private set; }
         private static float[] occlusionPixels = new float[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
@@ -47,11 +61,10 @@ namespace Terralume.Engine.Mapping
             int minX = (int)tileCaptureParameter.MinTile.X, minY = (int)tileCaptureParameter.MinTile.Y;
             int maxX = (int)tileCaptureParameter.MaxTile.X, maxY = (int)tileCaptureParameter.MaxTile.Y;
             int stride = (int)tileCaptureParameter.TileStride.X;
+            
+            Vector2 sunDirection = new Vector2(0.2f, 1f);
 
-            // Calculate sun direction
-            double timePercent = Main.time / (Main.dayTime ? Main.dayLength : Main.nightLength);
-            float angle = (float)(Math.PI - (timePercent * Math.PI));
-            Vector2 sunDirection = Vector2.Normalize(new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)));
+            Main.NewText(sunDirection);
 
             // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
             // Note: startPos is clamped here so the copy and the indexing below share the same origin
@@ -68,7 +81,18 @@ namespace Terralume.Engine.Mapping
                     int index = (y - minY) * stride + (x - minX);
                     if (index < 0 || index >= occlusionPixels.Length) continue;
 
-                    occlusionPixels[index] = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, sunDirection);
+                    // We cast a ray in the direction of the sun, if it doesnt reach the sun, we cast a ray in the opposite direction of the sun (along the x axis)
+                    // This prevents caves and overhangs from blocking a bunch of surface light
+                    float occlusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, sunDirection);
+
+                    if (occlusion < 0.999f)
+                    {
+                        float mirroredOcclusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, new Vector2(sunDirection.X, sunDirection.Y));
+
+                        occlusion = MathF.Max(occlusion, mirroredOcclusion);
+                    }
+
+                    occlusionPixels[index] = occlusion;
                 }
             }
         }
@@ -86,6 +110,8 @@ namespace Terralume.Engine.Mapping
             // Tile space is y-down, so flip y to march toward the sun
             Vector2 toSun = new Vector2(sunDir.X, -sunDir.Y);
 
+            int tilePassCount = 0;
+
             // Step through the tile grid in the direction of the sun
             for (int i = 1; i <= MAX_RAY_STEPS; i++)
             {
@@ -102,8 +128,16 @@ namespace Terralume.Engine.Mapping
 
                 Tile sampled = tiles[sampleX, sampleY];
 
-                // Ray has hit a solid, non-actuated tile, no sunlight shall reach this tile
-                if (sampled.HasTile && Main.tileSolid[sampled.TileType] && !sampled.IsActuated)
+                // Check if we can skip collision on this tile
+                if (!sampled.HasTile || !Main.tileSolid[sampled.TileType] || SKIPPED_TILES.Contains(sampled.TileType) || sampled.IsActuated)
+                {
+                    continue;
+                }
+
+                // Ray has hit a solid, non-actuated and non-skippable tile
+                tilePassCount++;
+
+                if (tilePassCount > MAX_TILE_PASSES)
                 {
                     return 0f;
                 }

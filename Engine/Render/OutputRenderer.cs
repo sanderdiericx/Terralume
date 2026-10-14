@@ -81,6 +81,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["MaterialBuffer"].SetValue(bufferCollection.MaterialBuffer);
             effect.Parameters["NoiseBuffer"].SetValue(bufferCollection.NoiseBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
+            effect.Parameters["SunOcclusionBuffer"].SetValue(bufferCollection.SunOcclusionBuffer);
 
             effect.Parameters["LightPositionTexture"].SetValue(LightPacker.LightPositionTexture);
             effect.Parameters["LightColorTexture"].SetValue(LightPacker.LightColorTexture);
