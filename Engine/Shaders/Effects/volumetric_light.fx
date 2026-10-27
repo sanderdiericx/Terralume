@@ -8,9 +8,11 @@ float2 SunDirection;
 float3 SunColor;
 
 float VolumetricIntensity;
+float VolumetricAttenuationDecay;
 float VolumetricAttenuationStrength;
 
 float BackgroundLayer;
+float TileLayer;
 
 Texture2D SunOcclusionBuffer;
 
@@ -29,9 +31,15 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 {
     float3 volumetric = float3(0.0, 0.0, 0.0);
     
+    float currentLayer = tex2Dlod(LayerSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
+    if (abs(currentLayer - TileLayer) < 0.01)
+    {
+        return float4(volumetric.r, volumetric.g, volumetric.b, 1.0);
+    }
+    
     if (tex2Dlod(SunOcclusionSampler, float4(uv.x, uv.y, 0.0, 0.0)).r > 0.01)
     {
-        float illuminationDecay = 1.0;
+        float illuminationDecay = VolumetricAttenuationStrength;
         
         for (int i = 0; i < MaxStepCount; i++)
         {
@@ -46,12 +54,12 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
 
             if (abs(sampledLayer - BackgroundLayer) > 0.01)
             {
-                break;   
+                illuminationDecay *= VolumetricAttenuationDecay;
             }
             
             float distance = length(sampleUV - uv);
 
-            float attenuation = 1 / (1 + (VolumetricAttenuationStrength * distance) + (VolumetricAttenuationStrength * (distance * distance)));
+            float attenuation = 1 / (1 + (illuminationDecay * distance) + (illuminationDecay * (distance * distance)));
 
             volumetric += SunColor * VolumetricIntensity * attenuation;
         }

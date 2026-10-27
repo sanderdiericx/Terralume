@@ -32,10 +32,12 @@ namespace Terralume.Engine.Render
             effect.Parameters["StepSize"].SetValue(new Vector2(stepSize, stepSize));
             effect.Parameters["SunDirection"].SetValue(SunLightTracker.GetSunDirection());
             effect.Parameters["SunColor"].SetValue(SunLightTracker.GetSunColor());
-            effect.Parameters["VolumetricIntensity"].SetValue(RenderConstants.DL_VOLUMETRIC_INTENSITY);
-            effect.Parameters["VolumetricAttenuationStrength"].SetValue(RenderConstants.DL_VOLUMETRIC_ATTENUATION_STRENGTH);
+            effect.Parameters["VolumetricIntensity"].SetValue(0.1f);
+            effect.Parameters["VolumetricAttenuationDecay"].SetValue(1.1f);
+            effect.Parameters["VolumetricAttenuationStrength"].SetValue(0.5f);
 
             effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
+            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
 
             effect.Parameters["SunOcclusionBuffer"].SetValue(bufferCollection.SunOcclusionBuffer);
 
@@ -234,6 +236,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
             effect.Parameters["BloomBuffer"].SetValue(outputCollection.BloomBuffer);
             effect.Parameters["ReflectionBuffer"].SetValue(outputCollection.ReflectionBuffer);
+            effect.Parameters["VolumetricBuffer"].SetValue(outputCollection.VolumetricLightBuffer);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 
