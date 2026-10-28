@@ -69,6 +69,12 @@ namespace Terralume.Engine.Constants
         public static readonly float AMBIENT_FILL_STRENGTH = 1f;
         public static readonly float AMBIENT_FILL_ROUGHNESS = 0.55f;
 
+        // SUN OCCLUSION
+        public static readonly int SUN_OCCLUSION_MAX_RAY_STEPS = 300;
+        public static readonly int SUN_OCCLUSION_MAX_TILE_PASSES = 20;
+        public static readonly Vector2 SUN_OCCLUSION_TILEMAP_PADDING = new Vector2(100, 100);
+
+
         // LAYER CONFIGURATION
         public static readonly LayerParameter LAYER_PARAMETER = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f);
         public static readonly DepthParameter DEPTH_PARAMETER = new DepthParameter(0.1f, 0.7f, 0.5f, 0.3f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);

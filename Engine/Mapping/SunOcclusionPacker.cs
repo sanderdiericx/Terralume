@@ -13,10 +13,6 @@ namespace Terralume.Engine.Mapping
 {
     internal class SunOcclusionPacker : ModSystem
     {
-        private static readonly int MAX_RAY_STEPS = 100;
-        private static readonly int MAX_TILE_PASSES = 20;
-        private static readonly Vector2 TILEMAP_PADDING = new Vector2(100, 100);
-
         // Tile IDs that the sun occlusion ray skips when determining if it hit a solid tile
         private static readonly HashSet<int> SKIPPED_TILES = new HashSet<int>
         {
@@ -67,8 +63,8 @@ namespace Terralume.Engine.Mapping
 
             // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
             // Note: startPos is clamped here so the copy and the indexing below share the same origin
-            Vector2 startPos = new Vector2(Math.Clamp(minX - (int)TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)TILEMAP_PADDING.Y, 0, Main.tile.Height));
-            Vector2 endPos = new Vector2(maxX + (int)TILEMAP_PADDING.X, maxY + (int)TILEMAP_PADDING.Y);
+            Vector2 startPos = new Vector2(Math.Clamp(minX - (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.Y, 0, Main.tile.Height));
+            Vector2 endPos = new Vector2(maxX + (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.X, maxY + (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.Y);
 
             Tile[,] tiles = TileHelper.CopyTileMap(startPos, endPos);
 
@@ -82,11 +78,11 @@ namespace Terralume.Engine.Mapping
 
                     // We cast a ray in the direction of the sun, if it doesnt reach the sun, we cast a ray in the opposite direction of the sun (along the x axis)
                     // This prevents caves and overhangs from blocking a bunch of surface light
-                    float occlusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, sunDirection);
+                    float occlusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, sunDirection, (int)startPos.Y);
 
                     if (occlusion < 0.999f)
                     {
-                        float mirroredOcclusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, new Vector2(sunDirection.X, sunDirection.Y));
+                        float mirroredOcclusion = CastSunRay(tiles, x - (int)startPos.X, y - (int)startPos.Y, new Vector2(sunDirection.X, sunDirection.Y), (int)startPos.Y);
 
                         occlusion = MathF.Max(occlusion, mirroredOcclusion);
                     }
@@ -102,27 +98,28 @@ namespace Terralume.Engine.Mapping
         }
 
         // Casts a ray from that steps along the tile grid from a tile space position until it hits a solid tile or reaches a max iteration count
-        private static float CastSunRay(Tile[,] tiles, int x, int y, Vector2 sunDir)
+        private static float CastSunRay(Tile[,] tiles, int x, int y, Vector2 sunDir, int startY)
         {
             Vector2 origin = new Vector2(x, y);
 
             // Tile space is y-down, so flip y to march toward the sun
             Vector2 toSun = new Vector2(sunDir.X, -sunDir.Y);
+            Vector2 currentPos = Vector2.Zero;
 
             int tilePassCount = 0;
 
             // Step through the tile grid in the direction of the sun
-            for (int i = 1; i <= MAX_RAY_STEPS; i++)
+            for (int i = 1; i <= RenderConstants.SUN_OCCLUSION_MAX_RAY_STEPS; i++)
             {
-                Vector2 currentPos = origin + (toSun * i);
+                currentPos = origin + (toSun * i);
 
                 int sampleX = (int)MathF.Floor(currentPos.X);
                 int sampleY = (int)MathF.Floor(currentPos.Y);
 
-                // Ray is out of bounds, assume unobstructed path to the sky
-                if (sampleX < 0 || sampleX >= tiles.GetLength(0) || sampleY < 0 || sampleY >= tiles.GetLength(1))
+                // Ray is out of bounds and above the surface, assume unobstructed path to the sky
+                if ((sampleX < 0 || sampleX >= tiles.GetLength(0) || sampleY < 0 || sampleY >= tiles.GetLength(1)))
                 {
-                    return 1f;
+                    return startY + currentPos.Y < Main.worldSurface ? 1f : 0f;
                 }
 
                 Tile sampled = tiles[sampleX, sampleY];
@@ -136,14 +133,14 @@ namespace Terralume.Engine.Mapping
                 // Ray has hit a solid, non-actuated and non-skippable tile
                 tilePassCount++;
 
-                if (tilePassCount > MAX_TILE_PASSES)
+                if (tilePassCount > RenderConstants.SUN_OCCLUSION_MAX_TILE_PASSES)
                 {
                     return 0f;
                 }
             }
 
             // This tile has an unobstructed path to the sky
-            return 1f;
+            return startY + currentPos.Y < Main.worldSurface ? 1f : 0f;
         }
     }
 }
