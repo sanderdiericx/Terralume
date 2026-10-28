@@ -62,6 +62,9 @@ namespace Terralume.Engine.Constants
 
         // AMBIENT LIGHTING
         public static readonly float AMBIENT_DIFFUSE_WEIGHT = 0.2f;
+        public static readonly Vector3 AMBIENT_FILL_DIRECTION = new Vector3(-0.4f, -0.6f, 1f);
+        public static readonly float AMBIENT_FILL_STRENGTH = 1f;
+        public static readonly float AMBIENT_FILL_ROUGHNESS = 0.55f;
 
         // LAYER CONFIGURATION
         public static readonly LayerParameter LAYER_PARAMETER = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f);

@@ -64,8 +64,6 @@ namespace Terralume.Engine.Mapping
 
             Vector2 sunDirection = new Vector2(0.2f, 1f);
 
-            Main.NewText(sunDirection);
-
             // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
             // Note: startPos is clamped here so the copy and the indexing below share the same origin
             Vector2 startPos = new Vector2(Math.Clamp(minX - (int)TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)TILEMAP_PADDING.Y, 0, Main.tile.Height));

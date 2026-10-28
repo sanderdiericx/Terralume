@@ -1,4 +1,4 @@
-﻿sampler2D AlbedoSampler : register(s0);
+sampler2D AlbedoSampler : register(s0);
 
 static const float PI = 3.14159265359f;
 
@@ -28,6 +28,9 @@ float VolumetricNoiseContrast;
 float3 AmbientColor;
 float AmbientStrength;
 float AmbientDiffuseWeight;
+float3 AmbientFillDirection;
+float AmbientFillStrength;
+float AmbientFillRoughness;
 
 float Gamma;
 
@@ -175,9 +178,7 @@ float3 BloomThreshold(float3 color, float threshold, float knee);
 
 float3 CalculatePointLight(float3 pixelPos, float3 lightPos, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir, float intensity, float range);
 float3 CalculateDirectionalLight(float2 lightDir, float lightZ, float pixelZ, float3 lightColor, float3 albedo, float3 material, float3 normal, float3 viewDir);
-float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize);
-
-float3 ApproximateOpenDirection(float2 uv, float2 texelSize, out bool gradientValid);
+float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir);
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo);
 float3 RadianceFunction(float3 lightColor, float intensity, float dist, float range);
@@ -266,8 +267,7 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     color += CalculateDirectionalLight(SunDirection, lightPositionZ, pixelZ, SunLightColor, albedo, material, normal, viewDir) * tex2Dlod(SunOcclusionSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
     
-    float2 texelSize = 1.0 / ScreenSize;
-    color += CalculateAmbientLight(albedo, material, normal, viewDir, uv, sdf, texelSize);
+    color += CalculateAmbientLight(albedo, material, normal, viewDir);
     
     color *= Occlusion(sdf);
     
@@ -347,20 +347,12 @@ float3 CalculateDirectionalLight(float2 lightDir, float lightZ, float pixelZ, fl
 }
 
 
-float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir, float2 uv, float2 sdf, float2 texelSize)
+float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, float3 viewDir)
 {
     float metallic = material.r;
     float roughness = material.g;
 
-    bool gradientValid;
-    float3 openDir = ApproximateOpenDirection(uv, texelSize, gradientValid);
-
-    float3 ambientSecondary = AmbientColor * float3(0.05, 0.05, 0.08);
-    float openWeight = gradientValid ? dot(normal.xy, openDir.xy) * 0.5 + 0.5 : (sdf.r >= 0.0 ? 1.0 : 0.0);
-    openWeight = pow(openWeight, 1.5);
-    
-    float3 hemisphereColor = lerp(ambientSecondary, AmbientColor, openWeight);
-    float3 ambientRadiance = hemisphereColor * AmbientStrength;
+    float3 ambientRadiance = AmbientColor * AmbientStrength;
 
     float NdotV = max(dot(normal, viewDir), 0.0);
     float3 baseReflectivity = BaseReflectivityFunction(metallic, albedo);
@@ -368,32 +360,20 @@ float3 CalculateAmbientLight(float3 albedo, float3 material, float3 normal, floa
     float3 energyConservation = EnergyConservationFunction(fresnel, metallic);
 
     float3 diffuseAmbient = energyConservation * albedo * ambientRadiance * AmbientDiffuseWeight;
-    float3 specularAmbient = fresnel * ambientRadiance;
 
-    return (diffuseAmbient + specularAmbient);
-}
+    float3 lightDir = normalize(AmbientFillDirection);
+    float3 halfVector = normalize(viewDir + lightDir);
+    float fillRoughness = max(roughness, AmbientFillRoughness);
 
-float3 ApproximateOpenDirection(float2 uv, float2 texelSize, out bool gradientValid)
-{
-    float right = tex2Dlod(SDFSampler, float4(uv + float2(texelSize.x, 0), 0, 0)).r;
-    float left = tex2Dlod(SDFSampler, float4(uv - float2(texelSize.x, 0), 0, 0)).r;
-    float up = tex2Dlod(SDFSampler, float4(uv - float2(0, texelSize.y), 0, 0)).r;
-    float down = tex2Dlod(SDFSampler, float4(uv + float2(0, texelSize.y), 0, 0)).r;
+    float distribution = NormalDistributionFunction(fillRoughness, normal, halfVector);
+    float geometry = GeometrySmith(fillRoughness, normal, viewDir, lightDir);
+    float3 fillFresnel = FresnelSchlickApproximationFunction(baseReflectivity, viewDir, halfVector);
+    float3 fillEnergyConservation = EnergyConservationFunction(fillFresnel, metallic);
+    float3 specular = CalculateBRDFSpecular(distribution, geometry, fillFresnel, normal, viewDir, lightDir);
 
-    float2 grad = float2(right - left, down - up);
-    gradientValid = dot(grad, grad) > 0.0001;
+    float3 fill = CalculateOutgoingLight(fillEnergyConservation, albedo, specular, ambientRadiance * AmbientFillStrength, normal, lightDir);
 
-    return gradientValid ? normalize(float3(grad, 0.0)) : float3(0, 0, 1);
-}
-
-float AmbientLightOcclusion(float2 sdf)
-{
-    float occlusion = 1.0;
-    if (sdf.r < 0.0)
-    {
-        occlusion = exp(OcclusionFactor * sdf.r * 2.0);
-    }
-    return occlusion;
+    return diffuseAmbient + fill;
 }
 
 float3 BaseReflectivityFunction(float metallic, float3 albedo)

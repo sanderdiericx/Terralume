@@ -52,6 +52,9 @@ namespace Terralume.Engine.Render
             effect.Parameters["AmbientColor"].SetValue(ambientLight.AmbientColor);
             effect.Parameters["AmbientStrength"].SetValue(ambientLight.AmbientStrength);
             effect.Parameters["AmbientDiffuseWeight"].SetValue(RenderConstants.AMBIENT_DIFFUSE_WEIGHT);
+            effect.Parameters["AmbientFillDirection"].SetValue(RenderConstants.AMBIENT_FILL_DIRECTION);
+            effect.Parameters["AmbientFillStrength"].SetValue(RenderConstants.AMBIENT_FILL_STRENGTH);
+            effect.Parameters["AmbientFillRoughness"].SetValue(RenderConstants.AMBIENT_FILL_ROUGHNESS);
 
             effect.Parameters["Gamma"].SetValue(RenderConstants.GAMMA);
 
