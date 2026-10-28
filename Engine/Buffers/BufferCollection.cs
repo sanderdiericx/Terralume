@@ -20,6 +20,7 @@ namespace Terralume.Engine.Buffers
         public RenderTarget2D SDFBufferFinal { get; private set; }
         public RenderTarget2D SDFBufferReflection { get; private set; }
         public RenderTarget2D SunOcclusionBuffer { get; private set; }
+        public RenderTarget2D PlayerAmbientOcclusionBuffer { get; private set; }
 
         public RenderTarget2D BlurredUndergroundBackgroundBuffer { get; private set; }
 
@@ -44,6 +45,7 @@ namespace Terralume.Engine.Buffers
             SDFBufferReflection = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             SunOcclusionBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+            PlayerAmbientOcclusionBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Single, DepthFormat.None);
 
             BlurredUndergroundBackgroundBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -73,6 +75,7 @@ namespace Terralume.Engine.Buffers
             SDFBufferReflection.Dispose();
 
             SunOcclusionBuffer.Dispose();
+            PlayerAmbientOcclusionBuffer.Dispose();
 
             BlurredUndergroundBackgroundBuffer.Dispose();
 

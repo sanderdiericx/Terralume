@@ -7,7 +7,7 @@ namespace Terralume.Engine.Constants
     // Note: Many constants here feed directly into the shading models, the values selected were tuned by eye, therefore changing them can result in a broken look
     internal static class RenderConstants
     {
-        public static readonly Vector2 SCREEN_SIZE = new Vector2(Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
+        public static Vector2 SCREEN_SIZE => new Vector2(Main.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Main.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
 
         // TEXTURE PACKING
         public static readonly int LIGHT_DATA_RESOLUTION = 64;
@@ -47,6 +47,8 @@ namespace Terralume.Engine.Constants
         // AMBIENT OCCLUSION
         public static readonly float AO_RADIUS = 40f;
         public static readonly float AO_STRENGTH = 0.001f;
+        public static readonly float PLAYER_AO_RADIUS = 8f;
+        public static readonly float PLAYER_AO_STRENGTH = 1f;
 
 
         // TILE OCCLUSION

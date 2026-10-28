@@ -139,9 +139,9 @@ namespace Terralume.Engine.Pipeline
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {
-                    Main.NewText($"Switching to underground background target view", Color.Green);
+                    Main.NewText($"Switching to player ao buffer view", Color.Green);
 
-                    currentRenderTarget = targetCollection.UndergroundBackground;
+                    currentRenderTarget = bufferCollection.PlayerAmbientOcclusionBuffer;
                 }
             }
 

@@ -51,6 +51,43 @@ namespace Terralume.Engine.Render
             device.SetRenderTargets(oldTargets);
         }
 
+        public static void RenderPlayerAmbientOcclusionBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            RenderTarget2D blurTarget = RenderTargetCache.RequestTarget(bufferCollection.Width, bufferCollection.Height, SurfaceFormat.Single);
+
+            Effect effect = EffectManager.GetEffect(EffectType.PlayerAmbientOcclusion);
+
+            effect.Parameters["ScreenSize"].SetValue(targetCollection.Player.Size());
+            effect.Parameters["Radius"].SetValue(RenderConstants.PLAYER_AO_RADIUS * Main.GameViewMatrix.Zoom);
+            effect.Parameters["Strength"].SetValue(RenderConstants.PLAYER_AO_STRENGTH);
+            effect.Parameters["PlayerTarget"].SetValue(targetCollection.Player);
+
+            device.SetRenderTarget(blurTarget);
+            device.Clear(Color.Transparent);
+
+            effect.Parameters["Horizontal"].SetValue(true);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(targetCollection.Player, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTarget(bufferCollection.PlayerAmbientOcclusionBuffer);
+            device.Clear(Color.Transparent);
+
+            effect.Parameters["Horizontal"].SetValue(false);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(blurTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(blurTarget);
+        }
+
         // Renders the noise texture for material variation on tiles and walls
         public static void RenderNoiseBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {

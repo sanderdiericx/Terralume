@@ -37,6 +37,7 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.SDFCombineReflection);
 
                 EffectManager.LoadEffect(EffectType.BackgroundBlur);
+                EffectManager.LoadEffect(EffectType.PlayerAmbientOcclusion);
 
                 EffectManager.LoadEffect(EffectType.ReflectiveMaterial);
             });
@@ -85,6 +86,7 @@ namespace Terralume.Engine.Pipeline
             if (!ReflectionPacker.LiquidsValid) ReflectionPacker.PackLiquidReflectionTexture();
 
             BufferRenderer.RenderLayerBuffer(spriteBatch, bufferCollection, targetCollection, layerParameter);
+            BufferRenderer.RenderPlayerAmbientOcclusionBuffer(spriteBatch, bufferCollection, targetCollection);
             BufferRenderer.RenderNoiseBuffer(spriteBatch, bufferCollection, layerParameter, tileCaptureParameter);
 
             BufferRenderer.RenderSDFBuffer(spriteBatch, bufferCollection, layerParameter);

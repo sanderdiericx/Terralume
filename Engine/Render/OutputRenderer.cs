@@ -235,6 +235,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);
             effect.Parameters["BloomBuffer"].SetValue(outputCollection.BloomBuffer);
+            effect.Parameters["PlayerAmbientOcclusionBuffer"].SetValue(bufferCollection.PlayerAmbientOcclusionBuffer);
             effect.Parameters["ReflectionBuffer"].SetValue(outputCollection.ReflectionBuffer);
             effect.Parameters["VolumetricBuffer"].SetValue(outputCollection.VolumetricLightBuffer);
 
