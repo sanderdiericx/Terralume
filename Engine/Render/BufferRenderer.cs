@@ -497,7 +497,7 @@ namespace Terralume.Engine.Render
             RenderTargetCache.ReturnTarget(tightBlurTarget);
         }
 
-        // Note SunOcclusionTexture must be packed for this method to work properly
+        // Note: SunOcclusionTexture must be packed for this method to work properly
         public static void RenderSunOcclusionBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TileCaptureParameter tileCaptureParameter)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;

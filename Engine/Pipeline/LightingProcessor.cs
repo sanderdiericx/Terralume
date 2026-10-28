@@ -71,6 +71,10 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
+            AmbientFilterPacker.CalculateReachableTiles(tileCaptureParameter, onScreenLights);
+            AmbientFilterPacker.PackAmbientFilterTexture(tileCaptureParameter);
+
+            OutputRenderer.RenderAmbientFilterBuffer(deferredSpriteBatch, outputCollection, bufferCollection, tileCaptureParameter);
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
             OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
@@ -128,6 +132,12 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText($"Switching to sun occlusion buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.SunOcclusionBuffer;
+                }
+                else if (keyboardState.IsKeyDown(Keys.D9))
+                {
+                    Main.NewText($"Switching to ambient filter buffer view", Color.Green);
+
+                    currentRenderTarget = outputCollection.AmbientFilterBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {

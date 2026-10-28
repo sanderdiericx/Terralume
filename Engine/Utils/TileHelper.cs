@@ -31,5 +31,30 @@ namespace Terralume.Engine.Utils
 
             return new TileCaptureParameter(screenPosition, viewSize, new Vector2(strideX, strideY), new Vector2(minTileX, minTileY), new Vector2(maxTileX, maxTileY));
         }
+
+
+        // Copies the Main.tile tilemap into a 2D array, only copies values within a specified bounding box
+        public static Tile[,] CopyTileMap(Vector2 startPos, Vector2 endPos)
+        {
+            // Ensure start and end positions are within bounds
+            int startX = (int)Math.Clamp(startPos.X, 0, Main.tile.Width);
+            int startY = (int)Math.Clamp(startPos.Y, 0, Main.tile.Height);
+
+            int endX = (int)Math.Clamp(endPos.X, 0, Main.tile.Width);
+            int endY = (int)Math.Clamp(endPos.Y, 0, Main.tile.Height);
+
+            Tile[,] tiles = new Tile[endX - startX, endY - startY];
+
+            // Copy Main.tile values into tiles
+            for (int x = startX; x < endX; x++)
+            {
+                for (int y = startY; y < endY; y++)
+                {
+                    tiles[x - startX, y - startY] = Main.tile[x, y];
+                }
+            }
+
+            return tiles;
+        }
     }
 }

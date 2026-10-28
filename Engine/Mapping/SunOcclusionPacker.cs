@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
+using Terralume.Engine.Utils;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -69,7 +70,7 @@ namespace Terralume.Engine.Mapping
             Vector2 startPos = new Vector2(Math.Clamp(minX - (int)TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)TILEMAP_PADDING.Y, 0, Main.tile.Height));
             Vector2 endPos = new Vector2(maxX + (int)TILEMAP_PADDING.X, maxY + (int)TILEMAP_PADDING.Y);
 
-            Tile[,] tiles = CopyTileMap(startPos, endPos);
+            Tile[,] tiles = TileHelper.CopyTileMap(startPos, endPos);
 
             // For each tile currently on screen, cast a ray toward the sun
             for (int y = minY; y < maxY; y++)
@@ -143,30 +144,6 @@ namespace Terralume.Engine.Mapping
 
             // This tile has an unobstructed path to the sky
             return 1f;
-        }
-
-        // Copies the Main.tile tilemap into a 2D array, only copies values within a specified bounding box
-        private static Tile[,] CopyTileMap(Vector2 startPos, Vector2 endPos)
-        {
-            // Ensure start and end positions are within bounds
-            int startX = (int)Math.Clamp(startPos.X, 0, Main.tile.Width);
-            int startY = (int)Math.Clamp(startPos.Y, 0, Main.tile.Height);
-
-            int endX = (int)Math.Clamp(endPos.X, 0, Main.tile.Width);
-            int endY = (int)Math.Clamp(endPos.Y, 0, Main.tile.Height);
-
-            Tile[,] tiles = new Tile[endX - startX, endY - startY];
-
-            // Copy Main.tile values into tiles
-            for (int x = startX; x < endX; x++)
-            {
-                for (int y = startY; y < endY; y++)
-                {
-                    tiles[x - startX, y - startY] = Main.tile[x, y];
-                }
-            }
-
-            return tiles;
         }
     }
 }

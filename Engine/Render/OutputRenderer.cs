@@ -14,6 +14,33 @@ namespace Terralume.Engine.Render
 {
     internal static class OutputRenderer
     {
+        // Note: AmbientFilterTexture must be packed for this method to work properly
+        public static void RenderAmbientFilterBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, TileCaptureParameter tileCaptureParameter)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            device.SetRenderTarget(outputCollection.AmbientFilterBuffer);
+            device.Clear(Color.Transparent);
+
+            Effect effect = EffectManager.GetEffect(EffectType.AmbientFilter);
+
+            effect.Parameters["TileStride"].SetValue(tileCaptureParameter.TileStride);
+            effect.Parameters["MinTilePosition"].SetValue(tileCaptureParameter.MinTile);
+
+            effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
+            effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
+
+            effect.Parameters["AmbientFilterTextureSize"].SetValue(AmbientFilterPacker.AmbientFilterTexture.Size());
+            effect.Parameters["AmbientFilterTexture"].SetValue(AmbientFilterPacker.AmbientFilterTexture);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            device.SetRenderTargets(oldTargets);
+        }
+
         // Uses the composed G-Buffer to compute radiance buffer and bloom mask
         public static void RenderRadianceAndBloomBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {

@@ -37,6 +37,7 @@ namespace Terralume.Engine.Pipeline
                 EffectManager.LoadEffect(EffectType.SDFCombineReflection);
 
                 EffectManager.LoadEffect(EffectType.BackgroundBlur);
+                EffectManager.LoadEffect(EffectType.SunOcclusion);
                 EffectManager.LoadEffect(EffectType.PlayerAmbientOcclusion);
 
                 EffectManager.LoadEffect(EffectType.ReflectiveMaterial);

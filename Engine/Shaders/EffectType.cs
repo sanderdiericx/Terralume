@@ -23,6 +23,7 @@
         SDFCombineReflection,
         Reflection,
         SunOcclusion,
-        PlayerAmbientOcclusion
+        PlayerAmbientOcclusion,
+        AmbientFilter
     }
 }
