@@ -67,7 +67,7 @@ namespace Terralume.Engine.Mapping.Registry
             { TileID.Sand, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Glass, new Vector3(0.85f, 0.0f, 0.0f) },
             { TileID.Signs, new Vector3(0.0f, 0.0f, 0.0f) },
-            { TileID.Obsidian, new Vector3(0.35f, 0.0f, 0.0f) },
+            { TileID.Obsidian, new Vector3(0.05f, 0.0f, 0.0f) },
             { TileID.Ash, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Hellstone, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Mud, new Vector3(0.0f, 0.0f, 0.0f) },
@@ -86,7 +86,7 @@ namespace Terralume.Engine.Mapping.Registry
             { TileID.MushroomTrees, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Plants2, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.JunglePlants2, new Vector3(0.0f, 0.0f, 0.0f) },
-            { TileID.ObsidianBrick, new Vector3(0.25f, 0.0f, 0.0f) },
+            { TileID.ObsidianBrick, new Vector3(0.01f, 0.0f, 0.0f) },
             { TileID.HellstoneBrick, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Hellforge, new Vector3(0.3f, 0.0f, 0.0f) },
             { TileID.ClayPot, new Vector3(0.0f, 0.0f, 0.0f) },
@@ -365,8 +365,8 @@ namespace Terralume.Engine.Mapping.Registry
         public static Dictionary<int, Vector3> MappedLiquids { get; private set; } = new Dictionary<int, Vector3>()
         {
             { LiquidID.Water, new Vector3(0.85f, 0.0f, 0.0f) },
-            { LiquidID.Lava, new Vector3(0.6f, 0.0f, 0.0f) },
-            { LiquidID.Honey, new Vector3(0.5f, 0.0f, 0.0f) },
+            { LiquidID.Lava, new Vector3(0.0f, 0.0f, 0.0f) },
+            { LiquidID.Honey, new Vector3(0.0f, 0.0f, 0.0f) },
             { LiquidID.Shimmer, new Vector3(0.9f, 0.0f, 0.0f) },
         };
     }
