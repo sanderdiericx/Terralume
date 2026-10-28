@@ -42,7 +42,7 @@ namespace Terralume.Engine.Constants
         public static readonly float GAMMA = 1.9f;
 
         // BLOOM
-        public static readonly float BLOOM_INTENSITY = 1.1f;
+        public static readonly float BLOOM_INTENSITY = 1.2f;
 
         // AMBIENT OCCLUSION
         public static readonly float AO_RADIUS = 40f;
@@ -52,7 +52,7 @@ namespace Terralume.Engine.Constants
 
         // AMBIENT LIGHT FILTER
         public static readonly float AMBIENT_FILTER_MIN_LIGHT_INFLUENCE = 1000f;
-        public static readonly int AMBIENT_FILTER_MAX_TILE_PASS_COUNT = 10;
+        public static readonly int AMBIENT_FILTER_MAX_TILE_PASS_COUNT = 5;
 
         // TILE OCCLUSION
         public static readonly float TILE_OCCLUSION_FACTOR = 0.08f;

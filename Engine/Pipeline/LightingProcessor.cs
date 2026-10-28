@@ -76,7 +76,7 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderAmbientFilterBuffer(deferredSpriteBatch, outputCollection, bufferCollection, tileCaptureParameter);
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
-            OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
+            OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 2);
             OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
