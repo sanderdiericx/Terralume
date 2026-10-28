@@ -50,6 +50,9 @@ namespace Terralume.Engine.Constants
         public static readonly float PLAYER_AO_RADIUS = 8f;
         public static readonly float PLAYER_AO_STRENGTH = 1f;
 
+        // AMBIENT LIGHT FILTER
+        public static readonly float AMBIENT_FILTER_MIN_LIGHT_INFLUENCE = 1000f;
+        public static readonly int AMBIENT_FILTER_MAX_TILE_PASS_COUNT = 10;
 
         // TILE OCCLUSION
         public static readonly float TILE_OCCLUSION_FACTOR = 0.08f;

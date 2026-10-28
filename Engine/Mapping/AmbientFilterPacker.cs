@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
 using Terralume.Engine.Utils;
@@ -21,10 +17,12 @@ namespace Terralume.Engine.Mapping
 
         // 2D boolean array which mirrors the on-screen tile grid, false means ambient lighting cannot reach a tile
         private static bool[,] reachableTiles;
+        private static int[,] bestTilePassCounts;
+
         private static Color[] reachablePixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
 
-        private static List<Vector2> queuedPositions = new List<Vector2>();
-        private static List<Vector2> newQueuedPositions = new List<Vector2>();
+        private static List<(Vector2, int)> queuedPositions = new List<(Vector2, int)>();
+        private static List<(Vector2, int)> newQueuedPositions = new List<(Vector2, int)>();
 
         public override void Load()
         {
@@ -58,7 +56,13 @@ namespace Terralume.Engine.Mapping
             SetQueuedPositions(onScreenLights, tileCaptureParameter);
 
             Tile[,] tiles = TileHelper.CopyTileMap(minTile, maxTile);
+
             reachableTiles = new bool[tiles.GetLength(0), tiles.GetLength(1)];
+            bestTilePassCounts = new int[tiles.GetLength(0), tiles.GetLength(1)];
+
+            // Initialize all values to int.maxValue
+            Span<int> flatSpan = MemoryMarshal.CreateSpan(ref bestTilePassCounts[0, 0], bestTilePassCounts.Length);
+            flatSpan.Fill(int.MaxValue);
 
             while (queuedPositions.Count > 0)
             {
@@ -93,13 +97,13 @@ namespace Terralume.Engine.Mapping
             int playerY = (int)MathF.Floor(playerWorldPos.Y / 16f) - (int)tileCaptureParameter.MinTile.Y;
 
             Vector2 playerPos = new Vector2(playerX, playerY);
-            queuedPositions.Add(playerPos);
+            queuedPositions.Add((playerPos, 0));
 
             // Add lights
             foreach ((Vector2 position, LightProfile lightProfile) in onScreenLights)
             {
                 // Only lights with a great enough influence can trigger ambient lighting
-                if (lightProfile.Range * lightProfile.Intensity < 200f)
+                if (lightProfile.Range * lightProfile.Intensity < RenderConstants.AMBIENT_FILTER_MIN_LIGHT_INFLUENCE)
                 {
                     continue;
                 }
@@ -109,7 +113,7 @@ namespace Terralume.Engine.Mapping
                 int x = (int)MathF.Floor(worldPosition.X / 16f) - (int)tileCaptureParameter.MinTile.X;
                 int y = (int)MathF.Floor(worldPosition.Y / 16f) - (int)tileCaptureParameter.MinTile.Y;
 
-                queuedPositions.Add(new Vector2(x, y));
+                queuedPositions.Add((new Vector2(x, y), 0));
             }
         }
 
@@ -119,37 +123,53 @@ namespace Terralume.Engine.Mapping
 
             for (int i = queuedPositions.Count - 1; i >= 0; i--)
             {
-                Vector2 position = queuedPositions[i];
+                Vector2 position = queuedPositions[i].Item1;
+                int tilePassCount = queuedPositions[i].Item2;
 
                 int x = (int)position.X;
                 int y = (int)position.Y;
 
                 // If we are out of bounds of the tiles array, do not propogate further
-                bool outOfBounds = x < 0 || x >= reachableTiles.GetLength(0) || y < 0 || y >= reachableTiles.GetLength(1);
-                if (outOfBounds)
+                if (x < 0 || x >= reachableTiles.GetLength(0) || y < 0 || y >= reachableTiles.GetLength(1))
                 {
                     queuedPositions.RemoveAt(i);
                     continue;
                 }
 
-                bool alreadyReachable = reachableTiles[x, y]; // If the tile is already marked as reachable, do not propogate further
-                bool solidTile = tiles[x, y].HasTile && Main.tileSolid[tiles[x, y].TileType]; // If we reach a solid tile, do not propogate further
-
-                if (alreadyReachable || solidTile)
+                // If the tile has been visited by a closer propogator, do not propogate further
+                if (tilePassCount >= bestTilePassCounts[x, y])
                 {
                     queuedPositions.RemoveAt(i);
                     continue;
+                }
+
+                // If we reach a solid tile
+                if (tiles[x, y].HasTile && Main.tileSolid[tiles[x, y].TileType])
+                {
+                    tilePassCount++;
+
+                    // If it has passed the max amount of solid tiles, do not propogate further
+                    if (tilePassCount >= RenderConstants.AMBIENT_FILTER_MAX_TILE_PASS_COUNT)
+                    {
+                        queuedPositions.RemoveAt(i);
+                        continue;
+                    }
+                }
+                else // Reset the tile pass count when we hit air
+                {
+                    tilePassCount = 0;
                 }
 
                 // Tile is reachable
+                bestTilePassCounts[x, y] = tilePassCount;
                 reachableTiles[x, y] = true;
                 queuedPositions.RemoveAt(i);
 
                 // Propogate in a cross pattern
-                newQueuedPositions.Add(new Vector2(x + 1, y));
-                newQueuedPositions.Add(new Vector2(x - 1, y));
-                newQueuedPositions.Add(new Vector2(x, y + 1));
-                newQueuedPositions.Add(new Vector2(x, y - 1));
+                newQueuedPositions.Add((new Vector2(x + 1, y), tilePassCount));
+                newQueuedPositions.Add((new Vector2(x - 1, y), tilePassCount));
+                newQueuedPositions.Add((new Vector2(x, y + 1), tilePassCount));
+                newQueuedPositions.Add((new Vector2(x, y - 1), tilePassCount));
             }
 
             queuedPositions.AddRange(newQueuedPositions);

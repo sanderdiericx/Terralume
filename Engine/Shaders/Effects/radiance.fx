@@ -118,6 +118,18 @@ sampler SunOcclusionSampler = sampler_state
     AddressV = Clamp;
 };
 
+Texture2D AmbientFilterBuffer;
+
+sampler AmbientFilterSampler = sampler_state
+{
+	Texture = (AmbientFilterBuffer);
+	MinFilter = Point;
+	MagFilter = Point;
+	MipFilter = Point;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
 Texture2D LightPositionTexture;
 
 sampler LightPositionSampler = sampler_state
@@ -267,7 +279,7 @@ Output PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     color += CalculateDirectionalLight(SunDirection, lightPositionZ, pixelZ, SunLightColor, albedo, material, normal, viewDir) * tex2Dlod(SunOcclusionSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
     
-    color += CalculateAmbientLight(albedo, material, normal, viewDir);
+	color += CalculateAmbientLight(albedo, material, normal, viewDir) * tex2Dlod(AmbientFilterSampler, float4(uv.x, uv.y, 0.0, 0.0)).r;
     
     color *= Occlusion(sdf);
     
