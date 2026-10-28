@@ -72,18 +72,6 @@ sampler ReflectionSampler = sampler_state
     AddressV = Clamp;
 };
 
-Texture2D VolumetricBuffer;
-
-sampler VolumetricSampler = sampler_state
-{
-    Texture = (VolumetricBuffer);
-    MinFilter = Point;
-    MagFilter = Point;
-    MipFilter = Point;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
 Texture2D PlayerAmbientOcclusionBuffer;
 
 sampler PlayerAmbientOcclusionSampler = sampler_state
@@ -113,9 +101,8 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     float playerAO = 1.0 - saturate(tex2D(PlayerAmbientOcclusionSampler, uv).r);
     float4 radiance = tex2D(RadianceSampler, uv);
     float4 reflection = tex2D(ReflectionSampler, uv);
-    float4 volumetric = tex2D(VolumetricSampler, uv);
     
-    float3 color = radiance.rgb + reflection.rgb + (tex2D(BloomSampler, uv).rgb * BloomIntensity) + volumetric.rgb;
+    float3 color = radiance.rgb + reflection.rgb + (tex2D(BloomSampler, uv).rgb * BloomIntensity);
   
     color *= ao * playerAO;
     

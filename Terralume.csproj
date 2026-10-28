@@ -9,11 +9,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <AdditionalFiles Remove="Engine\Shaders\Effects\gaussian.fx" />
-	  <AdditionalFiles Remove="Engine\Shaders\Effects\volumetric_light.fx" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Include="Engine\Shaders\Effects\gaussian.fx" />
-	  <Compile Include="Engine\Shaders\Effects\volumetric_light.fx" />
 	</ItemGroup>
 	
 	<!-- References -->

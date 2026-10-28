@@ -23,7 +23,6 @@
         SDFCombineReflection,
         Reflection,
         SunOcclusion,
-        VolumetricLight,
         PlayerAmbientOcclusion
     }
 }

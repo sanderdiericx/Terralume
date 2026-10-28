@@ -6,7 +6,6 @@ namespace Terralume.Engine.Buffers
 {
     internal class OutputCollection : IDisposable
     {
-        public RenderTarget2D VolumetricLightBuffer { get; private set; }
         public RenderTarget2D RadianceBuffer { get; private set; }
         public RenderTarget2D OutputBuffer { get; private set; }
         public RenderTarget2D BloomBuffer { get; private set; }
@@ -17,7 +16,6 @@ namespace Terralume.Engine.Buffers
 
         public OutputCollection(GraphicsDevice graphicsDevice, int width, int height)
         {
-            VolumetricLightBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             RadianceBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
             OutputBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None);
             BloomBuffer = new RenderTarget2D(graphicsDevice, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
@@ -34,7 +32,6 @@ namespace Terralume.Engine.Buffers
 
         public void Dispose()
         {
-            VolumetricLightBuffer.Dispose();
             RadianceBuffer.Dispose();
             OutputBuffer.Dispose();
             BloomBuffer.Dispose();

@@ -14,40 +14,6 @@ namespace Terralume.Engine.Render
 {
     internal static class OutputRenderer
     {
-        // Computes a volumetric lighting lighting buffer for the surface directional light
-        // Note: Must be produced before the radiance and bloom buffer
-        public static void RenderVolumetricLightBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter)
-        {
-            GraphicsDevice device = Main.graphics.GraphicsDevice;
-            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
-
-            device.SetRenderTarget(outputCollection.VolumetricLightBuffer);
-            device.Clear(Color.Transparent);
-
-            Effect effect = EffectManager.GetEffect(EffectType.VolumetricLight);
-
-            float stepSize = 1f / RenderConstants.DL_MAX_STEP_COUNT;
-
-            effect.Parameters["MaxStepCount"].SetValue(RenderConstants.DL_MAX_STEP_COUNT);
-            effect.Parameters["StepSize"].SetValue(new Vector2(stepSize, stepSize));
-            effect.Parameters["SunDirection"].SetValue(SunLightTracker.GetSunDirection());
-            effect.Parameters["SunColor"].SetValue(SunLightTracker.GetSunColor());
-            effect.Parameters["VolumetricIntensity"].SetValue(0.1f);
-            effect.Parameters["VolumetricAttenuationDecay"].SetValue(1.1f);
-            effect.Parameters["VolumetricAttenuationStrength"].SetValue(0.5f);
-
-            effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
-            effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
-
-            effect.Parameters["SunOcclusionBuffer"].SetValue(bufferCollection.SunOcclusionBuffer);
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
-            spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
-            spriteBatch.End();
-
-            device.SetRenderTargets(oldTargets);
-        }
-
         // Uses the composed G-Buffer to compute radiance buffer and bloom mask
         public static void RenderRadianceAndBloomBuffer(SpriteBatch spriteBatch, OutputCollection outputCollection, BufferCollection bufferCollection, LayerParameter layerParameter, TileCaptureParameter tileCaptureParameter)
         {
@@ -237,7 +203,6 @@ namespace Terralume.Engine.Render
             effect.Parameters["BloomBuffer"].SetValue(outputCollection.BloomBuffer);
             effect.Parameters["PlayerAmbientOcclusionBuffer"].SetValue(bufferCollection.PlayerAmbientOcclusionBuffer);
             effect.Parameters["ReflectionBuffer"].SetValue(outputCollection.ReflectionBuffer);
-            effect.Parameters["VolumetricBuffer"].SetValue(outputCollection.VolumetricLightBuffer);
 
             device.SamplerStates[1] = SamplerState.PointClamp;
 

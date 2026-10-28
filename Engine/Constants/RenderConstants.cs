@@ -63,11 +63,6 @@ namespace Terralume.Engine.Constants
         // AMBIENT LIGHTING
         public static readonly float AMBIENT_DIFFUSE_WEIGHT = 0.2f;
 
-        // DIRECTIONAL LIGHT VOLUMETRIC
-        public static readonly int DL_MAX_STEP_COUNT = 128;
-        public static readonly float DL_VOLUMETRIC_INTENSITY = 0.5f;
-        public static readonly float DL_VOLUMETRIC_ATTENUATION_STRENGTH = 0.4f;
-
         // LAYER CONFIGURATION
         public static readonly LayerParameter LAYER_PARAMETER = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f);
         public static readonly DepthParameter DEPTH_PARAMETER = new DepthParameter(0.1f, 0.7f, 0.5f, 0.3f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);

@@ -31,7 +31,6 @@ namespace Terralume.Engine.Pipeline
                 outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
-                EffectManager.LoadEffect(EffectType.VolumetricLight);
                 EffectManager.LoadEffect(EffectType.Downsample);
                 EffectManager.LoadEffect(EffectType.Radiance);
                 EffectManager.LoadEffect(EffectType.Output);
@@ -72,7 +71,6 @@ namespace Terralume.Engine.Pipeline
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
             LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
 
-            OutputRenderer.RenderVolumetricLightBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter);
             OutputRenderer.RenderRadianceAndBloomBuffer(deferredSpriteBatch, outputCollection, bufferCollection, layerParameter, tileCaptureParameter);
             OutputRenderer.RenderBlurredBloomBuffer(deferredSpriteBatch, outputCollection, 3);
             OutputRenderer.RenderReflectionBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
@@ -130,12 +128,6 @@ namespace Terralume.Engine.Pipeline
                     Main.NewText($"Switching to sun occlusion buffer view", Color.Green);
 
                     currentRenderTarget = bufferCollection.SunOcclusionBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D9))
-                {
-                    Main.NewText($"Switching to volumteric light buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.VolumetricLightBuffer;
                 }
                 else if (keyboardState.IsKeyDown(Keys.D0))
                 {

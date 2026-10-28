@@ -32,7 +32,6 @@ namespace Terralume.Engine.Shaders
             { EffectType.SDFCombineReflection, "sdf_combine_reflection" },
             { EffectType.Reflection, "reflection" },
             { EffectType.SunOcclusion, "sun_occlusion" },
-            { EffectType.VolumetricLight, "volumetric_light" },
             { EffectType.PlayerAmbientOcclusion, "player_ambient_occlusion" }
         };
 
