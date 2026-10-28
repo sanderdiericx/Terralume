@@ -38,7 +38,23 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
             spriteBatch.End();
 
+            // Heavy gaussian blur because the sun occlusion data is in tile-space
+            RenderTarget2D blurTarget = RenderTargetCache.RequestTarget(outputCollection.AmbientFilterBuffer.Width, outputCollection.AmbientFilterBuffer.Height, SurfaceFormat.Single);
+
+            device.SetRenderTarget(blurTarget);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(outputCollection.AmbientFilterBuffer, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            Vector2 blurSize = outputCollection.AmbientFilterBuffer.Size() / 4f;
+
+            BlurHelper.DownsampledGaussianBlur(spriteBatch, blurTarget, outputCollection.AmbientFilterBuffer, (int)blurSize.X, (int)blurSize.Y, 10f);
+
             device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(blurTarget);
         }
 
         // Uses the composed G-Buffer to compute radiance buffer and bloom mask

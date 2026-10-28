@@ -49,7 +49,7 @@ namespace Terralume.Engine.Mapping.Registry
         public static Dictionary<ushort, LightProfile> TileProfiles { get; private set; } = new Dictionary<ushort, LightProfile>
         {
             { TileID.Torches, new LightProfile(new Vector4(1.00f, 0.95f, 0.80f, 1f), 3.5f, 300f) },
-            { TileID.Furnaces, new LightProfile(new Vector4(1.00f, 0.60f, 0.20f, 1f), 3.5f, 240f) },
+            { TileID.Furnaces, new LightProfile(new Vector4(1.00f, 0.60f, 0.20f, 1f), 1.5f, 240f) },
             { TileID.Platforms, new LightProfile(new Vector4(1.00f, 1.00f, 1.00f, 1f), 0.1f, 1f) },
             { TileID.Saplings, new LightProfile(new Vector4(0.50f, 0.80f, 0.50f, 1f), 1.5f, 60f) },
             { TileID.Demonite, new LightProfile(new Vector4(0.45f, 0.22f, 0.90f, 1f), 5.0f, 100f) },
@@ -67,8 +67,8 @@ namespace Terralume.Engine.Mapping.Registry
             { TileID.MushroomGrass, new LightProfile(new Vector4(0.20f, 0.40f, 1.00f, 1f), 2.0f, 80f) },
             { TileID.MushroomPlants, new LightProfile(new Vector4(0.20f, 0.40f, 1.00f, 1f), 1.8f, 70f) },
             { TileID.MushroomTrees, new LightProfile(new Vector4(0.20f, 0.40f, 1.00f, 1f), 3.0f, 100f) },
-            { TileID.HellstoneBrick, new LightProfile(new Vector4(1.00f, 0.40f, 0.10f, 1f), 2.0f, 80f) },
-            { TileID.Hellforge, new LightProfile(new Vector4(1.00f, 0.50f, 0.20f, 1f), 3.5f, 240f) },
+            { TileID.HellstoneBrick, new LightProfile(new Vector4(1.00f, 0.40f, 0.10f, 1f), 1.0f, 80f) },
+            { TileID.Hellforge, new LightProfile(new Vector4(1.00f, 0.50f, 0.20f, 1f), 1.5f, 240f) },
             { TileID.MatureHerbs, new LightProfile(new Vector4(0.60f, 0.80f, 0.60f, 1f), 1.2f, 50f) },
             { TileID.BloomingHerbs, new LightProfile(new Vector4(0.80f, 1.00f, 0.80f, 1f), 1.8f, 70f) },
             { TileID.Lampposts, new LightProfile(new Vector4(1.00f, 0.90f, 0.70f, 1f), 3.0f, 240f) },

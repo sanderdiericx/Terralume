@@ -87,7 +87,7 @@ namespace Terralume.Engine.Mapping.Registry
             { TileID.Plants2, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.JunglePlants2, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.ObsidianBrick, new Vector3(0.01f, 0.0f, 0.0f) },
-            { TileID.HellstoneBrick, new Vector3(0.0f, 0.0f, 0.0f) },
+            { TileID.HellstoneBrick, new Vector3(0.0f, 0.0f, 0.04f) },
             { TileID.Hellforge, new Vector3(0.3f, 0.0f, 0.0f) },
             { TileID.ClayPot, new Vector3(0.0f, 0.0f, 0.0f) },
             { TileID.Beds, new Vector3(0.0f, 0.0f, 0.0f) },

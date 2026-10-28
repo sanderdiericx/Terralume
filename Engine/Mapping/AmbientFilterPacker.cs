@@ -79,7 +79,15 @@ namespace Terralume.Engine.Mapping
                 {
                     int index = y * (int)tileCaptureParameter.TileStride.X + x;
 
-                    reachablePixels[index] = reachableTiles[x, y] ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f);
+                    int tilePassCount = bestTilePassCounts[x, y];
+
+                    float halfway = RenderConstants.AMBIENT_FILTER_MAX_TILE_PASS_COUNT * 0.5f;
+                    float t = MathHelper.Clamp((tilePassCount - halfway) / halfway, 0f, 1f);
+
+                    float fade = t * t * (3f - 2f * t);
+
+                    float filter = reachableTiles[x, y] ? 1f - fade : 0f;
+                    reachablePixels[index] = new Color(filter, 0f, 0f);
                 }
             }
 
