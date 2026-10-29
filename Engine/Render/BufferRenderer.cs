@@ -497,6 +497,31 @@ namespace Terralume.Engine.Render
             RenderTargetCache.ReturnTarget(tightBlurTarget);
         }
 
+        // Blurs the underground background buffer slightly to signify distance from the camera
+        public static void BlurBackgroundBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TargetCollection targetCollection)
+        {
+            GraphicsDevice device = Main.graphics.GraphicsDevice;
+            RenderTargetBinding[] oldTargets = device.GetRenderTargets();
+
+            int width = targetCollection.Background.Width;
+            int height = targetCollection.Background.Height;
+
+            RenderTarget2D blurTarget = RenderTargetCache.RequestTarget(width, height, SurfaceFormat.Color);
+
+            device.SetRenderTarget(blurTarget);
+            device.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+            spriteBatch.Draw(targetCollection.Background, Vector2.Zero, Color.White);
+            spriteBatch.End();
+
+            BlurHelper.DownsampledGaussianBlur(spriteBatch, blurTarget, targetCollection.Background, width / 2, height / 2, RenderConstants.ABOVEGROUND_BACKGROUND_BLUR_DEVIATIONS);
+
+            device.SetRenderTargets(oldTargets);
+
+            RenderTargetCache.ReturnTarget(blurTarget);
+        }
+
         // Note: SunOcclusionTexture must be packed for this method to work properly
         public static void RenderSunOcclusionBuffer(SpriteBatch spriteBatch, BufferCollection bufferCollection, TileCaptureParameter tileCaptureParameter)
         {

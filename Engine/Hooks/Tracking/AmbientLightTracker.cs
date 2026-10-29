@@ -96,7 +96,7 @@ namespace Terralume.Engine.Hooks.Tracking
             else if (player.ZoneUnderworldHeight)
             {
                 ambientColor = new Vector3(0.90f, 0.25f, 0.10f);
-                ambientStrength = 0.75f;
+                ambientStrength = 1.2f;
             }
             else if (player.ZoneDungeon)
             {

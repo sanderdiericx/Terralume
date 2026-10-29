@@ -93,6 +93,7 @@ namespace Terralume.Engine.Pipeline
             BufferRenderer.RenderSDFBuffer(spriteBatch, bufferCollection, layerParameter);
 
             BufferRenderer.BlurUndergroundBackgroundBuffer(spriteBatch, bufferCollection, targetCollection);
+            BufferRenderer.BlurBackgroundBuffer(spriteBatch, bufferCollection, targetCollection);
 
             BufferRenderer.RenderHeightBuffer(spriteBatch, bufferCollection);
             BufferRenderer.RenderDepthBuffer(spriteBatch, bufferCollection, layerParameter, depthParameter);
