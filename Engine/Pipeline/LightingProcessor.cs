@@ -153,6 +153,9 @@ namespace Terralume.Engine.Pipeline
             deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
+
+            TextRenderer.RenderCombatText(deferredSpriteBatch, outputCollection);
+
             // Draw UI normally
             orig(self, gameTime);
         }
