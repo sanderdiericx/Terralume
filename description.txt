@@ -1,1 +1,29 @@
-Modify this file with a description of your mod.
+Terralume completely overhauls vanilla rendering to bring physically based rendering to Terraria. Materials respond to light with richer shading, reflections, and surface detail.
+
+Features include:
+- Material-based lighting: Surfaces react differently to light based on their material properties.
+- Normal mapping: Surface shading gives flat textures a more detailed, 3D appearance.
+- Reflections: Reflective surfaces reflect their surroundings.
+- Dynamic lighting: Light sources and sunlight work with the new rendering system which results in more detailed shading.
+- Bloom: Bright lights and glowing elements receive a soft glow.
+- Armor materials: Supported armor pieces respond to lighting according to their material.
+- Volumetric lighting: Lights produce atmospheric halos that interact with the environment.
+
+Terralume is still in active development. Expect bugs, visual glitches, and rough edges while exploring and playing.
+Some materials and effects may need further tuning. Bug reports and feedback are welcome and will help improve future releases.
+
+Performance
+
+A fairly capable GPU is required, as the rendering effects are more demanding than vanilla Terraria. 
+For reference, the game runs smoothly on my RTX 3060 at 1920×1200. Performance will vary depending on your hardware, resolution, and what is happening on screen.
+
+Mod Compatibility
+
+Terralume makes extensive changes to Terraria’s rendering pipeline and is likely incompatible with other mods that modify lighting or rendering.
+
+Content added by other mods, such as Calamity, requires manually defined material properties to take full advantage of Terralume’s rendering. Content without these definitions currently uses a fallback material.
+A system allowing other mods to provide their own material definitions is in development and will be available in a future update.
+
+Known Issues
+
+Terraria’s screen shader effects currently do not work correctly with Terralume enabled.
