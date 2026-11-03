@@ -65,7 +65,7 @@ namespace Terralume.Engine.Hooks.Tracking
         // Captures light profiles for tiles by scanning and binding tile ID to a mapped light profile
         private static void CaptureVisibleTileLights(TileCaptureParameter tileCaptureParameter)
         {
-            int tilePadding = RenderConstants.LIGHT_SEARCH_TILE_PADDING;
+            int tilePadding = RenderConfig.LightSearchTilePadding;
 
             int minX = (int)tileCaptureParameter.MinTile.X - tilePadding;
             int maxX = (int)tileCaptureParameter.MaxTile.X + tilePadding;
@@ -108,7 +108,7 @@ namespace Terralume.Engine.Hooks.Tracking
         // Merges lights within a given radius together, since some weapons create hundreds of lights at the same position
         private static void MergeHookedLights()
         {
-            float mergeRadius = RenderConstants.LIGHT_MERGE_RADIUS;
+            float mergeRadius = RenderConfig.LightMergeRadius;
 
             mergedLights.Clear();
 
@@ -177,7 +177,7 @@ namespace Terralume.Engine.Hooks.Tracking
                 float range = originalProfile.Range * zoom.X;
 
                 // Check if the light's bounding box intersects the screen
-                if (screenPos.X + range >= 0 && screenPos.X - range < RenderConstants.SCREEN_SIZE.X && screenPos.Y + range >= 0 && screenPos.Y - range < RenderConstants.SCREEN_SIZE.Y)
+                if (screenPos.X + range >= 0 && screenPos.X - range < RenderConfig.ScreenSize.X && screenPos.Y + range >= 0 && screenPos.Y - range < RenderConfig.ScreenSize.Y)
                 {
                     onScreenLights.Add((screenPos, new LightProfile(originalProfile.Color, originalProfile.Intensity, range)));
                 }

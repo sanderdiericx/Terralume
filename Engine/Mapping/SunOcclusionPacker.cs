@@ -25,7 +25,7 @@ namespace Terralume.Engine.Mapping
         };
 
         public static Texture2D SunOcclusionTexture { get; private set; }
-        private static float[] occlusionPixels = new float[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static float[] occlusionPixels = new float[RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution];
 
         public override void Load()
         {
@@ -35,7 +35,7 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                SunOcclusionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION, false, SurfaceFormat.Single);
+                SunOcclusionTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution, false, SurfaceFormat.Single);
             });
         }
 
@@ -63,8 +63,8 @@ namespace Terralume.Engine.Mapping
 
             // Grab a chunk of the main tilemap into our own 2D array, so that we can multithread the ray casts
             // Note: startPos is clamped here so the copy and the indexing below share the same origin
-            Vector2 startPos = new Vector2(Math.Clamp(minX - (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.X, 0, Main.tile.Width), Math.Clamp(minY - (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.Y, 0, Main.tile.Height));
-            Vector2 endPos = new Vector2(maxX + (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.X, maxY + (int)RenderConstants.SUN_OCCLUSION_TILEMAP_PADDING.Y);
+            Vector2 startPos = new Vector2(Math.Clamp(minX - (int)RenderConfig.SunOcclusionTilemapPadding.X, 0, Main.tile.Width), Math.Clamp(minY - (int)RenderConfig.SunOcclusionTilemapPadding.Y, 0, Main.tile.Height));
+            Vector2 endPos = new Vector2(maxX + (int)RenderConfig.SunOcclusionTilemapPadding.X, maxY + (int)RenderConfig.SunOcclusionTilemapPadding.Y);
 
             Tile[,] tiles = TileHelper.CopyTileMap(startPos, endPos);
 
@@ -109,7 +109,7 @@ namespace Terralume.Engine.Mapping
             int tilePassCount = 0;
 
             // Step through the tile grid in the direction of the sun
-            for (int i = 1; i <= RenderConstants.SUN_OCCLUSION_MAX_RAY_STEPS; i++)
+            for (int i = 1; i <= RenderConfig.SunOcclusionMaxRaySteps; i++)
             {
                 currentPos = origin + (toSun * i);
 
@@ -133,7 +133,7 @@ namespace Terralume.Engine.Mapping
                 // Ray has hit a solid, non-actuated and non-skippable tile
                 tilePassCount++;
 
-                if (tilePassCount > RenderConstants.SUN_OCCLUSION_MAX_TILE_PASSES)
+                if (tilePassCount > RenderConfig.SunOcclusionMaxTilePasses)
                 {
                     return 0f;
                 }

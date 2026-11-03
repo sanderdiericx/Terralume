@@ -10,7 +10,7 @@ namespace Terralume.Engine.Utils
     {
         public static TileCaptureParameter CalculateTileCaptureParameter()
         {
-            Vector2 screenSize = RenderConstants.SCREEN_SIZE;
+            Vector2 screenSize = RenderConfig.ScreenSize;
 
             Vector2 viewSize = screenSize;
             if (Main.GameViewMatrix != null)

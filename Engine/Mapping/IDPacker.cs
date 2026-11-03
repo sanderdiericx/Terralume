@@ -20,7 +20,7 @@ namespace Terralume.Engine.Mapping
         private static ushort[] wallIDs = new ushort[8];
         private static ushort[] liquidIDs = new ushort[8];
 
-        private static Color[] shortPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static Color[] shortPixels = new Color[RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution];
 
         public override void Load()
         {
@@ -30,9 +30,9 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                TileIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                WallIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                LiquidIDTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                TileIDTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
+                WallIDTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
+                LiquidIDTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
             });
         }
 
@@ -75,7 +75,7 @@ namespace Terralume.Engine.Mapping
         {
             int pixelCount = (shorts.Length + 1) / 2;
 
-            int safePixelCount = Math.Min(pixelCount, RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION);
+            int safePixelCount = Math.Min(pixelCount, RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution);
 
             for (int i = 0; i < safePixelCount; i++)
             {

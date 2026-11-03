@@ -28,7 +28,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
 
                 EffectManager.LoadEffect(EffectType.Downsample);
@@ -61,7 +61,7 @@ namespace Terralume.Engine.Pipeline
 
             AmbientLightTracker.GetAmbientLightProfile();
 
-            LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
+            LayerParameter layerParameter = RenderConfig.LayerParameter;
 
             TileCaptureParameter tileCaptureParameter = TileHelper.CalculateTileCaptureParameter();
 
@@ -69,7 +69,7 @@ namespace Terralume.Engine.Pipeline
             BufferCollection bufferCollection = BufferComposer.GetBufferCollection(deferredSpriteBatch, tileCaptureParameter);
 
             onScreenLights = LightTracker.GetOnScreenLights(tileCaptureParameter);
-            LightPacker.PackLightTextures(onScreenLights, RenderConstants.SCREEN_SIZE);
+            LightPacker.PackLightTextures(onScreenLights, RenderConfig.ScreenSize);
 
             AmbientFilterPacker.CalculateReachableTiles(tileCaptureParameter, onScreenLights);
             AmbientFilterPacker.PackAmbientFilterTexture(tileCaptureParameter);
@@ -150,7 +150,7 @@ namespace Terralume.Engine.Pipeline
             // END DEBUG
 
             deferredSpriteBatch.Begin();
-            deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
+            deferredSpriteBatch.Draw(outputCollection.OutputBuffer, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
             TextRenderer.RenderCombatText(deferredSpriteBatch, outputCollection);
@@ -166,7 +166,7 @@ namespace Terralume.Engine.Pipeline
             if (!outputCollection.IsValid())
             {
                 outputCollection.Dispose();
-                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                outputCollection = new OutputCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
             }
         }
     }

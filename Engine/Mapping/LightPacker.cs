@@ -25,8 +25,8 @@ namespace Terralume.Engine.Mapping
         // LightIndexTexture (light data texture index)
         public static Texture2D LightIndexTexture { get; private set; }
 
-        private static HalfVector4[] lightPositionPixels = new HalfVector4[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
-        private static Color[] lightColorPixels = new Color[RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION];
+        private static HalfVector4[] lightPositionPixels = new HalfVector4[RenderConfig.LightDataResolution * RenderConfig.LightDataResolution];
+        private static Color[] lightColorPixels = new Color[RenderConfig.LightDataResolution * RenderConfig.LightDataResolution];
 
         private static Vector4[] gridPixels;
         private static Vector4[] indexPixels;
@@ -41,13 +41,13 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                LightPositionTexture = new Texture2D(device, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.HalfVector4);
-                LightColorTexture = new Texture2D(device, RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION, false, SurfaceFormat.Color);
+                LightPositionTexture = new Texture2D(device, RenderConfig.LightDataResolution, RenderConfig.LightDataResolution, false, SurfaceFormat.HalfVector4);
+                LightColorTexture = new Texture2D(device, RenderConfig.LightDataResolution, RenderConfig.LightDataResolution, false, SurfaceFormat.Color);
 
-                int gridWidth = (int)Math.Ceiling((double)RenderConstants.SCREEN_SIZE.X / RenderConstants.LIGHT_GRID_TILE_SIZE);
-                int gridHeight = (int)Math.Ceiling((double)RenderConstants.SCREEN_SIZE.Y / RenderConstants.LIGHT_GRID_TILE_SIZE);
+                int gridWidth = (int)Math.Ceiling((double)RenderConfig.ScreenSize.X / RenderConfig.LightGridTileSize);
+                int gridHeight = (int)Math.Ceiling((double)RenderConfig.ScreenSize.Y / RenderConfig.LightGridTileSize);
 
-                int maxIndices = gridWidth * gridHeight * RenderConstants.MAX_LIGHTS_PER_TILE;
+                int maxIndices = gridWidth * gridHeight * RenderConfig.MaxLightsPerTile;
                 int indexTextureSize = (int)Math.Ceiling(Math.Sqrt(maxIndices));
                 indexTextureSize = Math.Min(indexTextureSize, 4096);
 
@@ -85,7 +85,7 @@ namespace Terralume.Engine.Mapping
                 Array.Clear(indexPixels, 0, indexPixels.Length);
             }
 
-            int lightCount = Math.Min(lightProfiles.Count, RenderConstants.LIGHT_DATA_RESOLUTION * RenderConstants.LIGHT_DATA_RESOLUTION);
+            int lightCount = Math.Min(lightProfiles.Count, RenderConfig.LightDataResolution * RenderConfig.LightDataResolution);
 
             // Pack position, range, intensity, color data
             for (int i = 0; i < lightCount; i++)
@@ -101,8 +101,8 @@ namespace Terralume.Engine.Mapping
             LightColorTexture.SetData(lightColorPixels);
 
             // Initialize grid data and index arrays based on screen size
-            int gridWidth = (int)Math.Ceiling(screenSize.X / RenderConstants.LIGHT_GRID_TILE_SIZE);
-            int gridHeight = (int)Math.Ceiling(screenSize.Y / RenderConstants.LIGHT_GRID_TILE_SIZE);
+            int gridWidth = (int)Math.Ceiling(screenSize.X / RenderConfig.LightGridTileSize);
+            int gridHeight = (int)Math.Ceiling(screenSize.Y / RenderConfig.LightGridTileSize);
             int totalTiles = gridWidth * gridHeight;
 
             if (indexPixels == null || indexPixels.Length != LightIndexTexture.Width * LightIndexTexture.Height)
@@ -134,10 +134,10 @@ namespace Terralume.Engine.Mapping
                 Vector2 screenPos = lightProfiles[i].Item1;
                 float range = lightProfiles[i].Item2.Range;
 
-                int minX = Math.Max(0, (int)((screenPos.X - range) / RenderConstants.LIGHT_GRID_TILE_SIZE));
-                int maxX = Math.Min(gridWidth - 1, (int)((screenPos.X + range) / RenderConstants.LIGHT_GRID_TILE_SIZE));
-                int minY = Math.Max(0, (int)((screenPos.Y - range) / RenderConstants.LIGHT_GRID_TILE_SIZE));
-                int maxY = Math.Min(gridHeight - 1, (int)((screenPos.Y + range) / RenderConstants.LIGHT_GRID_TILE_SIZE));
+                int minX = Math.Max(0, (int)((screenPos.X - range) / RenderConfig.LightGridTileSize));
+                int maxX = Math.Min(gridWidth - 1, (int)((screenPos.X + range) / RenderConfig.LightGridTileSize));
+                int minY = Math.Max(0, (int)((screenPos.Y - range) / RenderConfig.LightGridTileSize));
+                int maxY = Math.Min(gridHeight - 1, (int)((screenPos.Y + range) / RenderConfig.LightGridTileSize));
 
                 for (int y = minY; y <= maxY; y++)
                 {
@@ -157,7 +157,7 @@ namespace Terralume.Engine.Mapping
                 foreach (int lightIndex in tileBuckets[i])
                 {
                     // Currently only the first lights registered in GetOnScreenLights take priority, (Ordering system?)
-                    if (writtenCount >= RenderConstants.MAX_LIGHTS_PER_TILE)
+                    if (writtenCount >= RenderConfig.MaxLightsPerTile)
                     {
                         break;
                     }

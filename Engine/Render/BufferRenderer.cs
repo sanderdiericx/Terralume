@@ -61,8 +61,8 @@ namespace Terralume.Engine.Render
             Effect effect = EffectManager.GetEffect(EffectType.PlayerAmbientOcclusion);
 
             effect.Parameters["ScreenSize"].SetValue(targetCollection.Player.Size());
-            effect.Parameters["Radius"].SetValue(RenderConstants.PLAYER_AO_RADIUS * Main.GameViewMatrix.Zoom);
-            effect.Parameters["Strength"].SetValue(RenderConstants.PLAYER_AO_STRENGTH);
+            effect.Parameters["Radius"].SetValue(RenderConfig.PlayerAORadius * Main.GameViewMatrix.Zoom);
+            effect.Parameters["Strength"].SetValue(RenderConfig.PlayerAOStrength);
             effect.Parameters["PlayerTarget"].SetValue(targetCollection.Player);
 
             device.SetRenderTarget(blurTarget);
@@ -102,7 +102,7 @@ namespace Terralume.Engine.Render
             effect.Parameters["ScreenPosition"].SetValue(tileCaptureParameter.ScreenPosition);
             effect.Parameters["ViewSize"].SetValue(tileCaptureParameter.ViewSize);
 
-            effect.Parameters["DefaultNoise"].SetValue(RenderConstants.DEFAULT_NOISE);
+            effect.Parameters["DefaultNoise"].SetValue(RenderConfig.DefaultNoise);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
             spriteBatch.Draw(bufferCollection.LayerBuffer, Vector2.Zero, Color.White);
@@ -154,8 +154,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["DefaultProjectileMaterial"].SetValue(MaterialMapper.DefaultProjectileMaterial);
 
-            effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["MaterialTextureSize"].SetValue(new Vector2(RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution));
+            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution));
 
             layerParameter.SetUniforms(effect);
 
@@ -212,8 +212,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["DefaultReflection"].SetValue(ReflectionMapper.DefaultReflection);
 
-            effect.Parameters["ReflectionTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
-            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION));
+            effect.Parameters["ReflectionTextureSize"].SetValue(new Vector2(RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution));
+            effect.Parameters["TileIDTextureSize"].SetValue(new Vector2(RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution));
 
             effect.Parameters["NonSolidTileLayer"].SetValue(layerParameter.NonSolidTile);
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
@@ -263,13 +263,13 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ScreenSize"].SetValue(bufferCollection.NormalBuffer.Size());
 
-            effect.Parameters["NormalStrength"].SetValue(RenderConstants.NORMAL_STRENGTH);
+            effect.Parameters["NormalStrength"].SetValue(RenderConfig.NormalStrength);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, effect);
             spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            BlurHelper.GaussianBlur(spriteBatch, bufferCollection.NormalBuffer, RenderConstants.NORMAL_BLUR_DEVIATIONS);
+            BlurHelper.GaussianBlur(spriteBatch, bufferCollection.NormalBuffer, RenderConfig.NormalBlurDeviations);
 
             device.SetRenderTargets(oldTargets);
         }
@@ -481,8 +481,8 @@ namespace Terralume.Engine.Render
 
             Effect effect = EffectManager.GetEffect(EffectType.BackgroundBlur);
 
-            effect.Parameters["BlurStartDistance"].SetValue(RenderConstants.BACKGROUND_BLUR_START_DISTANCE);
-            effect.Parameters["BlurEndDistance"].SetValue(RenderConstants.BACKGROUND_BLUR_END_DISTANCE);
+            effect.Parameters["BlurStartDistance"].SetValue(RenderConfig.BackgroundBlurStartDistance);
+            effect.Parameters["BlurEndDistance"].SetValue(RenderConfig.BackgroundBlurEndDistance);
 
             effect.Parameters["WideBlurTarget"].SetValue(wideBlurTarget);
             effect.Parameters["TightBlurTarget"].SetValue(tightBlurTarget);
@@ -515,7 +515,7 @@ namespace Terralume.Engine.Render
             spriteBatch.Draw(targetCollection.Background, Vector2.Zero, Color.White);
             spriteBatch.End();
 
-            BlurHelper.DownsampledGaussianBlur(spriteBatch, blurTarget, targetCollection.Background, width / 2, height / 2, RenderConstants.ABOVEGROUND_BACKGROUND_BLUR_DEVIATIONS);
+            BlurHelper.DownsampledGaussianBlur(spriteBatch, blurTarget, targetCollection.Background, width / 2, height / 2, RenderConfig.AbovegroundBackgroundBlurDeviations);
 
             device.SetRenderTargets(oldTargets);
 

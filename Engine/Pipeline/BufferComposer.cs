@@ -19,7 +19,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
 
                 EffectManager.LoadEffect(EffectType.Layer);
                 EffectManager.LoadEffect(EffectType.Depth);
@@ -68,8 +68,8 @@ namespace Terralume.Engine.Pipeline
 
             TargetCollection targetCollection = TargetCapturer.GetTargetCollection();
 
-            LayerParameter layerParameter = RenderConstants.LAYER_PARAMETER;
-            DepthParameter depthParameter = RenderConstants.DEPTH_PARAMETER;
+            LayerParameter layerParameter = RenderConfig.LayerParameter;
+            DepthParameter depthParameter = RenderConfig.DepthParameter;
 
             IDPacker.UpdateStoredIDs(tileCaptureParameter);
             IDPacker.PackTileIDTexture();
@@ -117,7 +117,7 @@ namespace Terralume.Engine.Pipeline
             if (!bufferCollection.IsValid())
             {
                 bufferCollection.Dispose();
-                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                bufferCollection = new BufferCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
             }
         }
     }

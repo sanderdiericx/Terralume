@@ -19,7 +19,7 @@ namespace Terralume.Engine.Mapping
         public static Texture2D TileReflectionTexture { get; private set; }
         public static Texture2D LiquidReflectionTexture { get; private set; }
 
-        private static Color[] reflectionPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static Color[] reflectionPixels = new Color[RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution];
 
         public override void Load()
         {
@@ -29,8 +29,8 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                TileReflectionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                LiquidReflectionTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                TileReflectionTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
+                LiquidReflectionTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
             });
         }
 
@@ -76,7 +76,7 @@ namespace Terralume.Engine.Mapping
         // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID
         private static void PackReflectionTexture(Texture2D texture, Dictionary<int, Vector3> mappedMaterials)
         {
-            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
+            int maxPixels = RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution;
 
             Array.Clear(reflectionPixels, 0, reflectionPixels.Length);
 

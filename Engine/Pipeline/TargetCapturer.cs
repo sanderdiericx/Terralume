@@ -19,7 +19,7 @@ namespace Terralume.Engine.Pipeline
         {
             Main.QueueMainThreadAction(() =>
             {
-                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
                 deferredSpriteBatch = new SpriteBatch(Main.graphics.GraphicsDevice);
             });
 
@@ -134,7 +134,7 @@ namespace Terralume.Engine.Pipeline
             if (!targetCollection.IsValid())
             {
                 targetCollection.Dispose();
-                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConstants.SCREEN_SIZE.X, (int)RenderConstants.SCREEN_SIZE.Y);
+                targetCollection = new TargetCollection(Main.graphics.GraphicsDevice, (int)RenderConfig.ScreenSize.X, (int)RenderConfig.ScreenSize.Y);
             }
         }
     }

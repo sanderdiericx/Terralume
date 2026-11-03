@@ -72,8 +72,8 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ScreenSize"].SetValue(outputCollection.RadianceBuffer.Size());
 
-            effect.Parameters["DepthScale"].SetValue(RenderConstants.DEPTH_SCALE * currentZoom);
-            effect.Parameters["LightDepth"].SetValue(RenderConstants.LIGHT_DEPTH);
+            effect.Parameters["DepthScale"].SetValue(RenderConfig.DepthScale * currentZoom);
+            effect.Parameters["LightDepth"].SetValue(RenderConfig.LightDepth);
 
             effect.Parameters["BackgroundLayer"].SetValue(layerParameter.Background);
             effect.Parameters["TileLayer"].SetValue(layerParameter.Tile);
@@ -81,27 +81,27 @@ namespace Terralume.Engine.Render
             effect.Parameters["PlayerLayer"].SetValue(layerParameter.Player);
             effect.Parameters["ProjectileLayer"].SetValue(layerParameter.Projectile);
 
-            effect.Parameters["OcclusionFactor"].SetValue(RenderConstants.TILE_OCCLUSION_FACTOR / currentZoom);
+            effect.Parameters["OcclusionFactor"].SetValue(RenderConfig.TileOcclusionFactor / currentZoom);
 
             effect.Parameters["SunDirection"].SetValue(SunLightTracker.GetSunDirection());
             effect.Parameters["SunLightColor"].SetValue(SunLightTracker.GetSunColor());
 
-            effect.Parameters["VolumetricStrength"].SetValue(RenderConstants.PL_VOLUMETRIC_STRENGTH);
-            effect.Parameters["VolumetricRange"].SetValue(RenderConstants.PL_VOLUMETRIC_RANGE);
-            effect.Parameters["VolumetricNoiseContrast"].SetValue(RenderConstants.PL_VOLUMETRIC_NOISE_CONTRAST);
+            effect.Parameters["VolumetricStrength"].SetValue(RenderConfig.PointLightVolumetricStrength);
+            effect.Parameters["VolumetricRange"].SetValue(RenderConfig.PointLightVolumetricRange);
+            effect.Parameters["VolumetricNoiseContrast"].SetValue(RenderConfig.PointLightVolumetricNoiseContrast);
 
             AmbientLightProfile ambientLight = AmbientLightTracker.GetAmbientLightProfile();
 
             effect.Parameters["AmbientColor"].SetValue(ambientLight.AmbientColor);
             effect.Parameters["AmbientStrength"].SetValue(ambientLight.AmbientStrength);
-            effect.Parameters["AmbientDiffuseWeight"].SetValue(RenderConstants.AMBIENT_DIFFUSE_WEIGHT);
-            effect.Parameters["AmbientFillDirection"].SetValue(RenderConstants.AMBIENT_FILL_DIRECTION);
-            effect.Parameters["AmbientFillStrength"].SetValue(RenderConstants.AMBIENT_FILL_STRENGTH);
-            effect.Parameters["AmbientFillRoughness"].SetValue(RenderConstants.AMBIENT_FILL_ROUGHNESS);
+            effect.Parameters["AmbientDiffuseWeight"].SetValue(RenderConfig.AmbientDiffuseWeight);
+            effect.Parameters["AmbientFillDirection"].SetValue(RenderConfig.AmbientFillDirection);
+            effect.Parameters["AmbientFillStrength"].SetValue(RenderConfig.AmbientFillStrength);
+            effect.Parameters["AmbientFillRoughness"].SetValue(RenderConfig.AmbientFillRoughness);
 
-            effect.Parameters["Gamma"].SetValue(RenderConstants.GAMMA);
+            effect.Parameters["Gamma"].SetValue(RenderConfig.Gamma);
 
-            effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConstants.LIGHT_DATA_RESOLUTION, RenderConstants.LIGHT_DATA_RESOLUTION));
+            effect.Parameters["LightDataTextureSize"].SetValue(new Vector2(RenderConfig.LightDataResolution, RenderConfig.LightDataResolution));
             effect.Parameters["LightIndexTextureSize"].SetValue(new Vector2(LightPacker.LightIndexTexture.Width, LightPacker.LightIndexTexture.Height));
 
             effect.Parameters["LayerBuffer"].SetValue(bufferCollection.LayerBuffer);
@@ -224,13 +224,13 @@ namespace Terralume.Engine.Render
 
             effect.Parameters["ScreenSize"].SetValue(outputCollection.OutputBuffer.Size());
 
-            effect.Parameters["AORadius"].SetValue(RenderConstants.AO_RADIUS);
-            effect.Parameters["AOStrength"].SetValue(RenderConstants.AO_STRENGTH);
+            effect.Parameters["AORadius"].SetValue(RenderConfig.AORadius);
+            effect.Parameters["AOStrength"].SetValue(RenderConfig.AOStrength);
 
-            effect.Parameters["BloomIntensity"].SetValue(RenderConstants.BLOOM_INTENSITY);
+            effect.Parameters["BloomIntensity"].SetValue(RenderConfig.BloomIntensity);
 
-            effect.Parameters["Exposure"].SetValue(RenderConstants.TONE_MAPPING_EXPOSURE);
-            effect.Parameters["Gamma"].SetValue(RenderConstants.GAMMA);
+            effect.Parameters["Exposure"].SetValue(RenderConfig.ToneMappingExposure);
+            effect.Parameters["Gamma"].SetValue(RenderConfig.Gamma);
 
             effect.Parameters["RadianceBuffer"].SetValue(outputCollection.RadianceBuffer);
             effect.Parameters["SDFBuffer"].SetValue(bufferCollection.SDFBufferFinal);

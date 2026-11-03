@@ -23,7 +23,7 @@ namespace Terralume.Engine.Mapping
         public static Texture2D WallMaterialTexture { get; private set; }
         public static Texture2D LiquidMaterialTexture { get; private set; }
 
-        private static Color[] materialPixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static Color[] materialPixels = new Color[RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution];
 
         public override void Load()
         {
@@ -33,9 +33,9 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                TileMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                WallMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
-                LiquidMaterialTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                TileMaterialTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
+                WallMaterialTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
+                LiquidMaterialTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
             });
         }
 
@@ -96,7 +96,7 @@ namespace Terralume.Engine.Mapping
         // Encodes a dictionary (mapping ID to material vector) into a texture, the index of a pixel inside the texture refers to its ID
         private static void PackMaterialTexture(Texture2D texture, Dictionary<int, Vector3> mappedMaterials)
         {
-            int maxPixels = RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION;
+            int maxPixels = RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution;
 
             Array.Clear(materialPixels, 0, materialPixels.Length);
 

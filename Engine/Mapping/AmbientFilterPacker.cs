@@ -19,7 +19,7 @@ namespace Terralume.Engine.Mapping
         private static bool[,] reachableTiles;
         private static int[,] bestTilePassCounts;
 
-        private static Color[] reachablePixels = new Color[RenderConstants.MATERIAL_DATA_RESOLUTION * RenderConstants.MATERIAL_DATA_RESOLUTION];
+        private static Color[] reachablePixels = new Color[RenderConfig.MaterialDataResolution * RenderConfig.MaterialDataResolution];
 
         private static List<(Vector2, int)> queuedPositions = new List<(Vector2, int)>();
         private static List<(Vector2, int)> newQueuedPositions = new List<(Vector2, int)>();
@@ -32,7 +32,7 @@ namespace Terralume.Engine.Mapping
 
             Main.QueueMainThreadAction(() =>
             {
-                AmbientFilterTexture = new Texture2D(device, RenderConstants.MATERIAL_DATA_RESOLUTION, RenderConstants.MATERIAL_DATA_RESOLUTION);
+                AmbientFilterTexture = new Texture2D(device, RenderConfig.MaterialDataResolution, RenderConfig.MaterialDataResolution);
             });
         }
 
@@ -81,7 +81,7 @@ namespace Terralume.Engine.Mapping
 
                     int tilePassCount = bestTilePassCounts[x, y];
 
-                    float halfway = RenderConstants.AMBIENT_FILTER_MAX_TILE_PASS_COUNT * 0.5f;
+                    float halfway = RenderConfig.AmbientFilterMaxTilePassCount * 0.5f;
                     float t = MathHelper.Clamp((tilePassCount - halfway) / halfway, 0f, 1f);
 
                     float fade = t * t * (3f - 2f * t);
@@ -111,7 +111,7 @@ namespace Terralume.Engine.Mapping
             foreach ((Vector2 position, LightProfile lightProfile) in onScreenLights)
             {
                 // Only lights with a great enough influence can trigger ambient lighting
-                if (lightProfile.Range * lightProfile.Intensity < RenderConstants.AMBIENT_FILTER_MIN_LIGHT_INFLUENCE)
+                if (lightProfile.Range * lightProfile.Intensity < RenderConfig.AmbientFilterMinLightInfluence)
                 {
                     continue;
                 }
@@ -157,7 +157,7 @@ namespace Terralume.Engine.Mapping
                     tilePassCount++;
 
                     // If it has passed the max amount of solid tiles, do not propogate further
-                    if (tilePassCount >= RenderConstants.AMBIENT_FILTER_MAX_TILE_PASS_COUNT)
+                    if (tilePassCount >= RenderConfig.AmbientFilterMaxTilePassCount)
                     {
                         queuedPositions.RemoveAt(i);
                         continue;
