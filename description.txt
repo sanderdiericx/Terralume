@@ -12,6 +12,8 @@ Features include:
 Terralume is still in active development. Expect bugs, visual glitches, and rough edges while exploring and playing.
 Some materials and effects may need further tuning. Bug reports and feedback are welcome and will help improve future releases.
 
+Visual quality is better when zoomed in, as objects occupy more pixels on screen, allowing surface shading and material effects to stand out.
+
 Performance
 
 A fairly capable GPU is required, as the rendering effects are more demanding than vanilla Terraria. 
@@ -26,4 +28,5 @@ A system allowing other mods to provide their own material definitions is in dev
 
 Known Issues
 
-Terraria’s screen shader effects currently do not work correctly with Terralume enabled.
+- Terraria’s screen shader effects currently do not work correctly with Terralume enabled.
+- Certain underground tile clusters may visibly pop in as the camera moves.
