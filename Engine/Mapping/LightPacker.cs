@@ -105,6 +105,20 @@ namespace Terralume.Engine.Mapping
             int gridHeight = (int)Math.Ceiling(screenSize.Y / RenderConfig.LightGridTileSize);
             int totalTiles = gridWidth * gridHeight;
 
+            // GPU textures must use the same grid dimensions as the CPU data after a resize.
+            if (LightGridTexture.Width != gridWidth || LightGridTexture.Height != gridHeight)
+            {
+                LightGridTexture.Dispose();
+                LightIndexTexture.Dispose();
+
+                int maxIndices = totalTiles * RenderConfig.MaxLightsPerTile;
+                int indexTextureSize = Math.Min((int)Math.Ceiling(Math.Sqrt(maxIndices)), 4096);
+                GraphicsDevice device = Main.graphics.GraphicsDevice;
+
+                LightGridTexture = new Texture2D(device, gridWidth, gridHeight, false, SurfaceFormat.Vector4);
+                LightIndexTexture = new Texture2D(device, indexTextureSize, indexTextureSize, false, SurfaceFormat.Vector4);
+            }
+
             if (indexPixels == null || indexPixels.Length != LightIndexTexture.Width * LightIndexTexture.Height)
             {
                 indexPixels = new Vector4[LightIndexTexture.Width * LightIndexTexture.Height];
