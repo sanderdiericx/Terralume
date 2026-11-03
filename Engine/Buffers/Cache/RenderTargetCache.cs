@@ -37,8 +37,6 @@ namespace Terralume.Engine.Buffers.Cache
                 }
             }
 
-            Main.NewText($"NEW TARGET; ({width} : {height})");
-
             // No suitable target was found, create a new one
             return new RenderTarget2D(Main.graphics.GraphicsDevice, width, height, false, surfaceFormat, DepthFormat.None);
         }

@@ -366,7 +366,7 @@ namespace Terralume.Engine.Mapping.Registry
         {
             { LiquidID.Water, new Vector3(0.85f, 0.0f, 0.0f) },
             { LiquidID.Lava, new Vector3(0.0f, 0.0f, 0.0f) },
-            { LiquidID.Honey, new Vector3(0.0f, 0.0f, 0.0f) },
+            { LiquidID.Honey, new Vector3(0.3f, 0.0f, 0.0f) },
             { LiquidID.Shimmer, new Vector3(0.9f, 0.0f, 0.0f) },
         };
     }
