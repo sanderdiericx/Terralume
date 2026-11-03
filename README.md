@@ -6,6 +6,14 @@ Physically based shading requires inputs such as albedo, surface normals, materi
 
 To bridge that gap, Terralume combines captured draw layers, CPU-side world data, and procedurally generated screen-space buffers. It then uses this information to render a reconstructed version of the original frame.
 
+**Vanilla Terraria**
+
+<img width="1920" height="1080" alt="Terraria_ Now with even less Ocram! 2026-11-03 3_24_47 PM" src="https://github.com/user-attachments/assets/076f489e-c315-453b-9197-f875f26c76b3" />
+
+**Terraria with Terralume**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_19_08 PM" src="https://github.com/user-attachments/assets/fa1b858b-1e15-424f-85a0-1854ca968bab" />
+
 ## Architecture
 
 The renderer is organized into three stages: target capture, data buffer composition, and lighting. CPU-side systems track Terrarias game state and encode relevant data into textures that the GPU can sample during rendering.
@@ -38,6 +46,18 @@ The layer buffer is built by compositing the captured scene layers, this gives m
 
 Material and reflection registries supply properties for known content. Game IDs connect those definitions to tiles, walls, and liquids on screen, a separate capture path provides material information for supported player armor.
 
+**Layer Buffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_21_19 PM" src="https://github.com/user-attachments/assets/6c828e5e-66c4-4ae0-b19c-be4d3c17eca9" />
+
+**Depth Buffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_20_03 PM" src="https://github.com/user-attachments/assets/5513e73e-4871-469b-96e0-4c5a2daa0693" />
+
+**Albedo Buffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_19_32 PM" src="https://github.com/user-attachments/assets/fed3ac55-4116-4edd-bf86-8867d332d8e4" />
+
 ### 3. Lighting and composition
 
 [`LightingProcessor`](Engine/Pipeline/LightingProcessor.cs) coordinates the final rendering passes before Terraria draws its interface. It gathers point lights from the tracking system, which intercepts calls to Terrarias lighting engine, then packs the lighting data and prepares ambient filtering before running the lighting, bloom, reflection, and output passes.
@@ -54,6 +74,9 @@ Terralume derives surface normals synthetically from the rendered image rather t
 
 This allows surface detail to follow existing textures, which means that Terralume can support any texture pack. The tradeoff is these normals are only an estimate for shape: a highlight can be wrongly interpreted as a change in surface height. Normal strength is configurable to control how strongly this detail affects shading.
 
+**Normal Buffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_19_47 PM" src="https://github.com/user-attachments/assets/39db6e1d-5c52-49db-9e02-e0183378422a" />
 
 ### Encoding material data for the GPU
 
@@ -68,6 +91,10 @@ With the ID of a given pixel, I can then retrieve the material property from the
 The material buffer stores metallicity, roughness, and emission in its RGB channels. This separates material behavior from sprite color, two surfaces can use similar colors while responding differently to light.
 
 The material lookup textures are repacked when their definitions are invalidated rather than on every frame. Content without a specific definition uses fallback properties. This keeps the renderer usable with unmapped content, although materials still require manual definitions for full compatability with the renderer.
+
+**Material Buffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_20_22 PM" src="https://github.com/user-attachments/assets/175e8a3b-3b19-4c92-a300-73413e21056c" />
 
 ### Tiled dynamic lighting
 
@@ -119,6 +146,10 @@ The pass spreads through the on screen tile grid in four directions. It can cros
 The renderer packs the resulting weights into a texture, maps them to screen space, and blurs the buffer to soften tile boundaries. The radiance shader uses the buffer to mask ambient lighting independently of direct directional and point lights.
 
 Currently the visibility pass only runs on on-screen tiles, this can cause pockets to pop in/out when the player moves, the fix for this would be to add padding to the visibility search grid and then only pack the tiles on-screen.
+
+**Abient Filter Bufffer**
+
+<img width="1920" height="1080" alt="Terraria_ Also try Breath of the Wild! 2026-11-03 3_21_00 PM" src="https://github.com/user-attachments/assets/6ab87cd8-9099-4145-815c-1698ab728e74" />
 
 ## Debugging the pipeline
 
