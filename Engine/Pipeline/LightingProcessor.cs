@@ -48,6 +48,8 @@ namespace Terralume.Engine.Pipeline
             Main.QueueMainThreadAction(() =>
             {
                 outputCollection.Dispose();
+
+                EffectManager.DisposeEffects();
             });
 
             On_Main.DrawInterface -= On_Main_DrawInterface;

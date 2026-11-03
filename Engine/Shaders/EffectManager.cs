@@ -57,5 +57,17 @@ namespace Terralume.Engine.Shaders
             LoadEffect(effectType);
             return loadedEffects[effectType].Value;
         }
+
+
+        // Must be ran on the main thread
+        public static void DisposeEffects()
+        {
+            foreach (var kvp in loadedEffects)
+            {
+                kvp.Value.Value.Dispose();
+            }
+
+            loadedEffects.Clear();
+        }
     }
 }
