@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using Terralume.Engine.Buffers;
 using Terraria;
 using Terraria.GameContent;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Terralume.Engine.Render
 {

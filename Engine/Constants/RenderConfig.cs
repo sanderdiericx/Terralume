@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Terralume.Configuration;
 using Terralume.Engine.Buffers.Data;
 using Terraria;
 
@@ -79,6 +80,9 @@ namespace Terralume.Engine.Constants
 
         // ABOVE GROUND BACKGROUND
         public static float AbovegroundBackgroundBlurDeviations = 0.6f;
+
+        // DEBUG VIEW
+        public static DebugView DebugView = DebugView.Output;
 
         // LAYER CONFIGURATION
         public static LayerParameter LayerParameter = new LayerParameter(0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f);

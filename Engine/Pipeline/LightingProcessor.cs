@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using JetBrains.Annotations;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using Terralume.Configuration;
 using Terralume.Engine.Buffers;
 using Terralume.Engine.Buffers.Data;
 using Terralume.Engine.Constants;
@@ -22,8 +24,6 @@ namespace Terralume.Engine.Pipeline
 
         private List<(Vector2, LightProfile)> onScreenLights;
 
-        private RenderTarget2D currentRenderTarget;
-
         public override void Load()
         {
             Main.QueueMainThreadAction(() =>
@@ -37,8 +37,6 @@ namespace Terralume.Engine.Pipeline
             });
 
             onScreenLights = new List<(Vector2, LightProfile)>();
-
-            currentRenderTarget = Main.screenTarget;
 
             On_Main.DrawInterface += On_Main_DrawInterface;
         }
@@ -81,76 +79,10 @@ namespace Terralume.Engine.Pipeline
 
             OutputRenderer.RenderOutputBuffer(deferredSpriteBatch, outputCollection, bufferCollection, targetCollection);
 
-            // START DEBUG
-            KeyboardState keyboardState = Main.keyState;
-            if (keyboardState.IsKeyDown(Keys.LeftAlt))
-            {
-                if (keyboardState.IsKeyDown(Keys.D1))
-                {
-                    Main.NewText($"Switching to output buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.OutputBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D2))
-                {
-                    Main.NewText($"Switching to albedo buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.AlbedoBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D3))
-                {
-                    Main.NewText($"Switching to material buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.MaterialBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D4))
-                {
-                    Main.NewText($"Switching to depth buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.DepthBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D5))
-                {
-                    Main.NewText($"Switching to normal buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.NormalBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D6))
-                {
-                    Main.NewText($"Switching to layer buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.LayerBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D7))
-                {
-                    Main.NewText($"Switching to radiance buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.RadianceBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D8))
-                {
-                    Main.NewText($"Switching to sun occlusion buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.SunOcclusionBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D9))
-                {
-                    Main.NewText($"Switching to ambient filter buffer view", Color.Green);
-
-                    currentRenderTarget = outputCollection.AmbientFilterBuffer;
-                }
-                else if (keyboardState.IsKeyDown(Keys.D0))
-                {
-                    Main.NewText($"Switching to player ao buffer view", Color.Green);
-
-                    currentRenderTarget = bufferCollection.PlayerAmbientOcclusionBuffer;
-                }
-            }
-
-            // END DEBUG
+            RenderTarget2D currentRenderTarget = GetCurrentRenderTarget(outputCollection, bufferCollection);
 
             deferredSpriteBatch.Begin();
-            deferredSpriteBatch.Draw(outputCollection.OutputBuffer, Vector2.Zero, Color.White);
+            deferredSpriteBatch.Draw(currentRenderTarget, Vector2.Zero, Color.White);
             deferredSpriteBatch.End();
 
             TextRenderer.RenderCombatText(deferredSpriteBatch, outputCollection);
@@ -158,6 +90,37 @@ namespace Terralume.Engine.Pipeline
 
             // Draw UI normally
             orig(self, gameTime);
+        }
+
+        private static RenderTarget2D GetCurrentRenderTarget(OutputCollection outputCollection, BufferCollection bufferCollection)
+        {
+            DebugView debugView = RenderConfig.DebugView;
+
+            switch (debugView)
+            {
+                case DebugView.Output:
+                    return outputCollection.OutputBuffer;
+                case DebugView.Albedo:
+                    return bufferCollection.AlbedoBuffer;
+                case DebugView.Normal:
+                    return bufferCollection.NormalBuffer;
+                case DebugView.Depth:
+                    return bufferCollection.DepthBuffer;
+                case DebugView.Material:
+                    return bufferCollection.MaterialBuffer;
+                case DebugView.Layer:
+                    return bufferCollection.LayerBuffer;
+                case DebugView.Noise:
+                    return bufferCollection.NoiseBuffer;
+                case DebugView.ReflectiveMaterial:
+                    return bufferCollection.ReflectiveMaterialBuffer;
+                case DebugView.SunOcclusion:
+                    return bufferCollection.SunOcclusionBuffer;
+                case DebugView.AmbientFilter:
+                    return outputCollection.AmbientFilterBuffer;
+                default:
+                    return outputCollection.OutputBuffer;
+            }
         }
 
         // Make sure all buffers match screen size

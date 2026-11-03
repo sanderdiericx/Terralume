@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using Terralume.Engine.Constants;
-using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
@@ -20,6 +19,8 @@ namespace Terralume.Configuration
         [Range(1.5f, 2.5f), DefaultValue(1.9f)] public float Gamma = 1.9f;
 
         [DefaultValue(true)] public bool RenderArmorMaterials = true;
+
+        [DefaultValue(DebugView.Output)] public DebugView DebugView = DebugView.Output;
 
         public override void OnChanged()
         {
@@ -43,6 +44,7 @@ namespace Terralume.Configuration
             RenderConfig.ToneMappingExposure = config.Exposure;
             RenderConfig.Gamma = config.Gamma;
             RenderConfig.RenderArmorMaterials = config.RenderArmorMaterials;
+            RenderConfig.DebugView = config.DebugView;
         }
     }
 }

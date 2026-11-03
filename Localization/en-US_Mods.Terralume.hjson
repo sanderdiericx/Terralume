@@ -31,5 +31,64 @@ Configs: {
 			Label: Render Armor Materials
 			Tooltip: ""
 		}
+
+		DebugView: {
+			Label: Debug View
+			Tooltip: ""
+		}
+	}
+
+	DebugView: {
+		Tooltip: ""
+
+		Output: {
+			Label: Output
+			Tooltip: ""
+		}
+
+		Albedo: {
+			Label: Albedo
+			Tooltip: ""
+		}
+
+		Normal: {
+			Label: Normal
+			Tooltip: ""
+		}
+
+		Depth: {
+			Label: Depth
+			Tooltip: ""
+		}
+
+		Material: {
+			Label: Material
+			Tooltip: ""
+		}
+
+		Layer: {
+			Label: Layer
+			Tooltip: ""
+		}
+
+		Noise: {
+			Label: Noise
+			Tooltip: ""
+		}
+
+		ReflectiveMaterial: {
+			Label: Reflective Material
+			Tooltip: ""
+		}
+
+		SunOcclusion: {
+			Label: Sun Occlusion
+			Tooltip: ""
+		}
+
+		AmbientFilter: {
+			Label: Ambient Filter
+			Tooltip: ""
+		}
 	}
 }
