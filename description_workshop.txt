@@ -9,6 +9,7 @@ Terralume completely overhauls vanilla rendering to bring physically based rende
 - **Bloom:** Bright lights and glowing elements receive a soft glow.
 - **Armor materials:** Supported armor pieces respond to lighting according to their material.
 - **Volumetric lighting:** Lights produce atmospheric halos that interact with the environment.
+- **Texture pack support:** Works with any texture pack.
 
 Terralume is still in active development. Expect bugs, visual glitches, and rough edges while exploring and playing.
 Some materials and effects may need further tuning. Bug reports and feedback are welcome and will help improve future releases.
