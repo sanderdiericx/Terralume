@@ -172,22 +172,25 @@ namespace Terralume.Engine.Render
             spriteBatch.End();
 
             // Stamp player materials
-            Dictionary<Vector3, List<DrawData>> drawData = PlayerMaterialTracker.DrawData;
-
-            Effect injectEffect = EffectManager.GetEffect(EffectType.MaterialInject);
-
-            foreach (var kvp in drawData)
+            if (RenderConfig.RenderArmorMaterials)
             {
-                injectEffect.Parameters["Material"].SetValue(kvp.Key);
+                Dictionary<Vector3, List<DrawData>> drawData = PlayerMaterialTracker.DrawData;
 
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, injectEffect, Main.GameViewMatrix.TransformationMatrix);
+                Effect injectEffect = EffectManager.GetEffect(EffectType.MaterialInject);
 
-                foreach (DrawData drawItem in kvp.Value)
+                foreach (var kvp in drawData)
                 {
-                    spriteBatch.Draw(drawItem.texture, drawItem.position, drawItem.sourceRect, Color.White, drawItem.rotation, drawItem.origin, drawItem.scale, drawItem.effect, 0f);
-                }
+                    injectEffect.Parameters["Material"].SetValue(kvp.Key);
 
-                spriteBatch.End();
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, injectEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                    foreach (DrawData drawItem in kvp.Value)
+                    {
+                        spriteBatch.Draw(drawItem.texture, drawItem.position, drawItem.sourceRect, Color.White, drawItem.rotation, drawItem.origin, drawItem.scale, drawItem.effect, 0f);
+                    }
+
+                    spriteBatch.End();
+                }
             }
 
             device.SetRenderTargets(oldTargets);

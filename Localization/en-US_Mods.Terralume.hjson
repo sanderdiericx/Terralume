@@ -1,1 +1,35 @@
+Configs: {
+	Config: {
+		DisplayName: Config
 
+		NormalStrength: {
+			Label: Normal Strength
+			Tooltip: ""
+		}
+
+		AmbientStrength: {
+			Label: Ambient Strength
+			Tooltip: ""
+		}
+
+		BloomIntensity: {
+			Label: Bloom Intensity
+			Tooltip: ""
+		}
+
+		Exposure: {
+			Label: Exposure
+			Tooltip: ""
+		}
+
+		Gamma: {
+			Label: Gamma
+			Tooltip: ""
+		}
+
+		RenderArmorMaterials: {
+			Label: Render Armor Materials
+			Tooltip: ""
+		}
+	}
+}
